@@ -1,0 +1,4055 @@
+{
+    "categories": [
+        {
+            "id": "1",
+            "name": "Lập trình",
+            "slug": "lap-trinh",
+            "parentId": null
+        },
+        {
+            "id": "2",
+            "name": "Lập trình web",
+            "slug": "lap-trinh-web",
+            "parentId": "1"
+        },
+        {
+            "id": "3",
+            "name": "Khoa học dữ liệu",
+            "slug": "khoa-hoc-du-lieu",
+            "parentId": "1"
+        },
+        {
+            "id": "4",
+            "name": "Lập trình di động",
+            "slug": "lap-trinh-di-dong",
+            "parentId": "1"
+        },
+        {
+            "id": "5",
+            "name": "Ngôn ngữ lập trình",
+            "slug": "ngon-ngu-lap-trinh",
+            "parentId": "1"
+        },
+        {
+            "id": "6",
+            "name": "Lập trình trò chơi",
+            "slug": "lap-trinh-tro-choi",
+            "parentId": "1"
+        },
+        {
+            "id": "7",
+            "name": "Thiết kế và phát triển cơ sở dữ liệu",
+            "slug": "thiet-ke-va-phat-trien-co-so-du-lieu",
+            "parentId": "1"
+        },
+        {
+            "id": "8",
+            "name": "Kiểm tra phần mềm",
+            "slug": "kiem-tra-phan-mem",
+            "parentId": "1"
+        },
+        {
+            "id": "9",
+            "name": "Kỹ thuật phần mềm",
+            "slug": "ky-thuat-phan-mem",
+            "parentId": "1"
+        },
+        {
+            "id": "10",
+            "name": "Công cụ phát triển phần mềm",
+            "slug": "cong-cu-phat-trien-phan-mem",
+            "parentId": "1"
+        },
+        {
+            "id": "11",
+            "name": "Lập trình lowcode",
+            "slug": "lap-trinh-lowcode",
+            "parentId": "1"
+        },
+        {
+            "id": "12",
+            "name": "Kinh doanh",
+            "slug": "kinh-doanh",
+            "parentId": null
+        },
+        {
+            "id": "13",
+            "name": "Doanh nhân",
+            "slug": "doanh-nhan",
+            "parentId": "12"
+        },
+        {
+            "id": "14",
+            "name": "Giao tiếp",
+            "slug": "giao-tiep",
+            "parentId": "12"
+        },
+        {
+            "id": "15",
+            "name": "Quản lý",
+            "slug": "Quan-ly",
+            "parentId": "12"
+        },
+        {
+            "id": "16",
+            "name": "Bán hàng",
+            "slug": "ban-hang",
+            "parentId": "12"
+        },
+        {
+            "id": "17",
+            "name": "Chiến lược kinh doanh",
+            "slug": "chien-luoc-kinh-doanh",
+            "parentId": "12"
+        },
+        {
+            "id": "18",
+            "name": "Hoạt động",
+            "slug": "hoat-dong",
+            "parentId": "12"
+        },
+        {
+            "id": "19",
+            "name": "Quản lý dự án",
+            "slug": "quan-ly-du-an",
+            "parentId": "12"
+        },
+        {
+            "id": "20",
+            "name": "Luật kinh doanh",
+            "slug": "luat-kinh-doanh",
+            "parentId": "12"
+        },
+        {
+            "id": "21",
+            "name": "Phân tích & Trí thông minh kinh doanh",
+            "slug": "phan-tich-tri-thong-minh-kinh-doanh",
+            "parentId": "12"
+        },
+        {
+            "id": "22",
+            "name": "Nhân sự",
+            "slug": "nhan-su",
+            "parentId": "12"
+        },
+        {
+            "id": "23",
+            "name": "Công nghiệp",
+            "slug": "cong-nghiep",
+            "parentId": "12"
+        },
+        {
+            "id": "24",
+            "name": "Thương mại điện tử",
+            "slug": "thuong-mai-dien-tu",
+            "parentId": "12"
+        },
+        {
+            "id": "25",
+            "name": "Phương tiện truyền thông",
+            "slug": "phuong-tien-truyen-thong",
+            "parentId": "12"
+        },
+        {
+            "id": "26",
+            "name": "Bất động sản",
+            "slug": "bat-dong-san",
+            "parentId": "12"
+        },
+        {
+            "id": "27",
+            "name": "Kinh doanh khác",
+            "slug": "kinh-doanh-khac",
+            "parentId": "12"
+        },
+        {
+            "id": "28",
+            "name": "Tài chính & Kế toán",
+            "slug": "tai-chinh-ke-toan",
+            "parentId": null
+        },
+        {
+            "id": "29",
+            "name": "Kế toán & Sổ sách kế toán",
+            "slug": "ke-toan-so-sach-ke-toan",
+            "parentId": "28"
+        },
+        {
+            "id": "30",
+            "name": "Tuân thủ",
+            "slug": "tuan-thu",
+            "parentId": "28"
+        },
+        {
+            "id": "31",
+            "name": "Tiền điện tử & blockchain",
+            "slug": "tien-dien-tu-blockchain",
+            "parentId": "28"
+        },
+        {
+            "id": "32",
+            "name": "Kinh tế",
+            "slug": "kinh-te",
+            "parentId": "28"
+        },
+        {
+            "id": "33",
+            "name": "Tài chính",
+            "slug": "tai-chinh",
+            "parentId": "28"
+        },
+        {
+            "id": "34",
+            "name": "Chứng chỉ tài chính & Chuẩn bị thi",
+            "slug": "chung-chi-tai-chinh-chuan-bi-thi",
+            "parentId": "28"
+        },
+        {
+            "id": "35",
+            "name": "Mô hình hóa và phân tích tài chính",
+            "slug": "mo-hinh-hoa-va-phan-tich-tai-chinh",
+            "parentId": "28"
+        },
+        {
+            "id": "36",
+            "name": "Đầu tư & giao dịch",
+            "slug": "dau-tu-giao-dich",
+            "parentId": "28"
+        },
+        {
+            "id": "37",
+            "name": "Công cụ quản lý tiền",
+            "slug": "cong-cu-quan-ly-tien",
+            "parentId": "28"
+        },
+        {
+            "id": "38",
+            "name": "Thuế",
+            "slug": "thue",
+            "parentId": "28"
+        },
+        {
+            "id": "39",
+            "name": "Tài chính và kế toán khác",
+            "slug": "tai-chinh-va-ke-toan-khac",
+            "parentId": "28"
+        },
+        {
+            "id": "40",
+            "name": "CNTT & phần mềm",
+            "slug": "cntt-phan-mem",
+            "parentId": null
+        },
+        {
+            "id": "41",
+            "name": "Chứng nhận CNTT",
+            "slug": "chung-nhan-cntt",
+            "parentId": "40"
+        },
+        {
+            "id": "42",
+            "name": "Mạng & Bảo mật",
+            "slug": "mang-bao-mat",
+            "parentId": "40"
+        },
+        {
+            "id": "43",
+            "name": "Phần cứng",
+            "slug": "phan-cung",
+            "parentId": "40"
+        },
+        {
+            "id": "44",
+            "name": "Hệ điều hành và máy chủ",
+            "slug": "he-dieu-hanh-va-may-chu",
+            "parentId": "40"
+        },
+        {
+            "id": "45",
+            "name": "CNTT & phần mềm khác",
+            "slug": "cntt-phan-mem-khac",
+            "parentId": "40"
+        },
+        {
+            "id": "46",
+            "name": "Năng suất văn phòng",
+            "slug": "nang-suat-van-phong",
+            "parentId": null
+        },
+        {
+            "id": "47",
+            "name": "Microsoft",
+            "slug": "microsoft",
+            "parentId": "46"
+        },
+        {
+            "id": "48",
+            "name": "Apple",
+            "slug": "apple",
+            "parentId": "46"
+        },
+        {
+            "id": "49",
+            "name": "Google",
+            "slug": "google",
+            "parentId": "46"
+        },
+        {
+            "id": "50",
+            "name": "SAP",
+            "slug": "sap",
+            "parentId": "46"
+        },
+        {
+            "id": "51",
+            "name": "Oracle",
+            "slug": "oracle",
+            "parentId": "46"
+        },
+        {
+            "id": "52",
+            "name": "Năng suất văn phòng khác",
+            "slug": "nang-suat-van-phong-khac",
+            "parentId": "46"
+        },
+        {
+            "id": "53",
+            "name": "Phát triển cá nhân",
+            "slug": "phat-trien-ca-nhan",
+            "parentId": null
+        },
+        {
+            "id": "54",
+            "name": "Chuyển đổi cá nhân",
+            "slug": "chuyen-doi-ca-nhan",
+            "parentId": "53"
+        },
+        {
+            "id": "55",
+            "name": "Năng suất cá nhân",
+            "slug": "nang-suat-ca-nhan",
+            "parentId": "53"
+        },
+        {
+            "id": "56",
+            "name": "Khả năng lãnh đạo",
+            "slug": "kha-nang-lanh-dao",
+            "parentId": "53"
+        },
+        {
+            "id": "57",
+            "name": "Lập trình nghề nghiệp",
+            "slug": "lap-trinh-nghe-nghiep",
+            "parentId": "53"
+        },
+        {
+            "id": "58",
+            "name": "Nuôi dạy con cái và các mối quan hệ",
+            "slug": "nuoi-day-con-cai-va-cac-moi-quan-he",
+            "parentId": "53"
+        },
+        {
+            "id": "59",
+            "name": "Niềm hạnh phúc",
+            "slug": "niem-hanh-phuc",
+            "parentId": "53"
+        },
+        {
+            "id": "60",
+            "name": "Thực hành bí truyền",
+            "slug": "thuc-hanh-bi-truyen",
+            "parentId": "53"
+        },
+        {
+            "id": "61",
+            "name": "Tôn giáo & Tâm linh",
+            "slug": "ton-giao-tam-linh",
+            "parentId": "53"
+        },
+        {
+            "id": "62",
+            "name": "Xây dựng thương hiệu cá nhân",
+            "slug": "xay-dung-thuong-hieu-ca-nhan",
+            "parentId": "53"
+        },
+        {
+            "id": "63",
+            "name": "Sáng tạo",
+            "slug": "sang-tao",
+            "parentId": "53"
+        },
+        {
+            "id": "64",
+            "name": "Ảnh hưởng",
+            "slug": "anh-huong",
+            "parentId": "53"
+        },
+        {
+            "id": "65",
+            "name": "Lòng tự trọng & Tự tin",
+            "slug": "long-tu-trong-tu-tin",
+            "parentId": "53"
+        },
+        {
+            "id": "66",
+            "name": "Quản lý căng thẳng",
+            "slug": "quan-ly-cang-thang",
+            "parentId": "53"
+        },
+        {
+            "id": "67",
+            "name": "Kỹ năng học tập & nghiên cứu",
+            "slug": "ky-nang-hoc-tap-nghien-cuu",
+            "parentId": "53"
+        },
+        {
+            "id": "68",
+            "name": "Động lực",
+            "slug": "dong-luc",
+            "parentId": "53"
+        },
+        {
+            "id": "69",
+            "name": "Lập trình cá nhân khác",
+            "slug": "lap-trinh-ca-nhan-khac",
+            "parentId": "53"
+        },
+        {
+            "id": "70",
+            "name": "Thiết kế",
+            "slug": "thiet-ke",
+            "parentId": null
+        },
+        {
+            "id": "71",
+            "name": "Thiết kế web",
+            "slug": "thiet-ke-web",
+            "parentId": "70"
+        },
+        {
+            "id": "72",
+            "name": "Thiết kế đồ họa & minh họa",
+            "slug": "thiet-ke-do-hoa-minh-hoa",
+            "parentId": "70"
+        },
+        {
+            "id": "73",
+            "name": "Công cụ thiết kế",
+            "slug": "cong-cu-thiet-ke",
+            "parentId": "70"
+        },
+        {
+            "id": "74",
+            "name": "Thiết kế trải nghiệm người dùng",
+            "slug": "thiet-ke-trai-nghiem-nguoi-dung",
+            "parentId": "70"
+        },
+        {
+            "id": "75",
+            "name": "Thiết kế trò chơi",
+            "slug": "thiet-ke-tro-choi",
+            "parentId": "70"
+        },
+        {
+            "id": "76",
+            "name": "3D & hoạt hình",
+            "slug": "3d-hoat-hinh",
+            "parentId": "70"
+        },
+        {
+            "id": "77",
+            "name": "Thiết kế thời trang",
+            "slug": "thiet-ke-thoi-trang",
+            "parentId": "70"
+        },
+        {
+            "id": "78",
+            "name": "Thiết kế kiến ​​trúc",
+            "slug": "thiet-ke-kien-truc",
+            "parentId": "70"
+        },
+        {
+            "id": "79",
+            "name": "Thiết kế nội thất",
+            "slug": "thiet-ke-noi-that",
+            "parentId": "70"
+        },
+        {
+            "id": "80",
+            "name": "Thiết kế khác",
+            "slug": "thiet-ke-khac",
+            "parentId": "70"
+        },
+        {
+            "id": "81",
+            "name": "Tiếp thị",
+            "slug": "tiep-thi",
+            "parentId": null
+        },
+        {
+            "id": "82",
+            "name": "Tiếp thị kỹ thuật số",
+            "slug": "tiep-thi-ky-thuat-so",
+            "parentId": "81"
+        },
+        {
+            "id": "83",
+            "name": "Tối ưu hóa công cụ tìm kiếm",
+            "slug": "toi-uu-hoa-cong-cu-tim-kiem",
+            "parentId": "81"
+        },
+        {
+            "id": "84",
+            "name": "Tiếp thị truyền thông xã hội",
+            "slug": "tiep-thi-truyen-thong-xa-hoi",
+            "parentId": "81"
+        },
+        {
+            "id": "85",
+            "name": "Thương hiệu",
+            "slug": "thuong-hieu",
+            "parentId": "81"
+        },
+        {
+            "id": "86",
+            "name": "Nguyên tắc tiếp thị cơ bản",
+            "slug": "nguyen-tac-tiep-thi-co-ban",
+            "parentId": "81"
+        },
+        {
+            "id": "87",
+            "name": "Phân tích tiếp thị & tự động hóa",
+            "slug": "phan-tich-tiep-thi-tu-dong-hoa",
+            "parentId": "81"
+        },
+        {
+            "id": "88",
+            "name": "Quan hệ công chúng",
+            "slug": "quan-he-cong-chung",
+            "parentId": "81"
+        },
+        {
+            "id": "89",
+            "name": "Quảng cáo trả tiền",
+            "slug": "quang-cao-tra-tien",
+            "parentId": "81"
+        },
+        {
+            "id": "90",
+            "name": "Video & Marketing Mobile",
+            "slug": "video-marketing-mobile",
+            "parentId": "81"
+        },
+        {
+            "id": "91",
+            "name": "Tiếp thị nội dung",
+            "slug": "tiep-thi-noi-dung",
+            "parentId": "81"
+        },
+        {
+            "id": "92",
+            "name": "Hack tăng trưởng",
+            "slug": "hack-tang-truong",
+            "parentId": "81"
+        },
+        {
+            "id": "93",
+            "name": "Tiếp thị liên kết",
+            "slug": "tiep-thi-lien-ket",
+            "parentId": "81"
+        },
+        {
+            "id": "94",
+            "name": "Tiếp thị sản phẩm",
+            "slug": "tiep-thi-san-pham",
+            "parentId": "81"
+        },
+        {
+            "id": "95",
+            "name": "Tiếp thị khác",
+            "slug": "tiep-thi-khac",
+            "parentId": "81"
+        },
+        {
+            "id": "96",
+            "name": "Lối sống",
+            "slug": "loi-song",
+            "parentId": null
+        },
+        {
+            "id": "97",
+            "name": "Nghệ thuật & Thủ công",
+            "slug": "nghe-thuat-thu-cong",
+            "parentId": "96"
+        },
+        {
+            "id": "98",
+            "name": "Vẻ đẹp & trang điểm",
+            "slug": "ve-dep-trang-diem",
+            "parentId": "96"
+        },
+        {
+            "id": "99",
+            "name": "Thực hành bí truyền",
+            "slug": "thuc-hanh-bi-truyen",
+            "parentId": "96"
+        },
+        {
+            "id": "100",
+            "name": "Thực phẩm & Đồ uống",
+            "slug": "thuc-pham-do-uong",
+            "parentId": "96"
+        },
+        {
+            "id": "101",
+            "name": "Chơi game",
+            "slug": "choi-game",
+            "parentId": "96"
+        },
+        {
+            "id": "102",
+            "name": "Cải tiến nhà & làm vườn",
+            "slug": "cai-tien-nha-lam-vuon",
+            "parentId": "96"
+        },
+        {
+            "id": "103",
+            "name": "Chăm sóc & Đào tạo thú cưng",
+            "slug": "cham-soc-dao-tao-thu-cung",
+            "parentId": "96"
+        },
+        {
+            "id": "104",
+            "name": "Du lịch",
+            "slug": "du-lich",
+            "parentId": "96"
+        },
+        {
+            "id": "105",
+            "name": "Lối sống khác",
+            "slug": "loi-song-khac",
+            "parentId": "96"
+        },
+        {
+            "id": "106",
+            "name": "Nhiếp ảnh & Video",
+            "slug": "nhiep-anh-video",
+            "parentId": null
+        },
+        {
+            "id": "107",
+            "name": "Nhiếp ảnh kỹ thuật số",
+            "slug": "nhiep-anh-ky-thuat-so",
+            "parentId": "106"
+        },
+        {
+            "id": "108",
+            "name": "Nhiếp ảnh",
+            "slug": "nhiep-anh",
+            "parentId": "106"
+        },
+        {
+            "id": "109",
+            "name": "Chụp ảnh chân dung",
+            "slug": "chup-anh-chan-dung",
+            "parentId": "106"
+        },
+        {
+            "id": "110",
+            "name": "Công cụ chụp ảnh",
+            "slug": "cong-cu-chup-anh",
+            "parentId": "106"
+        },
+        {
+            "id": "111",
+            "name": "Nhiếp ảnh thương mại",
+            "slug": "nhiep-anh-thuong-mai",
+            "parentId": "106"
+        },
+        {
+            "id": "112",
+            "name": "Thiết kế video",
+            "slug": "thiet-ke-video",
+            "parentId": "106"
+        },
+        {
+            "id": "113",
+            "name": "Nhiếp ảnh & Video khác",
+            "slug": "nhiep-anh-video-khac",
+            "parentId": "106"
+        },
+        {
+            "id": "114",
+            "name": "Sức khỏe & Thể dục",
+            "slug": "suc-khoe-the-duc",
+            "parentId": null
+        },
+        {
+            "id": "115",
+            "name": "Sự thích hợp",
+            "slug": "su-thich-hop",
+            "parentId": "114"
+        },
+        {
+            "id": "116",
+            "name": "Sức khỏe nói chung",
+            "slug": "suc-khoe-noi-chung",
+            "parentId": "114"
+        },
+        {
+            "id": "117",
+            "name": "Thể thao",
+            "slug": "the-thao",
+            "parentId": "114"
+        },
+        {
+            "id": "118",
+            "name": "Dinh dưỡng & chế độ ăn uống",
+            "slug": "dinh-duong-che-do-an-uong",
+            "parentId": "114"
+        },
+        {
+            "id": "119",
+            "name": "Yoga",
+            "slug": "yoga",
+            "parentId": "114"
+        },
+        {
+            "id": "120",
+            "name": "Sức khỏe tâm thần",
+            "slug": "suc-khoe-tam-than",
+            "parentId": "114"
+        },
+        {
+            "id": "121",
+            "name": "Võ thuật & tự vệ",
+            "slug": "vo-thuat-tu-ve",
+            "parentId": "114"
+        },
+        {
+            "id": "122",
+            "name": "An toàn & sơ cứu",
+            "slug": "an-toan-so-cuu",
+            "parentId": "114"
+        },
+        {
+            "id": "123",
+            "name": "Nhảy",
+            "slug": "nhay",
+            "parentId": "114"
+        },
+        {
+            "id": "124",
+            "name": "Thiền",
+            "slug": "thien",
+            "parentId": "114"
+        },
+        {
+            "id": "125",
+            "name": "Sức khỏe & thể lực khác",
+            "slug": "suc-khoe-the-luc-khac",
+            "parentId": "114"
+        },
+        {
+            "id": "126",
+            "name": "Âm nhạc",
+            "slug": "am-nhac",
+            "parentId": null
+        },
+        {
+            "id": "127",
+            "name": "Dụng cụ",
+            "slug": "dung-cu",
+            "parentId": "126"
+        },
+        {
+            "id": "128",
+            "name": "Sản xuất âm nhạc",
+            "slug": "san-xuat-am-nhac",
+            "parentId": "126"
+        },
+        {
+            "id": "129",
+            "name": "Nguyên tắc cơ bản âm nhạc",
+            "slug": "nguyen-tac-co-ban-am-nhac",
+            "parentId": "126"
+        },
+        {
+            "id": "130",
+            "name": "Giọng hát",
+            "slug": "giong-hat",
+            "parentId": "126"
+        },
+        {
+            "id": "131",
+            "name": "Kỹ thuật âm nhạc",
+            "slug": "ky-thuat-am-nhac",
+            "parentId": "126"
+        },
+        {
+            "id": "132",
+            "name": "Phần mềm âm nhạc",
+            "slug": "phan-mem-am-nhac",
+            "parentId": "126"
+        },
+        {
+            "id": "133",
+            "name": "Âm nhạc khác",
+            "slug": "am-nhac-khac",
+            "parentId": "126"
+        },
+        {
+            "id": "134",
+            "name": "Giảng dạy & Học thuật",
+            "slug": "giang-day-hoc-thuat",
+            "parentId": null
+        },
+        {
+            "id": "135",
+            "name": "Kỹ thuật",
+            "slug": "ky-thuat",
+            "parentId": "134"
+        },
+        {
+            "id": "136",
+            "name": "Nhân văn",
+            "slug": "nhan-van",
+            "parentId": "134"
+        },
+        {
+            "id": "137",
+            "name": "Toán học",
+            "slug": "toan-hoc",
+            "parentId": "134"
+        },
+        {
+            "id": "138",
+            "name": "Khoa học",
+            "slug": "khoa-hoc",
+            "parentId": "134"
+        },
+        {
+            "id": "139",
+            "name": "Giáo dục trực tuyến",
+            "slug": "giao-duc-truc-tuyen",
+            "parentId": "134"
+        },
+        {
+            "id": "140",
+            "name": "Khoa học xã hội",
+            "slug": "khoa-hoc-xa-hoi",
+            "parentId": "134"
+        },
+        {
+            "id": "141",
+            "name": "Học ngôn ngữ",
+            "slug": "hoc-ngon-ngu",
+            "parentId": "134"
+        },
+        {
+            "id": "142",
+            "name": "Đào tạo giáo viên",
+            "slug": "dao-tao-giao-vien",
+            "parentId": "134"
+        },
+        {
+            "id": "143",
+            "name": "Thử nghiệm chuẩn bị",
+            "slug": "thu-nghiem-chuan-bi",
+            "parentId": "134"
+        },
+        {
+            "id": "144",
+            "name": "Giảng dạy và học thuật khác",
+            "slug": "giang-day-va-hoc-thuat-khac",
+            "parentId": "134"
+        }
+    ],
+    "courses": [
+        {
+            "id": "0d1f3a9f-2d9f-464c-b851-2abb3ebea39f",
+            "name": "C++ Cơ bản dành cho người mới học lập trình",
+            "description": "Bắt đầu học lâp trình bằng ngôn ngữ C++",
+            "slug": "c-co-ban-danh-cho-nguoi-moi-hoc-lap-trinh",
+            "image": "https://img-c.udemycdn.com/course/480x270/823546_a941.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "1",
+            "rating": 4.4232545,
+            "totalRating": 661,
+            "totalStudent": 1619,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "634f9a9a-5098-4695-8e54-80a76d0430ee",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "88f81d07-9d99-4431-baec-146889c3c338",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c24b90a7-08ee-44bd-98c2-df72637a80ab",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "61a9dc2f-3c12-4a67-ac69-f59e02f5aae9",
+                            "title": "Course duration: Tổng số 10,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "c103a49c-24eb-43a4-852b-b0ec22b694cb",
+            "name": "Lập trình Hướng đối tượng với C++ cơ bản đến nâng cao",
+            "description": "Hiểu rõ phương pháp lập trình hướng đối tượng với C++",
+            "slug": "lap-trinh-huong-doi-tuong-c-co-ban-den-nang-cao",
+            "image": "https://img-c.udemycdn.com/course/480x270/552190_c48b_5.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "1",
+            "rating": 4.5910378,
+            "totalRating": 479,
+            "totalStudent": 2954,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "7da9f31f-ad5b-42b9-94ab-5f67a77c5729",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "c85f44a5-b278-4c76-aa89-9937679b7f91",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c90dd95a-30c0-4de8-b0cd-7eb175bd9101",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "406596a9-7509-4e76-a0be-0d85f35d041a",
+                            "title": "Course duration: Tổng số 12 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "b4dc1f9a-0b31-4466-9f30-fe7cf7501e30",
+            "name": "React Ultimate - React.JS Cơ Bản Từ Z Đến A Cho Beginners",
+            "description": "Hiểu và Làm Chủ React (Chỉ Học Những Thứ Cần Thiết)",
+            "slug": "hoidanit-react-basic-ultimate",
+            "image": "https://img-c.udemycdn.com/course/480x270/4467252_61d1_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "1",
+            "rating": 4.8347616,
+            "totalRating": 438,
+            "totalStudent": 1589,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "991f0b83-5056-4e63-8a7c-fe5699140b5b",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "833c8660-5334-4ead-b6bc-938ec45deb42",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "3c8b4119-6506-45c2-bf8b-d64d44132436",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "78104641-a2f5-46ab-a86b-37067194a4d7",
+                            "title": "Course duration: Tổng số 20,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "c0053a28-1bf0-4b1e-9030-2b4fe83c4f94",
+            "name": "Backend RESTFul Server với Node.JS và Express (SQL/MongoDB)",
+            "description": "Xây Dựng Backend API Từ Số 0 (From Zero to Hero)",
+            "slug": "hoidanit-backend-restful-api-from-zero",
+            "image": "https://img-c.udemycdn.com/course/480x270/4947234_f0db.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "1",
+            "rating": 4.7586303,
+            "totalRating": 315,
+            "totalStudent": 1223,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "a74db82d-a1f9-492b-8d42-0ee83ceb2809",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "444f253b-235f-4aa5-8a65-18907dcfa278",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c41de31c-9a35-4758-a847-9852dc570f10",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "b6f80622-00c5-4771-96cd-76579053e2ac",
+                            "title": "Course duration: Tổng số 36 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "d2be82cf-f72b-40fd-976a-8e084343cffa",
+            "name": "Unreal Engine 5: Blueprint Cơ Bản",
+            "description": "Học Unreal để làm game Nhập Vai chiến đấu với AI",
+            "slug": "unreal-engine-5-blueprint-co-ban",
+            "image": "https://img-c.udemycdn.com/course/480x270/5177526_1ae5_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "1",
+            "rating": 4.727096,
+            "totalRating": 221,
+            "totalStudent": 703,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "03606eb0-2306-4b57-9db6-0034f34f2806",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "6bc39e16-ca96-4ac9-9e62-71dc2b999a53",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c2b098eb-e3c2-4481-9e67-082552fbb765",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "47eed55d-aa71-477c-b5a2-c82d581cf6a4",
+                            "title": "Course duration: Tổng số 28 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "a2db3c34-8e10-4950-a497-ddf59a7989a6",
+            "name": "Business Analysis -BA  thực chiến cho người mới - Tiếng Việt",
+            "description": "Khóa học BA thực chiến cho người mới, dành cho ai muốn trở thành Business Analyst",
+            "slug": "business-analyst-ba-for-practitioners-ba-thuc-chien",
+            "image": "https://img-c.udemycdn.com/course/480x270/5751944_e20a_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "12",
+            "rating": 4.7302337,
+            "totalRating": 436,
+            "totalStudent": 2897,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "7f89efc4-a802-4d4f-a193-df01030d4b1b",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "519c2747-aa35-4f79-8315-82757dc11003",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "ad2af542-d328-4af0-9bfb-8e5f00ad62c2",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "2337442d-ffd6-43b5-abcb-00b6fb7d44e6",
+                            "title": "Course duration: Tổng số 5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "87048eaa-5ff3-4f9e-81bd-047ff056aac3",
+            "name": "AI for HR - Chinh phục AI trong Nhân sự",
+            "description": "AI trong Tuyển dụng, đánh giá, đào tạo, quản lý,... Tối ưu hiệu quả, nâng tầm doanh nghiệp!",
+            "slug": "ai-for-hr-chinh-phuc-ai-trong-nhan-su",
+            "image": "https://img-c.udemycdn.com/course/480x270/5942514_88ea_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "12",
+            "rating": 4.300331,
+            "totalRating": 344,
+            "totalStudent": 1220,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "4a6eb5c8-7aef-4202-bf49-d0ec9a6b1224",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "8cd571ba-4496-4df1-a8ff-ed70bd13b31a",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "d139c313-fbbb-47d2-965c-6c4a7cc08b59",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "9335801f-b01e-4680-9f4d-eaad25bd59d7",
+                            "title": "Course duration: Tổng số 7 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "bffb831e-4b46-44bc-b969-abd134dab72d",
+            "name": "Agile Scrum thực chiến - Khóa học Tiếng Việt",
+            "description": "Learn Agile Scrum and Apply to work - Học và vận dụng Scrum cho công việc - Chi tiết các kỹ thuật cần có - Scrum Master",
+            "slug": "agile-scrum-for-practitioners-agile-scrum-thuc-chien",
+            "image": "https://img-c.udemycdn.com/course/480x270/5783776_99eb_5.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "12",
+            "rating": 4.712265,
+            "totalRating": 288,
+            "totalStudent": 2032,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "4c4d6a4b-0fd8-4d40-aa4a-9412f100116e",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "a5cacc59-d7dc-47aa-bfe7-c98921081a04",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "47bdcc56-361d-4920-8047-98844c9f01be",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "ae2f07e6-313d-466c-a8ef-3ebd5dc4447f",
+                            "title": "Course duration: Tổng số 7,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "d6f47b11-3b74-40a8-9a1a-77d11ccfc4d1",
+            "name": "[HR - HRM] XÂY DỰNG BỘ PHẬN NHÂN SỰ CHUYÊN NGHIỆP",
+            "description": "Thiết kế bộ phận Nhân sự hiện đại phù hợp với các doanh nghiệp Việt Nam",
+            "slug": "xay-dung-bo-phan-nhan-su-chuyen-nghiep",
+            "image": "https://img-c.udemycdn.com/course/480x270/5865962_b67c_2.jpg",
+            "price": "0.00",
+            "level": "INTERMEDIATE",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "12",
+            "rating": 4.346222,
+            "totalRating": 263,
+            "totalStudent": 1261,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "15b09373-2c3a-4bda-ac88-3224fdac6782",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "d948087b-f4bb-46c7-b4c2-05c6091fdfba",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "e16f4bc5-ff2c-4693-851b-00444cbfaad1",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "07ad06e4-5bf8-46cd-9ee7-4251e87003e3",
+                            "title": "Course duration: Tổng số 1,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "8bdf6c30-5a21-4d25-a7af-c8b935c3c56b",
+            "name": "HR Strategy - Xây dựng chiến lược Nhân sự",
+            "description": "Liên kết mục tiêu Nhân sự với chiến lược kinh doanh, giúp bạn có thể tự tin xây dựng được một chiến lược Nhân sự cụ thể",
+            "slug": "hr-strategy-xay-dung-chien-luoc-nhan-su",
+            "image": "https://img-c.udemycdn.com/course/480x270/5793344_710a_5.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "12",
+            "rating": 4.6973915,
+            "totalRating": 196,
+            "totalStudent": 666,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "61e56aa1-2cc6-41b1-8a4d-dcb425f6c497",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "c20e5be3-c663-4153-ac88-be8d4057959d",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "4c35db01-406a-47b1-9899-61d663817ee5",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "c807fd77-3132-49df-9bb0-2686c64f2482",
+                            "title": "Course duration: Tổng số 5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "3f9cd608-67a2-4c9a-9612-083a176f553b",
+            "name": "Tài chính cá nhân từ A - Z dành cho người đi làm",
+            "description": "Bí quyết quản lý tài chính cá nhân, tiết kiệm, vay nợ và đầu tư thông minh, bền vững để làm chủ tài chính.",
+            "slug": "tai-chinh-ca-nhan",
+            "image": "https://img-c.udemycdn.com/course/480x270/5506587_0490_13.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "28",
+            "rating": 4.6605477,
+            "totalRating": 168,
+            "totalStudent": 1675,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "df7ba270-8f67-4f27-97d0-48312263acb2",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "c382ceba-4965-4dc9-810b-bd3ddcc1d41c",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "73f2fd46-57f5-45ce-8162-470a95f2e04e",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "60548d9b-39ab-445a-9e39-4761361735b6",
+                            "title": "Course duration: Tổng số 4,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "230f8f75-4dcb-4632-8e54-34c9749aac11",
+            "name": "Tự do tài chính cho người dưới 30 tuổi",
+            "description": "Nền móng vững chắc về tài chính cá nhân: lên mục tiêu, phân bổ tiền hợp lý để nghỉ hưu sớm, sống thoải mái và tự do!",
+            "slug": "tu-do-tai-chinh-cho-nguoi-duoi-30-tuoi",
+            "image": "https://img-c.udemycdn.com/course/480x270/5282940_57ad_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "28",
+            "rating": 4.5786734,
+            "totalRating": 81,
+            "totalStudent": 313,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "5a9e76cb-38f7-49e9-9188-1111b0cd04a0",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "1fd249f1-7871-4469-9d8e-30824ec82ac5",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "b929ab0d-3c12-4c3c-9daf-7954ff2056e2",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "ba25e2aa-aa0b-4379-8474-b0ee6a76a251",
+                            "title": "Course duration: Tổng số 4,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "4965ff42-ada2-48f1-bf20-46591a556a5e",
+            "name": "ERP 101 for beginer course",
+            "description": "ERP knowledge for students, beginners, and companies looking to invest in or explore ERP ( SAP, Oracle, Odoo, Epicor)",
+            "slug": "erp101_beginer",
+            "image": "https://img-c.udemycdn.com/course/480x270/6367463_c41c_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "28",
+            "rating": 4.7322454,
+            "totalRating": 61,
+            "totalStudent": 1210,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "d8192988-8195-4c8b-a32e-e766d5d838bf",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "b7c3442f-a6d2-4aa3-bcd5-06dd3154436e",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "a416f659-3cf3-4a80-84af-190742234c26",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "8a76f193-64b0-42ba-852a-b62b084f4f81",
+                            "title": "Course duration: Tổng số 3,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "e2ded7af-1ef5-43c6-998a-6338a4f75b0a",
+            "name": "FRM part I exam: Quantitative Analysis",
+            "description": "Ôn luyện kỳ thi GARP FRM part I (Chứng chỉ quản trị rủi ro tài chính) - phân tích định lượng (Quantitative Analysis)",
+            "slug": "frm-quantitative-analysis",
+            "image": "https://img-c.udemycdn.com/course/480x270/1867222_bfe7_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "28",
+            "rating": 4.307755,
+            "totalRating": 50,
+            "totalStudent": 1358,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "a2d1b047-a098-428f-9695-412098049cde",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "d1e4ea51-e347-493b-9847-ba4d11a42e07",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "89fcb6e6-3589-4e1b-8243-ee3c1a70d736",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "3b3f910d-34e0-4fe4-8de7-20846bb5e15a",
+                            "title": "Course duration: Tổng số 11 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "04d8fbb5-6b5d-4a0c-aebd-66efd356d9fe",
+            "name": "Phần 1 - Luyện thi Kế toán Quản trị Mỹ US. CMA - Kỳ thi 2025",
+            "description": "Kế toán Quản trị Mỹ, US. CMA, chuyên gia tài chính, báo cáo tích hợp, tạo ra và lưu trữ giá trị doanh nghiệp, 2025",
+            "slug": "tu-hoc-ke-toan-quan-tri-my-us-cma-ky-thi-2024-phan-1",
+            "image": "https://img-c.udemycdn.com/course/480x270/5703586_7e20.jpg",
+            "price": "0.00",
+            "level": "INTERMEDIATE",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "28",
+            "rating": 4.595904,
+            "totalRating": 34,
+            "totalStudent": 265,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "969694a9-f974-4ed4-a34e-d8d0b3d741fa",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "25e7d2a1-5eb1-4ba2-bb56-553161e0dbde",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "131afd54-7259-42db-bec2-5774463a62c4",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "5952542a-b291-4f1d-8869-dac5420c4857",
+                            "title": "Course duration: Tổng số 22 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "4d1e41c2-2533-4140-8bc3-a32147aae725",
+            "name": "AWS Cloud for beginner (Vietnamese)",
+            "description": "AWS Cloud cho người mới bắt đầu (Tiếng Việt)",
+            "slug": "aws-cloud-for-beginner-vietnamese",
+            "image": "https://img-c.udemycdn.com/course/480x270/5246952_37c4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "40",
+            "rating": 4.7707086,
+            "totalRating": 948,
+            "totalStudent": 4534,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "57af3f93-b994-423e-8586-600beb42664e",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "884c57d5-3e66-41d4-8a92-12c169af076c",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "2bd9d410-43bb-4560-938e-27bf5ebf92f9",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "1bef6846-b3a2-4b3a-af39-7cda51b02661",
+                            "title": "Course duration: Tổng số 25,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "aeda320a-7fdd-4627-be86-242743c26027",
+            "name": "30 Days of Code: The Complete Python Bootcamp (Vietnamese)",
+            "description": "Chinh Phục Python Trong 30 Ngày: Từ Cơ Bản Đến Nâng Cao (Tiếng Việt)",
+            "slug": "30-days-of-code-the-complete-python-bootcamp-vietnamese",
+            "image": "https://img-c.udemycdn.com/course/480x270/6172081_088c_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "40",
+            "rating": 4.818547,
+            "totalRating": 567,
+            "totalStudent": 7993,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "5e1a669c-1cc6-4c99-b3ab-c4bb31301d9b",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "2cad95bd-61b3-4b57-9e66-3c10d2489a49",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "555c187d-f81d-4feb-b70b-4a50c8d66765",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "470805b3-6660-4b36-b0cf-571c2547e705",
+                            "title": "Course duration: Tổng số 8,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "4461e066-c675-4976-9522-fe45d955f447",
+            "name": "Javascript cho người mới bắt đầu",
+            "description": "Hỗ trợ các bạn bước đầu vào ngành lập trình một cách đơn giản và dễ hiểu nhất",
+            "slug": "javascript-cho-nguoi-moi-bat-dau-2021",
+            "image": "https://img-c.udemycdn.com/course/480x270/3812184_290c.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "40",
+            "rating": 4.6719346,
+            "totalRating": 467,
+            "totalStudent": 848,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "58de7e7b-b69c-4ee4-b068-77b1892621ab",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "d8beba07-5594-4165-8acb-d22e9c31d1b0",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "75ddb9f6-0b90-4ca9-bab9-defc2e410aba",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "4f7397e3-2332-44aa-bb05-a36e4a3d634a",
+                            "title": "Course duration: Tổng số 57 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "d022908d-ddd8-45bf-9618-9e5347c0e35d",
+            "name": "Viết ứng dụng bán hàng với Java Springboot/API và Angular",
+            "description": "Thực chiến, xây dựng ứng dụng bán hàng với Java Springboot API và Angular",
+            "slug": "viet-ung-dung-ban-hang-voi-java-springbootapi-va-angular",
+            "image": "https://img-c.udemycdn.com/course/480x270/5391834_7008_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "40",
+            "rating": 4.6446977,
+            "totalRating": 382,
+            "totalStudent": 2014,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "24407653-a9bf-4b9c-b048-e690a19797bf",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "58ab6189-880c-41b8-b81f-08e01b943cab",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "e4df78fb-caa6-4b29-a489-02d2db1f1362",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "9b71624f-36d2-49ea-a412-8d82e6c2cbed",
+                            "title": "Course duration: Tổng số 24 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "b31fb2a8-3c84-4319-a505-333aaa011b77",
+            "name": "Thành thạo Docker - Kubernetes trong 8 giờ - 2024",
+            "description": "8 giờ học hiệu quả với 9 bài tập, 45 video thực hành và 50 video bài giảng",
+            "slug": "docker-2021-study-docker-in-8-hours-vietnamese",
+            "image": "https://img-c.udemycdn.com/course/480x270/4159138_008f.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "40",
+            "rating": 4.6103005,
+            "totalRating": 306,
+            "totalStudent": 1437,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "3c665288-b66b-48b3-bc37-b9779dc009d1",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "fbfb8c7b-8f11-45b5-9439-49dd6fd6d98c",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "e1e690dd-5240-4d49-a763-f92637701687",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "5914ecd7-a557-4a87-a0a9-ba6a90ee91f4",
+                            "title": "Course duration: Tổng số 11 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "a3de3e32-617c-4fe9-a411-d0b5be9c7704",
+            "name": "Notion with Snow - Quản lý công việc khoa học",
+            "description": "Quản lý công việc, Tối ưu hóa năng suất, Notion, Productivity",
+            "slug": "notion-with-snow",
+            "image": "https://img-c.udemycdn.com/course/480x270/5941890_ff99_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "46",
+            "rating": 4.710307,
+            "totalRating": 371,
+            "totalStudent": 4643,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "c61a5ce7-7629-4101-9662-3f38a6bc3bff",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "af314b6e-44fe-4b42-9c7f-3dec01188b35",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "795fe70d-ddd1-485e-9cf9-384f207c52b9",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "6d6599e0-1497-4d6e-ab7e-b1a44fe4e7f2",
+                            "title": "Course duration: Tổng số 3,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "6a7e98f1-5deb-487d-822c-4408e1bf2924",
+            "name": "Thiết Kế Slide Powerpoint Doanh Nghiệp Và Ngân Hàng (Master)",
+            "description": "Ví dụ + Template của FPT, CMC, VNG, Viettel và 10 ngân hàng VIB, BIDV, MB, ACB, TCB, MSB, VCB, VietinBank, VPBank, OCB",
+            "slug": "slidepowerpointdesign",
+            "image": "https://img-c.udemycdn.com/course/480x270/5779176_8ccc.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "46",
+            "rating": 4.673197,
+            "totalRating": 284,
+            "totalStudent": 3212,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "bbe788ac-e8ca-4e77-8e7b-53e8480c0852",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "4d525351-ecae-47d9-bf82-cd74aa46ba5b",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "ab9c839d-e9b0-44eb-93e7-3181739c4cf9",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "90733ce0-39a5-4c01-a18f-e6e373d528d4",
+                            "title": "Course duration: Tổng số 15 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "bb79cecc-2947-438b-8117-2566a45467bc",
+            "name": "Ôn thi Chứng chỉ MOS Word 2019 - Exam MO-100 Microsoft Word",
+            "description": "Thành thạo MOS WORD 2019 từ A – Z tự tin thi đỗ Chứng chỉ MOS. Khóa học online đơn giản, hiệu quả, siêu tiết kiệm.",
+            "slug": "on-thi-chung-chi-mos-word-2019-exam-mo-100-microsoft-word",
+            "image": "https://img-c.udemycdn.com/course/480x270/5463370_b5d5.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "46",
+            "rating": 4.980121,
+            "totalRating": 195,
+            "totalStudent": 1995,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "026bf81f-67c9-480f-8c4f-04a07d505426",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "8e0e6173-714e-464d-94dc-b21cac6ca408",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "6d3e2ae4-64a8-4d9e-9597-7726abe16113",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "43bcf5b2-3b8b-4b8a-acc2-3d1180118e96",
+                            "title": "Course duration: Tổng số 5,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "04a7f9c5-c8e7-41dd-b510-d19b7cf131d8",
+            "name": "Chứng chỉ MOS Excel 2019 - Exam MO-200 Microsoft Excel",
+            "description": "Thành thạo MOS EXCEL 2019 từ A – Z tự tin thi đỗ Chứng chỉ MOS. Khóa học online đơn giản, hiệu quả, siêu tiết kiệm.",
+            "slug": "chung-chi-mos-excel-2019-exam-mo-200-microsoft-excel",
+            "image": "https://img-c.udemycdn.com/course/480x270/5536966_74ce.jpg",
+            "price": "0.00",
+            "level": "INTERMEDIATE",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "46",
+            "rating": 4.7357197,
+            "totalRating": 183,
+            "totalStudent": 2005,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "4ba0f937-f8b6-4d7d-9947-14bf47cbccac",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "d34406c4-0239-4f9b-8ca7-638dcaa0fdb4",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "3f3c3432-c858-496e-a5d6-09ef8a28378e",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "8d93ba39-248a-4241-bb08-d96be49cb356",
+                            "title": "Course duration: Tổng số 6 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "cad3ded1-0a97-4e8f-aace-6306ba565139",
+            "name": "Notion with Snow Pro - Tự động theo dõi tiến độ công việc",
+            "description": "Quản lý công việc, Tối ưu hóa năng suất, Notion, Productivity",
+            "slug": "notion-with-snow-pro",
+            "image": "https://img-c.udemycdn.com/course/480x270/5965742_89cd_2.jpg",
+            "price": "0.00",
+            "level": "INTERMEDIATE",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "46",
+            "rating": 4.845365,
+            "totalRating": 159,
+            "totalStudent": 3337,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "5bcace29-0f04-4a6c-af60-d96946fdec38",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "41a20c07-c0dc-4e3a-b49b-9e6d9f51f578",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "adf96551-52a1-41ba-a308-0e7471785be3",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "7734dfbc-5054-46d3-b702-e23250849b0f",
+                            "title": "Course duration: Tổng số 1,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "7f7fa6fd-81a5-4875-ab07-1821ada67655",
+            "name": "Nghệ Thuật Thuyết Trình Bằng Câu Chuyện",
+            "description": "Kỹ năng thuyết trình thuyết phục bằng câu chuyện",
+            "slug": "thuyet-trinh-bang-cau-chuyen-presentation-by-storytelling",
+            "image": "https://img-c.udemycdn.com/course/480x270/5943718_55f8_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "53",
+            "rating": 4.691788,
+            "totalRating": 567,
+            "totalStudent": 1713,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "def2af27-2bd3-4cf4-be3f-731189a38c20",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "f93b4f8d-6d26-40ff-a38a-edb6a40ad3ac",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "d3fa75fa-6dd0-48f9-8810-5c5f56238543",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "98c74580-efbf-4697-97c6-61fe9b7bbf9c",
+                            "title": "Course duration: Tổng số 4,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "bc4ce91e-81fc-400a-81ca-c2de68ab70a8",
+            "name": "Bí Mật Đàm Phán",
+            "description": "Làm chủ Nghệ Thuật Đàm Phán, Thấu Hiểu Đối Tác, Am tường Thuật Thao Túng Tâm Lý, 60 Nguyên Tắc Đàm Phán Đỉnh Cao.",
+            "slug": "bi-mat-dam-phan",
+            "image": "https://img-c.udemycdn.com/course/480x270/5539676_d154_10.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "53",
+            "rating": 4.720081,
+            "totalRating": 339,
+            "totalStudent": 1215,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "3cd5aaf0-4b14-4fe4-ac10-4e3ce985391d",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "172b433b-a387-4159-bb2d-f3ad0f625a02",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "a737e8f5-4e63-407e-89fb-c5c680978c24",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "7745dcb4-8a98-4a98-a778-ae90518ef351",
+                            "title": "Course duration: Tổng số 5,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "56d2f12d-95bb-4e25-8ce3-0b03ef4da419",
+            "name": "Kỹ năng đặt câu hỏi",
+            "description": "Hiểu mình, hiểu đời từ những câu hỏi sâu sắc",
+            "slug": "ky-nang-dat-cau-hoi",
+            "image": "https://img-c.udemycdn.com/course/480x270/5538248_ccee_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "53",
+            "rating": 4.7013574,
+            "totalRating": 324,
+            "totalStudent": 873,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "e2a88bfe-f199-40db-a454-f780d86d6ca6",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "2e43c960-4f73-4976-8cda-9bda1c9fd718",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "9f32a369-153b-4158-88a8-29e1b62df988",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "3977910a-6721-47dd-b948-4a2b78327fed",
+                            "title": "Course duration: Tổng số 2 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "0cd74a0e-f05f-4167-b4db-3b4540dee742",
+            "name": "Học cách học: 6 trụ cột giúp bạn học bất cứ điều gì bạn muốn",
+            "description": "Kỹ năng học tập giúp bạn học hiệu quả hơn: bởi học tập là một hành trình suốt đời, vì vậy hãy học thật thông minh ^^",
+            "slug": "hoc-cach-hoc",
+            "image": "https://img-c.udemycdn.com/course/480x270/5795912_bc22_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "53",
+            "rating": 4.447122,
+            "totalRating": 289,
+            "totalStudent": 2313,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "30a8c41d-6b6e-4e10-88e4-5d72984f1beb",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "7d8b00a9-4ea7-4851-bb99-6ed00d8766c7",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "d706d232-74e5-4c3d-bf71-ff46dd36633e",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "c599ca73-d9f7-44b9-bda4-b86c10bde8fa",
+                            "title": "Course duration: Tổng số 2 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "9827e3dc-195b-4dc1-8281-61efa50c59f1",
+            "name": "Sử Dụng Hiệu Quả Các Công Cụ AI Miễn Phí",
+            "description": "AI không chỉ dành cho các chuyên gia, dành cho tất cả mọi người. Không cần vẽ vẫn có hình, không cần quay vẫn có video.",
+            "slug": "su-dung-hieu-qua-cong-nghe-ai-mien-phi",
+            "image": "https://img-c.udemycdn.com/course/480x270/5632966_781f_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "53",
+            "rating": 4.6152496,
+            "totalRating": 283,
+            "totalStudent": 1133,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "0ad39dd5-2cf0-434a-ac87-cd84f06ae281",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "32c0f2f8-6996-420d-bcb7-f3f23fb85800",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "dfaaddea-70df-421e-a552-5442614d3fda",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "4f758acf-1af6-411c-a520-0047120956c1",
+                            "title": "Course duration: Tổng số 10,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "1f57b138-9b07-457d-afa4-7bb4ad786ecc",
+            "name": "Khóa học Figma từ căn bản đến thực chiến [2025 BIG UPDATE!]",
+            "description": "Những kiến thức nền tảng và chuyên sâu nhất về figma từ kinh nghiệm 6 năm giảng dạy",
+            "slug": "khoa-hoc-figma-can-ban-by-telos",
+            "image": "https://img-c.udemycdn.com/course/480x270/4343860_9b72_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "70",
+            "rating": 4.7891335,
+            "totalRating": 320,
+            "totalStudent": 1245,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "df04a32d-1c43-4a2d-9521-838b9341ae09",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "cf732e12-fb58-48ea-937b-3572db7453e8",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "1587b11e-29d3-44a1-8cbc-0d2e9fe44e74",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "c466e7f1-5e9b-491c-9f55-4e71fcc5edf2",
+                            "title": "Course duration: Tổng số 6 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "068c6993-3b53-4388-b5ac-a5648664ee98",
+            "name": "Figmarketing | Khoá học figma dành cho thiết kế marketing",
+            "description": "Khoá học figma để làm thiết kế phục vụ marketing giúp giảm đến gần 60% công sức và thời gian",
+            "slug": "figmarketing-khoa-hoc-figma-danh-cho-thiet-ke-marketing",
+            "image": "https://img-c.udemycdn.com/course/480x270/5636636_e8e5_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "70",
+            "rating": 4.983604,
+            "totalRating": 144,
+            "totalStudent": 824,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "79f46568-696a-42e9-b569-f214928898db",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "afa595aa-1416-4217-b604-e7eaad934433",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "642fa696-1fd4-4194-a4c1-641d66604f07",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "597402e8-9e77-4d8e-8e27-e3d703fac923",
+                            "title": "Course duration: Tổng số 2,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "a6a34841-bd72-497f-92d5-61b5ec988eda",
+            "name": "Trọn Bộ 5 Kỹ Năng Thiết Kế Adobe",
+            "description": "Một khóa học đa dạng với các phần mềm của Adobe bao gồm Photoshop, Illustrator, Indesign, Premiere Pro và Affter Effect",
+            "slug": "tron-bo-5-ky-nang-thiet-ke-adobe",
+            "image": "https://img-c.udemycdn.com/course/480x270/5499942_3a51_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "70",
+            "rating": 4.493883,
+            "totalRating": 93,
+            "totalStudent": 544,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "f2257b6f-ee42-4687-b45a-07884d8f6a8c",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "e73713ae-d64c-4285-a98b-9b35deda5d7d",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "8fcc0226-1db7-46ad-87d0-b226017cc171",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "5d10d313-25d1-417b-93c4-7f82594d1cb9",
+                            "title": "Course duration: Tổng số 12,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.209967",
+            "updatedAt": "2025-04-06T17:12:57.209967"
+        },
+        {
+            "id": "2c50be40-9320-46ae-927c-2c18afa718f7",
+            "name": "Figma Prototype Từ A-Z dành cho UI/UX Designer",
+            "description": "Khoá học về công cụ prototype đầy đủ và chi tiết nhất bằng tiếng Việt bởi TELOS Academy",
+            "slug": "figma-prototype-tu-a-z-danh-cho-uiux-designer",
+            "image": "https://img-c.udemycdn.com/course/480x270/5848310_41cf.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "70",
+            "rating": 4.680522,
+            "totalRating": 84,
+            "totalStudent": 679,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "73ddb088-5be4-48d1-92df-3bae32a15772",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "f4986b83-99aa-4cfc-927e-6589668afe86",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "62e969cf-6ced-4428-9fb0-41d67453b29b",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "b943a05f-972d-467f-aa38-f0c383cb03f5",
+                            "title": "Course duration: Tổng số 3 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "b22478f4-6a9f-4a22-971e-2ad8a511c0a6",
+            "name": "Canva 101 - Làm chủ kỹ năng thiết kế Canva cho người mới",
+            "description": "Tự tin sử dụng Canva (phiên bản 2025) thiết kế ấn phẩm, video ứng dụng vào công việc, kinh doanh hay cuộc sống cá nhân.",
+            "slug": "canva-101-cho-nguoi-moi",
+            "image": "https://img-c.udemycdn.com/course/480x270/5506036_d060_15.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "70",
+            "rating": 4.6990175,
+            "totalRating": 80,
+            "totalStudent": 2602,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "76afbafb-2855-46cd-ada5-8ce9449d215a",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "6088ce29-00d2-4ddb-9beb-0225fe557d41",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "9fd01bf6-7daf-4d3a-aabc-80d58a30f9b8",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "c89c534c-d230-4cab-9fc9-cc36aa36f645",
+                            "title": "Course duration: Tổng số 6,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "e9dc26c3-4045-4c2a-9aa2-e935f58138ee",
+            "name": "Làm VIDEO Quảng Cáo TikTok - HieuCB",
+            "description": "Tìm kiếm ý tưởng triệu view, xây dựng kịch bản chốt sale hoàn hảo, kỹ thuật quay dựng để giữ chân người xem.",
+            "slug": "tiktok-ads-video-hieucb",
+            "image": "https://img-c.udemycdn.com/course/480x270/5242390_b6ad_4.jpg",
+            "price": "0.00",
+            "level": "INTERMEDIATE",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "81",
+            "rating": 4.2075515,
+            "totalRating": 156,
+            "totalStudent": 576,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "7190e800-951d-47d4-a0b6-e6eaf5b26e2b",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "b48fa707-cd45-4f79-86b2-2ea9040c6906",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "e5972b95-18de-46f9-85a7-c5bce94a1a2c",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "2139eac7-d79d-4c4e-b46a-1fe7e969943b",
+                            "title": "Course duration: Tổng số 3,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "bad193ac-d173-47be-9eab-5caf74c41193",
+            "name": "TikTok Ads: Test Sản Phẩm và Chạy Quảng Cáo - HieuCB",
+            "description": "Test sản phẩm, Chạy quảng cáo TikTok, Tối ưu và scale quảng cáo",
+            "slug": "tiktok-ads-hieucb",
+            "image": "https://img-c.udemycdn.com/course/480x270/5652860_fb57_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "81",
+            "rating": 4.5043826,
+            "totalRating": 147,
+            "totalStudent": 2965,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "7247e576-867a-4c60-9e29-9fb1ba60d865",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "406f4563-afe5-4e7a-b082-9b6892f45968",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "ccb4b523-7e9e-4e8d-a4ce-ee55d4ed52bc",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "8531c072-87d3-4c09-9464-88139915e142",
+                            "title": "Course duration: Tổng số 2 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "58404fec-6a93-4194-ab1d-b66f74e6bd0a",
+            "name": "Khoá học ChatGPT và AI đỉnh cao",
+            "description": "Khoá học không chỉ hướng dẫn những kiến thức và kỹ năng cần thiết về ChatGPT mà còn đào tạo chi tiết cách kết hợp ChatGP",
+            "slug": "khoa-hoc-chatgpt-va-ai-dinh-cao",
+            "image": "https://img-c.udemycdn.com/course/480x270/5675046_910f_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "81",
+            "rating": 4.364088,
+            "totalRating": 138,
+            "totalStudent": 643,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "8563a104-64ee-4d7f-a574-f158a1b307a7",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "02f1b7d5-fffa-4304-bdf9-53dfbc9c8a65",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "93e475f7-fee0-45c4-885a-a2bf24e92d8e",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "dfd89ab9-60cc-4402-81c8-e0defe99b6aa",
+                            "title": "Course duration: Tổng số 9 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "a04987fc-c66c-463d-a9dc-d4083026150e",
+            "name": "Digital Marketing: Từ nền tảng đến chiến lược",
+            "description": "Case Study thực tế",
+            "slug": "digital-marketing-tu-nen-nang-en-chien-luoc",
+            "image": "https://img-c.udemycdn.com/course/480x270/5586996_7ddf.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "81",
+            "rating": 4.7008734,
+            "totalRating": 102,
+            "totalStudent": 404,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "b3f15ab8-53a3-4ade-b0cc-15125cd3f33b",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "4f9fd291-6f2a-4289-8710-74d67fa72a78",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "9227ab22-749a-44f5-a9b7-4fcd9f900a3a",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "8c93a325-8562-4015-a6f0-64d6074dfb56",
+                            "title": "Course duration: Tổng số 6,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "9bf34eb0-356d-4ef6-b44c-fbea8396103a",
+            "name": "Khoá học Google Ads 2025: Kiến thức gọn, dễ hiểu cho SMEs",
+            "description": "Khóa học Google Ads giúp bạn tạo và quản lý chiến dịch quảng cáo Google Ads đầu tiên, tiếp cận đúng khách hàng mục tiêu",
+            "slug": "google-ads-kien-thuc-nhanh-de-hieu-danh-cho-smes",
+            "image": "https://img-c.udemycdn.com/course/480x270/6206589_8e81.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "81",
+            "rating": 4.7958937,
+            "totalRating": 47,
+            "totalStudent": 276,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "ab7fb718-c7c6-437a-b04d-da8bd970c742",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "ffea0631-7398-4e9d-8ddd-666e7025399f",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "2f153b9c-0240-498b-91bf-595ec6c3bbbe",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "ea1e7e9c-75ed-4cde-aad5-c1ca57d67f44",
+                            "title": "Course duration: Tổng số 5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "c0c7bf71-31bb-4e0f-aacb-e83c0f41fe6c",
+            "name": "Basic Floral Design Course",
+            "description": "This course is instructed by An International Multiple Award-Winning Floral Designer - Rose Cao",
+            "slug": "basic-floral-design-rose-cao",
+            "image": "https://img-c.udemycdn.com/course/480x270/930818_74a2_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "96",
+            "rating": 4.6840105,
+            "totalRating": 38,
+            "totalStudent": 179,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "c673c1df-625c-4d57-a50a-3faaf257683e",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "32899ee6-70bf-4ce2-9c39-1c9a3e13a02d",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "520f7461-e4e8-4408-9891-682c624dd541",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "b3f8c3f3-2f55-4e9c-bd53-695830503211",
+                            "title": "Course duration: Tổng số 3,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "03e3fc58-6da9-4401-b9ab-12ee49f7114d",
+            "name": "Giant Eva Foam Flowers",
+            "description": "foam flowers, eva foam flowers, handmade flower, giant flowers, making flowers, diy, flower, handmade, craft",
+            "slug": "giant-eva-foam-flowers",
+            "image": "https://img-c.udemycdn.com/course/480x270/5367202_76dc_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "96",
+            "rating": 5.0,
+            "totalRating": 2,
+            "totalStudent": 6,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "f112f5ef-ab54-47f7-aafb-4248528a05d3",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "12fce0af-a429-4eaa-9e8d-fd94873450fd",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "829407c5-5372-41a7-9661-9a4907eb8ec6",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "e15c3256-8a18-4aec-be94-48c6fd99841e",
+                            "title": "Course duration: Tổng số 2,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "1923ced5-5532-4983-9f13-1a00dd88ad87",
+            "name": "Giant Art Paper Flowers",
+            "description": "paper flowers, art paper flowers, handmade flower, giant flowers, making flowers, diy, flower, handmade, craft",
+            "slug": "giant-art-paper-flowers",
+            "image": "https://img-c.udemycdn.com/course/480x270/5373758_b48e_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "96",
+            "rating": 4.0,
+            "totalRating": 1,
+            "totalStudent": 4,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "9f9d9dcf-2378-4f27-9c66-88421c1c37bb",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "6b04121f-3bcc-4f96-8543-49e261b936b0",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "cf916333-3b03-42f1-9d3f-75b949a3b6b3",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "33fd40d4-c2e8-4f63-9b72-be8236021eb5",
+                            "title": "Course duration: Tổng số 3 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "4dd07b72-acc8-4b51-9ec0-213fe5a644ce",
+            "name": "Giant Organza Flowers",
+            "description": "organza flowers, organza fabric, handmade flower, giant flowers, making flowers, diy, flower, handmade, craft",
+            "slug": "giant-organza-flowers",
+            "image": "https://img-c.udemycdn.com/course/480x270/5361550_7265_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "96",
+            "rating": 5.0,
+            "totalRating": 1,
+            "totalStudent": 11,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "7037355a-cf35-46f0-9a34-ec38cdfb0dc1",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "42001b7c-3d41-4bbf-88e8-508ddce36386",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "f7941010-05ba-4ecd-a357-82b96234547d",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "aa673730-05ef-48aa-aec9-59e52d9f3b8d",
+                            "title": "Course duration: Tổng số 6 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "28ff9f7c-4896-48c3-b703-d68e15f9615c",
+            "name": "Màu nước Cơ bản",
+            "description": "Khoá học dành cho những bạn yêu thích mỹ thuật, chưa hoặc mới bắt đầu làm quen với màu nước.",
+            "slug": "mau-nuoc-co-ban",
+            "image": "https://img-c.udemycdn.com/course/480x270/5364982_8321_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "96",
+            "rating": 0,
+            "totalRating": 0,
+            "totalStudent": 2,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "08fbbf4e-0df9-4c69-b605-d2fc89483d2d",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "099b53f8-756e-4aae-ba80-1dd54f95d521",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "d3c14049-1269-4518-b5ed-ec7a9bc2b071",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "34f0b804-95ea-4e3c-9cb5-8bf5eb6775cd",
+                            "title": "Course duration: Tổng số 4 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "9d2fb447-47fe-47c2-a426-8c99c9ad690c",
+            "name": "After Effects LoopFlow Tạo Video Loop Cực Chất Từ Ảnh Tĩnh",
+            "description": "Tạo Ra Các Video Loop Chuyển Động Tuyệt Đẹp Từ Hình Ảnh Của Bạn.",
+            "slug": "after-effects-loopflow-tao-video-loop-cuc-chat-tu-anh-tinh",
+            "image": "https://img-c.udemycdn.com/course/480x270/5501902_1f50_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "106",
+            "rating": 4.956753,
+            "totalRating": 49,
+            "totalStudent": 263,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "a79c7c0d-496d-46d2-8e84-32aca3184713",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "2bf3dc2c-d912-43c4-a905-b6435162dd88",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "873bd0ca-a257-4b81-8de8-87f2c94166eb",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "c4ae8244-c99f-4139-b368-1a4bbe261ecb",
+                            "title": "Course duration: Tổng số 18 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "a2ba1fd3-9062-48e8-b7a6-229295b4f51c",
+            "name": "Học After Effects Từ Đầu Cùng Unn Thanh",
+            "description": "After Effects zero Text, Shape, Effects, Animation, Expressions, Rotoscoping, Green Screen, Tracking, VFX Composition...",
+            "slug": "hoc-after-effects-tu-dau-cung-unn-thanh",
+            "image": "https://img-c.udemycdn.com/course/480x270/5568382_38f3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "106",
+            "rating": 4.9232073,
+            "totalRating": 41,
+            "totalStudent": 194,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "f18e6c7d-de9c-4232-b246-da7599ceecb1",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "9dd511c9-aced-431b-aea2-4d94ff90deed",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c4e0cd00-785b-40f6-bded-7cd6ebc2c0e2",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "db417988-6ea5-4b77-90b6-90cf549dad0f",
+                            "title": "Course duration: Tổng số 46 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225200",
+            "updatedAt": "2025-04-06T17:12:57.225200"
+        },
+        {
+            "id": "38aa4022-b34a-4b97-8af4-9afb46d3dcc9",
+            "name": "Làm video bằng điện thoại, xây kênh và bán hàng đa nền tảng",
+            "description": "Khóa học Làm video bằng điện thoại, xây kênh thương hiệu và làm video bán hàng, học chỉnh sửa video trên điện thoại",
+            "slug": "edit-video-bang-dien-thoai-xay-kenh-thuong-hieu-va-ban-hang",
+            "image": "https://img-c.udemycdn.com/course/480x270/6031454_f9c2_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "106",
+            "rating": 4.3737183,
+            "totalRating": 36,
+            "totalStudent": 284,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "4022ad30-b99b-41e3-ba9f-cfbe96e1928b",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "03efb56c-604e-4d37-a934-595a8acba58d",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "986be9e3-4824-47a2-a655-6028e6a99df5",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "55a509a8-65b4-4400-9f9c-a64945cc39b3",
+                            "title": "Course duration: Tổng số 2,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "73767c1e-b855-4a69-976a-4ba559bc6f48",
+            "name": "Dựng video cơ bản với Premiere Pro",
+            "description": "Learn Beginner Adobe Premiere Pro Video Editing, Audio Editing, Color Grading, Motion Graphics, Green Screen+",
+            "slug": "dung-video-co-ban-voi-premiere-pro",
+            "image": "https://img-c.udemycdn.com/course/480x270/5240152_12e6_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "106",
+            "rating": 4.7548466,
+            "totalRating": 29,
+            "totalStudent": 163,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "f159fb7e-4e60-47b8-93bf-abccb4293aa9",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "d8716f6c-aebc-48c2-bf0b-b676aadfb99a",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c4248cc0-656f-4dde-8ede-a76094fe6471",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "33ef858a-84a4-433d-8179-a14fee0c3261",
+                            "title": "Course duration: Tổng số 3 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "f1870fe0-3d1e-469e-83da-d1c8276692a1",
+            "name": "Sản xuất bài giảng điện tử E-Learning với Camtasia",
+            "description": "Cung cấp các công cụ để biên tập video, đặc biệt là các video giảng dạy.",
+            "slug": "dung-video-bai-giang-chuyen-nghiep-voi-camtasia",
+            "image": "https://img-c.udemycdn.com/course/480x270/5953730_c66d.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "106",
+            "rating": 4.66522,
+            "totalRating": 19,
+            "totalStudent": 799,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "0efff368-f1af-4463-b0a1-2026aafcb5c0",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "5114cdf1-15f1-498d-8a3b-7ef1cb075c18",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "4aeda513-75c2-4359-adb4-c1621f3712e4",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "e932c9e4-1e1c-4a69-8855-ebc4fcb96df3",
+                            "title": "Course duration: Tổng số 2 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "6c5f7089-7c83-4b9c-9b8e-442dc6afc78e",
+            "name": "Yoga cho người mới - Cân bằng cơ thể và tâm trí",
+            "description": "Tập luyện yoga an toàn, bài bản và thuận tiện cho người mới",
+            "slug": "yoga-cho-nguoi-moi",
+            "image": "https://img-c.udemycdn.com/course/480x270/5547430_0c59_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "114",
+            "rating": 4.890321,
+            "totalRating": 55,
+            "totalStudent": 244,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "dcda43da-52e6-40fd-b491-2eb19172bae9",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "c30327a1-07f1-444f-98f7-f877a4eaee4b",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "fab85043-dd8f-4026-9951-e8ab4a9a8781",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "5f37f9ea-e436-4cbd-b34c-e625e9cb19ed",
+                            "title": "Course duration: Tổng số 11 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "6df5340e-f622-49fb-89dd-9976a03caef7",
+            "name": "Yoga nâng cao - Cân bằng cơ thể và tâm trí",
+            "description": "Tập luyện yoga nâng cao: an toàn, bài bản và thuận tiện",
+            "slug": "yoga-nang-cao",
+            "image": "https://img-c.udemycdn.com/course/480x270/5609220_1cfb_2.jpg",
+            "price": "0.00",
+            "level": "INTERMEDIATE",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "114",
+            "rating": 4.920875,
+            "totalRating": 26,
+            "totalStudent": 104,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "6225214c-a697-4dcb-90ff-438df70c5f49",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "74f91179-4b76-46f1-ae88-2a0793a002c7",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "99b75b06-5610-45fd-b253-c52a02fc18a7",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "97484445-f30d-4c19-9990-eeac5520636d",
+                            "title": "Course duration: Tổng số 13,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "4abf2139-9f9f-49d6-b843-a28d746246fa",
+            "name": "Nhập môn Tâm lý học cơ bản - Psychology Fundamental 101",
+            "description": "Giúp bạn bắt đầu hành trình tìm hiểu về Tâm lý học, Hiểu mình thương người, Chữa lành bản thân và làm chủ cảm xúc",
+            "slug": "nhap-mon-tam-ly-hoc-co-ban-psychology-fundamental-101",
+            "image": "https://img-c.udemycdn.com/course/480x270/6532395_4a78.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "114",
+            "rating": 4.0794535,
+            "totalRating": 21,
+            "totalStudent": 804,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "6a13e647-6a6c-45eb-9e09-658e08334b2a",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "cd2f39cd-3a54-4f16-9f02-7a1a7a9859bc",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "9370039c-f29f-4593-a005-e2bb7d10e846",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "505aa739-5966-45a8-9d8f-ac49c3d7d2b0",
+                            "title": "Course duration: Tổng số 1 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "f07c49e9-baab-4784-b8eb-9b1ada45aa19",
+            "name": "20 phút yoga dành cho người bận rộn",
+            "description": "Yoga thật dễ dàng và hiệu quả",
+            "slug": "20-phut-yoga",
+            "image": "https://img-c.udemycdn.com/course/480x270/5574224_b760_9.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "114",
+            "rating": 4.8210626,
+            "totalRating": 17,
+            "totalStudent": 69,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "6ac58e8d-b229-4e58-9b67-96f2f9a0ce67",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "2fffba6d-bdd5-4d4f-b072-f1e1fcea6ec8",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "96d98791-c850-45c4-8b82-6d5f838b43a9",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "5884557e-dac8-439b-be08-1a05400f2b71",
+                            "title": "Course duration: Tổng số 3,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "8aec346b-d9e4-484e-a0c2-a490b342c16e",
+            "name": "14 tư thế yoga cổ điển",
+            "description": "Dành cho yogi thành thục",
+            "slug": "14-tu-the-yoga-co-ien",
+            "image": "https://img-c.udemycdn.com/course/480x270/5638126_eaa7_2.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "114",
+            "rating": 4.6711836,
+            "totalRating": 15,
+            "totalStudent": 58,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "bbf3e802-c019-4fa2-badd-1f80fee87716",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "f0f11a64-04b2-403f-ac9b-cb6852349abd",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "c9d418ec-5fe9-49dd-a671-1b5c506bb10c",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "c4cd04e5-74e6-4a71-a6b2-969b832b1d35",
+                            "title": "Course duration: Tổng số 2,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "df738028-e4ed-4792-947e-f616133ceafd",
+            "name": "Guitar nền tảng cho người mới bắt đầu (100 bài học)",
+            "description": "Khoá học Guitar dành cho người muốn nâng cao khả năng chơi nhạc, người mới bắt đầu và người tự học",
+            "slug": "guitar-foundation-for-beginners-to-intermediate-3-courses-in-1",
+            "image": "https://img-c.udemycdn.com/course/480x270/2723894_4ce8_3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "126",
+            "rating": 4.8528805,
+            "totalRating": 38,
+            "totalStudent": 248,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "b75f8c08-27be-49c8-be94-d1a28c9e66d5",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "d8c4362d-f513-4e7a-a4c3-e0fba400ff2e",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "3e3684ea-ccef-4c01-b760-b73f82a8d993",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "2308d3de-05fe-41a9-b21e-899ef46c5042",
+                            "title": "Course duration: Tổng số 6,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "2e917695-5ad8-4a2a-8e28-c56b96237ed7",
+            "name": "Pianoforall - Incredible New Way To Learn Piano & Keyboard",
+            "description": "Learn Piano in WEEKS not years. Play-By-Ear & learn to Read Music. Pop, Blues, Jazz, Ballads, Improvisation, Classical",
+            "slug": "pianoforall-incredible-new-way-to-learn-piano-keyboard",
+            "image": "https://img-c.udemycdn.com/course/480x270/238934_4d81_7.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "126",
+            "rating": 4.7909813,
+            "totalRating": 50569,
+            "totalStudent": 410578,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "724414e8-cd97-4b81-a680-6c9775b4c352",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "71de72dc-16c0-4220-abac-82e37a29328e",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "00674516-72b3-4748-a577-6118b6ddca8e",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "38eaf3ff-7c49-4e77-8871-1012bd3b477d",
+                            "title": "Course duration: Tổng số 38,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "35832a9b-9700-4b70-b75b-1420daa51e13",
+            "name": "Complete Guitar Lessons System - Beginner to Advanced",
+            "description": "All-in-one Guitar Course, Fingerstyle Guitar, Blues Guitar, Acoustic Guitar, Electric Guitar & Fingerpicking Guitarra",
+            "slug": "complete-guitar-system-beginner-to-advanced",
+            "image": "https://img-c.udemycdn.com/course/480x270/42271_886a_9.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "126",
+            "rating": 4.5648847,
+            "totalRating": 44179,
+            "totalStudent": 311198,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "b464d168-42cb-479e-96c0-50851c7cfb89",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "e2b10498-2016-4e27-8fbf-98903dc9e3f5",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "15351da4-630c-4301-a3f1-42a1e1967852",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "223f0cc8-4dc7-452d-9750-aa7d6eadf3fe",
+                            "title": "Course duration: Tổng số 40 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "167c8aaf-c976-4ade-8377-78cc105581a2",
+            "name": "Music Theory Comprehensive Complete! (Parts 1, 2, & 3)",
+            "description": "A Complete College-Level Music Theory Curriculum. **IAOMEI Certified**",
+            "slug": "music-theory-complete",
+            "image": "https://img-c.udemycdn.com/course/480x270/882594_f8ec_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "126",
+            "rating": 4.7078867,
+            "totalRating": 22233,
+            "totalStudent": 122590,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "ac56efba-a85f-4f21-8a8d-ca39947a7f7f",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "1dd00b92-b4f7-47d7-880f-361be1b066b1",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "be9253fc-e741-4ba2-8755-e834e476d7a1",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "4523877a-b3d4-41bb-ac08-965a39b5f1b5",
+                            "title": "Course duration: Tổng số 12,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "e37e7ae1-dbbd-4f57-972d-f13139109b6c",
+            "name": "Music Production in Logic Pro - The Complete Course!",
+            "description": "Join Successful Music Production + Logic Pro students in Creating, Recording, Mixing Music + Mastering in Logic Pro",
+            "slug": "thecompletelogicprox",
+            "image": "https://img-c.udemycdn.com/course/480x270/897192_2cee_12.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "126",
+            "rating": 4.6849008,
+            "totalRating": 13834,
+            "totalStudent": 73905,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "2eec0aca-fc80-4403-93e8-96d12bf28cdc",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "2d4eb880-18b6-48ef-9a39-0c1a85391bfe",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "e0b516d8-8686-46e0-ac69-26df768e5b06",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "fe1dc5a7-ebe5-4059-8f09-b38453dfb25c",
+                            "title": "Course duration: Tổng số 52 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "c59ca569-d621-41f4-95e8-a8407b4b422b",
+            "name": "Tư duy đột phá, nâng tầm dịch vụ khách hàng",
+            "description": "Cung cấp công cụ để xác định các yếu tố tạo nên giá trị khách hàng, cách thức để liên kết dịch vụ với kết quả",
+            "slug": "tu-duy-ot-pha-nang-tam-dich-vu-khach-hang",
+            "image": "https://img-c.udemycdn.com/course/480x270/5918940_8411_5.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "134",
+            "rating": 4.900383,
+            "totalRating": 736,
+            "totalStudent": 1849,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "bc528587-1e58-4edf-8ba4-fee6e8a7c0bb",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "746215fa-f92f-47c5-8be8-2c08263266b1",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "1f2d417c-98da-49fc-9760-28553c9d461c",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "2c61dbbc-cc10-4bf2-9a9b-c591a29ce6bd",
+                            "title": "Course duration: Tổng số 1 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "4c083331-dd94-4161-a48a-0b94446302c7",
+            "name": "Từ vựng tiếng Anh thiết yếu",
+            "description": "Essential English Vocabulary (Vietnamese)",
+            "slug": "tu-vung-tieng-anh-can-ban",
+            "image": "https://img-c.udemycdn.com/course/480x270/5552564_79f3.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "134",
+            "rating": 4.6981215,
+            "totalRating": 222,
+            "totalStudent": 1703,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "6a182bc2-8fa6-4445-9a17-e2bf5b2c6b71",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "3bf42a96-e5b8-48d1-add3-fcb3631f2a11",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "8c6a3676-7fdb-4fcb-938d-bd70b9b6d87b",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "7c18e17a-1c79-4dc8-ae67-49ff7e0ad2ea",
+                            "title": "Course duration: Tổng số 12,5 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "95d20969-62f8-4805-819b-256de9adefab",
+            "name": "Luyện thi TOEIC new format (mục tiêu 450-750)",
+            "description": "Luyện thi TOEIC new format",
+            "slug": "luyen-thi-toeic-new-format-muc-tieu-450-750",
+            "image": "https://img-c.udemycdn.com/course/480x270/2207908_4733_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "134",
+            "rating": 4.6805243,
+            "totalRating": 177,
+            "totalStudent": 1294,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "d40a04ba-3442-46ad-8ca9-ac49f9f4d3ef",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "5abd8b73-fab1-40eb-8755-c41c5096281f",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "fe3562d7-7716-493a-a714-43cc54132864",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "b46edb72-d582-4e1f-a8bc-12664508185f",
+                            "title": "Course duration: Tổng số 7 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "0193aec6-c2ea-46da-897f-0fab7f56caca",
+            "name": "Lý thuyết xác suất thống kê",
+            "description": "Giới thiệu về các mô hình ngẫu nhiên và phương pháp suy diễn, phân tích thống kê",
+            "slug": "xac-suat-thong-ke",
+            "image": "https://img-c.udemycdn.com/course/480x270/1847126_d557_7.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "134",
+            "rating": 4.096838,
+            "totalRating": 166,
+            "totalStudent": 1881,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "3d0beb67-7172-40e1-91fd-b3a4978eb335",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "bbc3bc77-31dc-4616-830d-e0c65d0d0f05",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "291a8502-3967-4d3f-8e1e-f8d320b46f6d",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "76cafca3-f921-40c5-b465-dce78e010225",
+                            "title": "Course duration: Tổng số 9 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        },
+        {
+            "id": "31cc2511-5fa7-4ffa-b032-55a226f12261",
+            "name": "Phát âm tiếng Anh cho người Việt",
+            "description": "Phát âm tiếng Anh cho người Việt",
+            "slug": "phat-am-tieng-anh",
+            "image": "https://img-c.udemycdn.com/course/480x270/4424206_471a_4.jpg",
+            "price": "0.00",
+            "level": "BEGINNER",
+            "status": "PUBLISHED",
+            "language": "Tiếng Việt",
+            "categoryId": "134",
+            "rating": 4.6587634,
+            "totalRating": 163,
+            "totalStudent": 820,
+            "totalSection": 2,
+            "totalLesson": 2,
+            "sections": [
+                {
+                    "id": "a954aac8-e80e-4f4f-8d46-3faabd79ac72",
+                    "title": "Introduction",
+                    "orderIndex": 0,
+                    "lessons": [
+                        {
+                            "id": "384324cd-c80c-4c56-9d65-47176a4f53ee",
+                            "title": "Welcome to the course",
+                            "type": "VIDEO",
+                            "free": true,
+                            "orderIndex": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "3e5c430b-3e18-4dfa-9d2d-192a512a8464",
+                    "title": "Course Content",
+                    "orderIndex": 1,
+                    "lessons": [
+                        {
+                            "id": "2b1c879f-da1a-4f9e-99be-3c696faeb777",
+                            "title": "Course duration: Tổng số 3 giờ",
+                            "type": "READING",
+                            "free": false,
+                            "orderIndex": 0
+                        }
+                    ]
+                }
+            ],
+            "createdAt": "2025-04-06T17:12:57.225635",
+            "updatedAt": "2025-04-06T17:12:57.225635"
+        }
+    ]
+}

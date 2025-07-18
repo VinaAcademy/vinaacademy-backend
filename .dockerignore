@@ -1,0 +1,21 @@
+# Ignore Maven wrapper files
+.mvn/
+mvnw
+mvnw.cmd
+
+# Ignore target directory
+target/
+
+# Ignore IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore other unnecessary files
+.git/
+.gitignore
+.DS_Store

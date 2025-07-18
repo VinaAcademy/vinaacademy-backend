@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Footer -->
+<div th:fragment="footer" style="background:#f9f9f9;background-color:#f9f9f9;margin:0px auto;max-width:600px;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+           style="background:#f9f9f9;background-color:#f9f9f9;width:100%;">
+        <tbody>
+        <tr>
+            <td style="border-top:1px solid #eeeeee;direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                <div class="mj-column-per-100 mj-outlook-group-fix"
+                     style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;"
+                           width="100%">
+                        <tbody>
+                        <tr>
+                            <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:13px;font-weight:400;line-height:24px;text-align:center;color:#777777;">
+                                    © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span>
+                                    VinaAcademy. Tất cả quyền được bảo lưu.
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:13px;font-weight:400;line-height:24px;text-align:center;color:#777777;">
+                                    Nền tảng học trực tuyến hàng đầu Việt Nam
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Social links -->
+                        <tr>
+                            <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                <!--[if mso | IE]>
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                    <tr>
+                                        <td><![endif]-->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                       style="float:none;display:inline-table;">
+                                    <tbody>
+                                    <tr>
+                                        <td style="padding:4px;vertical-align:middle;">
+                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                                   style="background:#3b5998;border-radius:3px;width:24px;">
+                                                <tbody>
+                                                <tr>
+                                                    <td style="font-size:0;height:24px;vertical-align:middle;width:24px;">
+                                                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://facebook.com/lochuung"
+                                                           target="_blank">
+                                                            <img alt="" height="24"
+                                                                 src="https://www.mailjet.com/images/theme/v1/icons/ico-social/facebook.png"
+                                                                 style="border-radius:3px;display:block;" width="24"/>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <!--[if mso | IE]></td>
+                            <td><![endif]-->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                       style="float:none;display:inline-table;">
+                                    <tbody>
+                                    <tr>
+                                        <td style="padding:4px;vertical-align:middle;">
+                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                                   style="background:#EB3323;border-radius:3px;width:24px;">
+                                                <tbody>
+                                                <tr>
+                                                    <td style="font-size:0;height:24px;vertical-align:middle;width:24px;">
+                                                        <a href="https://youtube.com/@HLOriginal" target="_blank">
+                                                            <img alt="" height="24"
+                                                                 src="https://www.mailjet.com/images/theme/v1/icons/ico-social/youtube.png"
+                                                                 style="border-radius:3px;display:block;" width="24"/>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <!--[if mso | IE]></td>
+                            <td><![endif]-->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                       style="float:none;display:inline-table;">
+                                    <tbody>
+                                    <tr>
+                                        <td style="padding:4px;vertical-align:middle;">
+                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                                   style="background:#0077b5;border-radius:3px;width:24px;">
+                                                <tbody>
+                                                <tr>
+                                                    <td style="font-size:0;height:24px;vertical-align:middle;width:24px;">
+                                                        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://linkedin.com/lochuung&title=&summary=&source="
+                                                           target="_blank">
+                                                            <img alt="" height="24"
+                                                                 src="https://www.mailjet.com/images/theme/v1/icons/ico-social/linkedin.png"
+                                                                 style="border-radius:3px;display:block;" width="24"/>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <!--[if mso | IE]></td></tr></table><![endif]-->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" class="footer"
+                                style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:13px;font-weight:400;line-height:24px;text-align:center;color:#777777;">
+                                    <a th:href="${frontEndUrl} + '/help'" style="color:#3498db;text-decoration:none;">Trung
+                                        tâm trợ giúp</a> |
+                                    <a th:href="${frontEndUrl} + '/terms'" style="color:#3498db;text-decoration:none;">Điều
+                                        khoản dịch vụ</a> |
+                                    <a th:href="${frontEndUrl} + '/privacy'"
+                                       style="color:#3498db;text-decoration:none;">Chính sách bảo mật</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:12px;font-weight:400;line-height:24px;text-align:center;color:#777777;">
+                                    Email này được gửi tới bạn vì bạn đã đăng ký tài khoản tại VinaAcademy.<br/> Nếu bạn
+                                    không muốn nhận email từ chúng tôi, vui lòng <a
+                                        th:href="${frontEndUrl} + '/unsubscribe'" style="color: #3498db;">hủy đăng
+                                    ký</a>.
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

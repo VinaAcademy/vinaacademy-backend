@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head th:replace="~{fragments/head :: head}">
+  <!-- Head content will be replaced by the fragment -->
+</head>
+
+<body style="word-spacing:normal;background-color:#f5f5f5;">
+  <div style="background-color:#f5f5f5;" lang="vi" dir="auto">
+    <!-- Header with logo -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <!-- Content section - will be replaced by specific content for each email type -->
+    <div th:replace="~{::content}"></div>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::content})}">
+<th:block th:fragment="content">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">Thanh toán thành công</h2>
+    
+    <p style="margin-bottom: 15px;">Xin chào <span th:text="${userName}">bạn</span>,</p>
+    
+    <p style="margin-bottom: 15px;">
+        Chúng tôi xác nhận đã nhận được khoản thanh toán của bạn. Cảm ơn bạn đã đăng ký khóa học tại VinaAcademy!
+    </p>
+    
+    <div class="info-box">
+        <h3 style="color: #2c3e50; margin-bottom: 10px;">Chi tiết thanh toán</h3>
+        <p><strong>Mã đơn hàng:</strong> <span th:text="${orderId}">ORD123456</span></p>
+        <p><strong>Số tiền:</strong> <span th:text="${amount}">1.000.000 VNĐ</span></p>
+        <p><strong>Thời gian:</strong> <span th:text="${orderTime}">01/01/2024 10:00:00</span></p>
+    </div>
+
+    <div style="text-align: center;">
+        <a th:href="${courseUrl}" class="button">
+            Truy cập khóa học
+        </a>
+    </div>
+
+    <p style="margin-top: 20px;">
+        Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.
+    </p>
+</th:block>
+</html>

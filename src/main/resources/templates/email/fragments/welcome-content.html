@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+  <div th:fragment="welcome-content">
+    <!-- Main welcome message -->
+    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;border-radius:8px;max-width:600px;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;border-radius:8px;">
+        <tbody>
+          <tr>
+            <td style="direction:ltr;font-size:0px;padding:30px;text-align:center;">
+              <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                  <tbody>
+                    <tr>
+                      <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:22px;font-weight:600;line-height:24px;text-align:left;color:#2c3e50;">Chào mừng đến với VinaAcademy!</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#444444;">Xin chào <span th:text="${userName}">User</span>,</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#444444;">Chúng tôi rất vui mừng được chào đón bạn đến với cộng đồng học tập VinaAcademy. Hãy bắt đầu hành trình học tập của bạn ngay hôm nay!</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Steps info box -->
+    <div class="info-box" style="background:#f8f9fa;background-color:#f8f9fa;margin:0px auto;border-radius:5px;max-width:600px;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f8f9fa;background-color:#f8f9fa;width:100%;border-radius:5px;">
+        <tbody>
+          <tr>
+            <td style="direction:ltr;font-size:0px;padding:15px;text-align:center;">
+              <div style="margin:0px auto;max-width:570px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                  <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:18px;font-weight:600;line-height:24px;text-align:left;color:#2c3e50;">Bắt đầu với 3 bước đơn giản:</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                  <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#444444;">1. Hoàn thiện thông tin cá nhân<br /> 2. Khám phá các khóa học phù hợp<br /> 3. Tham gia cộng đồng học tập</div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Call to action -->
+    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;border-radius:8px;max-width:600px;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;border-radius:8px;">
+        <tbody>
+          <tr>
+            <td style="direction:ltr;font-size:0px;padding:30px;text-align:center;">
+              <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                  <tbody>
+                    <tr>
+                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;width:200px;line-height:100%;">
+                          <tbody>
+                            <tr>
+                              <td align="center" bgcolor="#3498db" role="presentation" style="border:none;border-radius:4px;cursor:auto;mso-padding-alt:10px 25px;background:#3498db;" valign="middle">
+                                <a th:href="${exploreUrl}" href="#" style="display:inline-block;width:150px;background:#3498db;color:#ffffff;font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:13px;font-weight:500;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:4px;" target="_blank"> Khám phá ngay </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <div style="font-family:Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#444444;">Nếu bạn cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi qua email support@vinaacademy.edu.vn</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="~{email/fragments/head :: head}">
+    <!-- Head content will be replaced by the fragment -->
+</head>
+<body>
+<div class="container" th:fragment="layout(content)">
+    <div class="card">
+        <!-- Header with logo -->
+        <div th:replace="~{email/fragments/header :: header}"></div>
+
+        <!-- Main content -->
+        <div th:replace="~{::content}"></div>
+
+        <!-- Footer -->
+        <div th:replace="~{email/fragments/footer :: footer}"></div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    restart: 'always'
+    image: postgres:15-alpine
+    container_name: vinaacademy-postgres
+    environment:
+      POSTGRES_DB: vinaacademy
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    restart: 'always'
+    image: redis:7-alpine
+    container_name: vinaacademy-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Web UI
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123456
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: always
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
