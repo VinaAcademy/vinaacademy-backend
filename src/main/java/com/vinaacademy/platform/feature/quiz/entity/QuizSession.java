@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -42,6 +45,9 @@ public class QuizSession extends BaseEntity {
     @Column(name = "expiry_time")
     private LocalDateTime expiryTime;
 
+//    @Column(name = "attempt_number", nullable = false)
+//    private int attemptNumber = 1;
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "quiz_submission_id")
@@ -63,6 +69,10 @@ public class QuizSession extends BaseEntity {
                 .active(true)
                 .expiryTime(expiry)
                 .build();
+    }
+
+    public boolean isSubmitted() {
+        return quizSubmission != null && quizSubmission.getId() != null;
     }
 
     public boolean isExpired() {

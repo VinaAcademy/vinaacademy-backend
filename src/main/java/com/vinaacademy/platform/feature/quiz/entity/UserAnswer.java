@@ -18,33 +18,33 @@ import java.util.UUID;
 @Entity
 @Table(name = "user_answers")
 public class UserAnswer extends BaseEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
+
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)
     private QuizSubmission submission;
-    
+
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
-    
+
     @ManyToMany
     @JoinTable(
             name = "user_answer_selections",
             joinColumns = @JoinColumn(name = "user_answer_id"),
             inverseJoinColumns = @JoinColumn(name = "answer_id")
     )
-    private List<Answer> selectedAnswers = new ArrayList<>();
-    
-    @Column(name = "text_answer")
-    private String textAnswer;
-    
+    private List<Answer> selectedAnswers = new ArrayList<>(); // for MCQ
+
+    @Column(name = "text_answer", columnDefinition = "TEXT")
+    private String textAnswer; // for Essay
+
     @Column(name = "is_correct")
     private boolean isCorrect;
-    
+
     @Column(name = "earned_points")
     private double earnedPoints;
 }

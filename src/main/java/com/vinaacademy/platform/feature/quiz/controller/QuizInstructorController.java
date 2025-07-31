@@ -7,7 +7,7 @@ import com.vinaacademy.platform.feature.lesson.service.LessonService;
 import com.vinaacademy.platform.feature.quiz.dto.*;
 import com.vinaacademy.platform.feature.quiz.service.AnswerService;
 import com.vinaacademy.platform.feature.quiz.service.QuestionService;
-import com.vinaacademy.platform.feature.quiz.service.QuizService;
+import com.vinaacademy.platform.feature.quiz.service.QuizInstructorService;
 import com.vinaacademy.platform.feature.user.auth.annotation.HasAnyRole;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Instructor Quiz", description = "Instructor quiz management APIs")
 public class QuizInstructorController {
-    private final QuizService quizService;
+    private final QuizInstructorService quizService;
     private final AnswerService answerService;
     private final QuestionService questionService;
     private final LessonService lessonService;
