@@ -1,4 +1,4 @@
-package com.vinaacademy.platform.feature.quiz.service.student.internal.strategy.impl;
+package com.vinaacademy.platform.feature.quiz.strategy.impl;
 
 import com.vinaacademy.platform.exception.ValidationException;
 import com.vinaacademy.platform.feature.quiz.dto.UserAnswerRequest;
@@ -7,7 +7,7 @@ import com.vinaacademy.platform.feature.quiz.entity.Question;
 import com.vinaacademy.platform.feature.quiz.entity.UserAnswer;
 import com.vinaacademy.platform.feature.quiz.enums.QuestionType;
 import com.vinaacademy.platform.feature.quiz.repository.AnswerRepository;
-import com.vinaacademy.platform.feature.quiz.service.student.internal.strategy.GradingStrategy;
+import com.vinaacademy.platform.feature.quiz.strategy.GradingStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

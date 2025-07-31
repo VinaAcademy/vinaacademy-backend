@@ -1,4 +1,4 @@
-package com.vinaacademy.platform.feature.quiz.service.student.internal;
+package com.vinaacademy.platform.feature.quiz.service.internal;
 
 import com.vinaacademy.platform.feature.quiz.dto.UserAnswerRequest;
 import com.vinaacademy.platform.feature.quiz.entity.Question;

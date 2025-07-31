@@ -1,8 +1,8 @@
-package com.vinaacademy.platform.feature.quiz.service.student.internal.impl;
+package com.vinaacademy.platform.feature.quiz.service.internal.impl;
 
 import com.vinaacademy.platform.feature.quiz.entity.QuizSession;
 import com.vinaacademy.platform.feature.quiz.repository.QuizSessionRepository;
-import com.vinaacademy.platform.feature.quiz.service.student.internal.QuizSessionHandler;
+import com.vinaacademy.platform.feature.quiz.service.internal.QuizSessionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;

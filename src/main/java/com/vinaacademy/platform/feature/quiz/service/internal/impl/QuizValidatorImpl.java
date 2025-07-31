@@ -1,11 +1,11 @@
-package com.vinaacademy.platform.feature.quiz.service.student.internal.impl;
+package com.vinaacademy.platform.feature.quiz.service.internal.impl;
 
 import com.vinaacademy.platform.exception.ValidationException;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
 import com.vinaacademy.platform.feature.quiz.entity.QuizSession;
 import com.vinaacademy.platform.feature.quiz.repository.QuizSessionRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuizSubmissionRepository;
-import com.vinaacademy.platform.feature.quiz.service.student.internal.QuizValidator;
+import com.vinaacademy.platform.feature.quiz.service.internal.QuizValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.vinaacademy.platform.feature.quiz.service.student.internal.impl;
+package com.vinaacademy.platform.feature.quiz.service.internal.impl;
 
 import com.vinaacademy.platform.feature.course.repository.UserProgressRepository;
 import com.vinaacademy.platform.feature.lesson.entity.UserProgress;
@@ -6,7 +6,7 @@ import com.vinaacademy.platform.feature.lesson.service.LessonService;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
 import com.vinaacademy.platform.feature.quiz.entity.QuizSubmission;
 import com.vinaacademy.platform.feature.quiz.entity.UserAnswer;
-import com.vinaacademy.platform.feature.quiz.service.student.internal.QuizSubmissionFactory;
+import com.vinaacademy.platform.feature.quiz.service.internal.QuizSubmissionFactory;
 import com.vinaacademy.platform.feature.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
