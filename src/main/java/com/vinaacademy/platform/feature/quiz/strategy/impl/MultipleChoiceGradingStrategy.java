@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -73,14 +70,20 @@ public class MultipleChoiceGradingStrategy implements GradingStrategy {
                     .format(earnedPointRate * question.getPoint()));
 
             userAnswer.setEarnedPoints(earnedPoints);
-            
+
             // Check if it's fully correct (all correct answers selected, no incorrect ones)
             List<Answer> correctAnswers = answerRepository.findByQuestionIdAndIsCorrect(question.getId(), true);
+
+            Set<Answer> selectedAnswerSet = new HashSet<>(selectedAnswers);
+            boolean hasNoDuplicates = selectedAnswerSet.size() == selectedAnswers.size();
+
             boolean allSelectedAreCorrect = selectedAnswers.stream().allMatch(Answer::getIsCorrect);
-            boolean allCorrectAreSelected = correctAnswers.size() == selectedAnswers.size() &&
-                    new HashSet<>(selectedAnswers).containsAll(correctAnswers);
-            
-            userAnswer.setCorrect(allSelectedAreCorrect && allCorrectAreSelected);
+            boolean allCorrectAreSelected = selectedAnswerSet.containsAll(correctAnswers) &&
+                    correctAnswers.size() == selectedAnswerSet.size();
+
+            boolean isFullyCorrect = hasNoDuplicates && allSelectedAreCorrect && allCorrectAreSelected;
+
+            userAnswer.setCorrect(isFullyCorrect);
         } else {
             userAnswer.setCorrect(false);
             userAnswer.setEarnedPoints(0);

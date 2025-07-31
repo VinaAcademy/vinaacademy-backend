@@ -55,8 +55,8 @@ public class QuizSubmissionFactoryImpl implements QuizSubmissionFactory {
         if (submission.isPassed()) {
             Optional<UserProgress> existingProgress = userProgressRepository
                     .findByLessonIdAndUserId(quiz.getId(), user.getId());
-            
-            if (existingProgress.isEmpty()) {
+
+            if (existingProgress.isEmpty() || !existingProgress.get().isCompleted()) {
                 lessonService.markLessonCompleted(quiz, user);
             }
         }
