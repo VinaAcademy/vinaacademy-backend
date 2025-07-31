@@ -42,6 +42,9 @@ public class QuizSession extends BaseEntity {
     @Column(name = "expiry_time")
     private LocalDateTime expiryTime;
 
+//    @Column(name = "attempt_number", nullable = false)
+//    private int attemptNumber = 1;
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "quiz_submission_id")
@@ -63,6 +66,10 @@ public class QuizSession extends BaseEntity {
                 .active(true)
                 .expiryTime(expiry)
                 .build();
+    }
+
+    public boolean isSubmitted() {
+        return quizSubmission != null && quizSubmission.getId() != null;
     }
 
     public boolean isExpired() {

@@ -7,7 +7,7 @@ import com.vinaacademy.platform.feature.quiz.dto.QuizSubmissionResultDto;
 import com.vinaacademy.platform.feature.quiz.dto.UserAnswerRequest;
 import com.vinaacademy.platform.feature.quiz.entity.QuizSession;
 import com.vinaacademy.platform.feature.quiz.service.QuizCacheService;
-import com.vinaacademy.platform.feature.quiz.service.QuizService;
+import com.vinaacademy.platform.feature.quiz.service.student.QuizStudentService;
 import com.vinaacademy.platform.feature.user.auth.annotation.HasAnyRole;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
@@ -37,7 +37,7 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Student Quiz", description = "Student quiz APIs")
 public class QuizStudentController {
-    private final QuizService quizService;
+    private final QuizStudentService quizService;
     private final QuizCacheService quizCacheService;
 
     @Autowired
@@ -111,7 +111,7 @@ public class QuizStudentController {
     @HasAnyRole({AuthConstants.STUDENT_ROLE})
     @GetMapping("/{quizId}/cached-answers")
     public ApiResponse<Map<String, UserAnswerRequest>> getCachedAnswers(@PathVariable UUID quizId,
-                                                                      @RequestParam UUID sessionId) {
+                                                                        @RequestParam UUID sessionId) {
         User currentUser = securityHelper.getCurrentUser();
         Map<String, UserAnswerRequest> cachedAnswers = quizCacheService.getCachedUserAnswers(currentUser.getId(), sessionId, quizId);
 
