@@ -9,7 +9,6 @@ import com.vinaacademy.platform.feature.cart.repository.CartRepository;
 import com.vinaacademy.platform.feature.order_payment.entity.Coupon;
 import com.vinaacademy.platform.feature.order_payment.repository.CouponRepository;
 import com.vinaacademy.platform.feature.user.UserRepository;
-import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,13 +25,9 @@ public class CartServiceImpl implements CartService {
     private CartMapper cartMapper;
     @Autowired
     private CouponRepository couponRepository;
-    @Autowired
-    private SecurityHelper securityHelper;
 
     @Override
-    public CartDto getCart() {
-    	User user = securityHelper.getCurrentUser();
-    	UUID userId = user.getId();
+    public CartDto getCart(UUID userId) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElse(null);
         CartDto cartDto = cartMapper.toDTO(cart);
@@ -63,21 +58,15 @@ public class CartServiceImpl implements CartService {
     public CartDto updateCart(CartRequest request) {
         Cart cart = cartRepository.findByUserId(request.getUser_id())
                 .orElseThrow(() -> BadRequestException.message("Không tìm thấy Cart của ID người dùng này"));
-        User user = securityHelper.getCurrentUser();
-    	UUID userId = user.getId();
-    	
-    	if (request.getUser_id() != userId) {
-    		throw BadRequestException.message("Bạn không có quyền sở hữu với cart này");
-    	}
-    	
+        User userp = userRepository.findById(request.getUser_id())
+                .orElseThrow(() -> BadRequestException.message("Không tìm thấy ID người dùng này"));
         Coupon coupon = null;
         if (request.getCoupon_id() != null) {
             coupon = couponRepository.findById(request.getCoupon_id())
                     .orElseThrow(() -> BadRequestException.message("Không tìm thấy coupon"));
         }
-        
         cart.setCoupon(coupon);
-        cart.setUser(user);
+        cart.setUser(userp);
         cartRepository.save(cart);
         CartDto cartDto = cartMapper.toDTO(cart);
         return cartDto;
@@ -87,13 +76,6 @@ public class CartServiceImpl implements CartService {
     public void deleteCart(CartRequest request) {
         Cart cart = cartRepository.findByUserId(request.getUser_id())
                 .orElseThrow(() -> BadRequestException.message("Không tìm thấy Cart của ID người dùng này"));
-        
-        User user = securityHelper.getCurrentUser();
-    	UUID userId = user.getId();
-    	if (request.getUser_id() != userId) {
-    		throw BadRequestException.message("Bạn không có quyền sở hữu với cart này");
-    	}
-    	
         cartRepository.delete(cart);
     }
 

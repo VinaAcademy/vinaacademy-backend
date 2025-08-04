@@ -17,7 +17,7 @@ public interface CartItemService {
 	 
 	 List<CartItemDto> getCartItems(Long cartId);
 	 
-	 List<CartItem> getCartItems();
+	 List<CartItem> getCartItems(UUID userId);
 	 
 	 CartItemDto getCartItem(Long cartItemId);
 }
