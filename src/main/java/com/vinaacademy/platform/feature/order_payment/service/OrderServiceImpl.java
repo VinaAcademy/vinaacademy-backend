@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
 		order.calculateAmounts();
 		order = orderRepository.save(order);
 
-//		//xoa all item trong cart
+//		xoa all item trong cart
 		
 		for (CartItem cartitem: cartItems) {
 			log.debug("Xóa "+cartitem.getId());
