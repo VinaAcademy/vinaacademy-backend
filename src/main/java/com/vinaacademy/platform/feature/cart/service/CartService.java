@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface CartService {
 	
-	 CartDto getCart(UUID userId);
+	 CartDto getCart();
 	 
 	 CartDto createCart(CartRequest request);
 

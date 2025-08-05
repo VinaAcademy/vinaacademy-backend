@@ -33,25 +33,25 @@ public class CartController {
     @Autowired
 	private CartItemService cartItemService;
 	
-	@HasAnyRole({AuthConstants.STUDENT_ROLE}) 
-    @PostMapping
-    @Operation(summary = "Tạo giỏ hàng mới", description = "Tạo giỏ hàng mới cho học viên")
-    public ResponseEntity<ApiResponse<CartDto>> createCart(@RequestBody @Valid CartRequest request) {
-        log.debug("Cart created");
-        CartDto cart = cartService.createCart(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.<CartDto>builder()
-                        .status("success")
-                        .message("Tạo giỏ hàng thành công")
-                        .data(cart)
-                        .build());    }
+//	@HasAnyRole({AuthConstants.STUDENT_ROLE}) 
+//    @PostMapping
+//    @Operation(summary = "Tạo giỏ hàng mới", description = "Tạo giỏ hàng mới cho học viên")
+//    public ResponseEntity<ApiResponse<CartDto>> createCart(@RequestBody @Valid CartRequest request) {
+//        log.debug("Cart created");
+//        CartDto cart = cartService.createCart(request);
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(ApiResponse.<CartDto>builder()
+//                        .status("success")
+//                        .message("Tạo giỏ hàng thành công")
+//                        .data(cart)
+//                        .build());    }
 
     @HasAnyRole({AuthConstants.STUDENT_ROLE})
-    @GetMapping("/{userId}")
+    @GetMapping
     @Operation(summary = "Lấy thông tin giỏ hàng", description = "Lấy thông tin giỏ hàng của học viên")
-    public ResponseEntity<ApiResponse<CartDto>> getCart(@PathVariable UUID userId) {
-        log.debug("Get cart for user " + userId);
-        CartDto cart = cartService.getCart(userId);
+    public ResponseEntity<ApiResponse<CartDto>> getCart() {
+        log.debug("Get cart");
+        CartDto cart = cartService.getCart();
         return ResponseEntity.ok(ApiResponse.<CartDto>builder()
                 .status("success")
                 .data(cart)
@@ -73,11 +73,11 @@ public class CartController {
     }
 
     @HasAnyRole({AuthConstants.STUDENT_ROLE})
-    @GetMapping("/{userId}/items")
+    @GetMapping("/items")
     @Operation(summary = "Lấy danh sách sản phẩm", description = "Lấy danh sách các khóa học trong giỏ hàng")
-    public ResponseEntity<ApiResponse<List<CartItemDto>>> getListCartItems(@PathVariable UUID userId) {
-        log.debug("Get list cart items for user " + userId);
-        List<CartItemDto> cartItems = cartService.getCart(userId).getCartItems();
+    public ResponseEntity<ApiResponse<List<CartItemDto>>> getListCartItems() {
+        log.debug("Get list cart items for user");
+        List<CartItemDto> cartItems = cartService.getCart().getCartItems();
         return ResponseEntity.ok(ApiResponse.<List<CartItemDto>>builder()
                 .status("success")
                 .data(cartItems)
