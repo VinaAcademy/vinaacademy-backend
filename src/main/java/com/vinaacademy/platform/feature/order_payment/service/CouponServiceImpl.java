@@ -22,6 +22,8 @@ public class CouponServiceImpl implements CouponService{
 		
 	private final CouponRepository couponRepository;
     private final CouponMapper couponMapper;
+    
+    private final Utils utils;
 
     @Override
     @Transactional(readOnly = true)
@@ -31,7 +33,7 @@ public class CouponServiceImpl implements CouponService{
         return coupons.stream()
             .map(coupon -> {
                 CouponDto dto = couponMapper.toDto(coupon);
-                dto.setValid(Utils.isCouponValid(coupon));
+                dto.setValid(utils.isCouponValid(coupon));
                 return dto;
             })
             .collect(Collectors.toList());
@@ -45,7 +47,7 @@ public class CouponServiceImpl implements CouponService{
         return validCoupons.stream()
                 .map(coupon -> {
                     CouponDto dto = couponMapper.toDto(coupon);
-                    dto.setValid(Utils.isCouponValid(coupon));
+                    dto.setValid(utils.isCouponValid(coupon));
                     return dto;
                 })
                 .collect(Collectors.toList());

@@ -1,8 +1,10 @@
 package com.vinaacademy.platform.feature.order_payment.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
@@ -16,15 +18,18 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
+@Getter
 @Component
 public class VNPayConfig {
-    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_TmnCode = "2JVRHVF9";
-    public static String vnp_HashSecret = "4TD8VD92KMWZ6E1VCUDJ4HF78LX7D1FD";
-    public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-    public static String urlReturn = "https://vinaacademy.huuloc.id.vn/transaction";
+    public String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    @Value("${vnpay.tmn-code}")
+    public String vnp_TmnCode;
+    @Value("${vnpay.hash-secret}") 
+    public String vnp_HashSecret;
+    public String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+    public String urlReturn = "https://vinaacademy.huuloc.id.vn/transaction";
 
-    public static String md5(String message) {
+    public String md5(String message) {
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -42,7 +47,7 @@ public class VNPayConfig {
         return digest;
     }
 
-    public static String Sha256(String message) {
+    public String Sha256(String message) {
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -61,7 +66,7 @@ public class VNPayConfig {
     }
 
     //Util for VNPAY
-    public static String hashAllFields(Map fields) {
+    public String hashAllFields(Map fields) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
@@ -81,7 +86,7 @@ public class VNPayConfig {
         return hmacSHA512(vnp_HashSecret,sb.toString());
     }
     
-    public static String hmacSHA512(final String key, final String data) {
+    public String hmacSHA512(final String key, final String data) {
         try {
 
             if (key == null || data == null) {
@@ -106,7 +111,7 @@ public class VNPayConfig {
 
     
 
-    public static String getIpAddress(HttpServletRequest request) {
+    public  String getIpAddress(HttpServletRequest request) {
         String ipAdress;
         try {
             ipAdress = request.getHeader("X-FORWARDED-FOR");
@@ -119,7 +124,7 @@ public class VNPayConfig {
         return ipAdress;
     }
 
-    public static String getRandomNumber(int len) {
+    public String getRandomNumber(int len) {
         Random rnd = new Random();
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(len);
@@ -129,12 +134,11 @@ public class VNPayConfig {
         return sb.toString();
     }
     
-    public static String createPaymentRedirect(Long total, String orderInfor, String idRef, HttpServletRequest request) {
+    public String createPaymentRedirect(Long total, String orderInfor, String idRef, HttpServletRequest request) {
 		String vnp_Version = "2.1.0";
 		String vnp_Command = "pay";
 		String vnp_TxnRef = idRef;
 		String vnp_IpAddr = getIpAddress(request);
-		String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
 		String orderType = "other";
 		
 		Map<String, String> vnp_Params = new HashMap<>();
@@ -194,9 +198,9 @@ public class VNPayConfig {
 			}
 		}
 		String queryUrl = query.toString();
-		String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
+		String vnp_SecureHash = hmacSHA512(vnp_HashSecret, hashData.toString());
 		queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-		String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+		String paymentUrl = vnp_PayUrl + "?" + queryUrl;
 		return paymentUrl;
 	}
     
