@@ -89,7 +89,11 @@ mail:
         mail.smtp.starttls.enable: true
 
 springdoc:
-  swagger-ui:
+  swagger-ui: 
     enabled: false
   api-docs:
     enabled: false
+
+vnpay:
+  tmn-code: 2JVRHVF9
+  hash-secret: 4TD8VD92KMWZ6E1VCUDJ4HF78LX7D1FD

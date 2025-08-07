@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vinaacademy.platform.feature.cart.service.CartItemService;
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
 import com.vinaacademy.platform.feature.order_payment.service.PaymentService;
+import com.vinaacademy.platform.feature.order_payment.utils.Utils;
+import com.vinaacademy.platform.feature.order_payment.utils.VNPayConfig;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class testVNpayController {
 	private final PaymentService paymentService;
 	private final CartItemService cartItemService;
+	private final VNPayConfig vnPayConfig;
 	
 //    @GetMapping
 //    public ApiResponse<String> getPaymentUrl() {
@@ -43,7 +47,11 @@ public class testVNpayController {
 //        return  vnpayUrl;
 //    }
 
-    
+//    @GetMapping("/print")
+//    public ApiResponse<String> get(){
+//    	
+//    	return ApiResponse.success(vnPayConfig.vnp_HashSecret+" code");
+//    }
     
 //    @GetMapping("/get-ip")
 //    public String getClientIp(@RequestHeader(value = "X-Forwarded-For", required = false) String xForwardedFor,

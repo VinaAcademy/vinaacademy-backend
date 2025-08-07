@@ -96,3 +96,6 @@ server:
     enabled: true
     mime-types: application/x-mpegURL, text/plain
     min-response-size: 1024
+vnpay:
+  tmn-code: 2JVRHVF9
+  hash-secret: 4TD8VD92KMWZ6E1VCUDJ4HF78LX7D1FD

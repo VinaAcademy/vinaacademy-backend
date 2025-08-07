@@ -20,6 +20,8 @@ import com.vinaacademy.platform.feature.order_payment.mapper.OrderMapper;
 import com.vinaacademy.platform.feature.order_payment.repository.CouponRepository;
 import com.vinaacademy.platform.feature.order_payment.repository.OrderItemRepository;
 import com.vinaacademy.platform.feature.order_payment.repository.OrderRepository;
+import com.vinaacademy.platform.feature.order_payment.utils.Utils;
+import com.vinaacademy.platform.feature.order_payment.utils.VNPayConfig;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.entity.User;
@@ -70,6 +72,8 @@ public class OrderServiceImpl implements OrderService {
 	private final CouponRepository couponRepository;
 
 	private final SecurityHelper securityHelper;
+	
+	private final Utils utils;
 
 	@Override
 	public OrderDto createOrder() {
@@ -167,13 +171,15 @@ public class OrderServiceImpl implements OrderService {
 		if (order.getUser().getId() != user.getId())
 			throw BadRequestException.message("Bạn không phải người sở hữu order này");
 		
-		if (orderCouponRequest.getCouponId()==null) {
-			order.setCoupon(null);
-		}else {
+		order.setCoupon(null);
+		if (orderCouponRequest.getCouponId() != null) {
 			Coupon coupon = couponRepository.findById(orderCouponRequest.getCouponId())
 					.orElseThrow(() -> BadRequestException.message("Không tìm thấy order id này"));
+			if (!utils.isCouponValid(coupon, order.getTotalAmount()))
+				throw BadRequestException.message("Coupon không khả dụng đối với order này");
 			order.setCoupon(coupon);
 		}
+		
 		order.calculateAmounts();
 		order = orderRepository.save(order);
 		OrderDto orderDto = orderMapper.toOrderDto(order);
