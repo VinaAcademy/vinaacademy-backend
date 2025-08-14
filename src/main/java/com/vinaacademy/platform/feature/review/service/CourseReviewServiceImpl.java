@@ -12,6 +12,9 @@ import com.vinaacademy.platform.feature.review.mapper.CourseReviewMapper;
 import com.vinaacademy.platform.feature.review.repository.CourseReviewRepository;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.entity.User;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +38,9 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @Transactional
@@ -71,9 +77,8 @@ public class CourseReviewServiceImpl implements CourseReviewService {
                 throw new RuntimeException("Không thể cập nhật đánh giá");
             }
             
-            // Refresh entity để có data mới nhất
-            courseReview = courseReviewRepository.findById(courseReview.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đánh giá sau khi cập nhật"));
+            entityManager.flush();
+            entityManager.refresh(courseReview);
         }
 
         // Cập nhật rating trung bình
