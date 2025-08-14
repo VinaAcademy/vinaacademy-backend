@@ -18,9 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,32 +39,44 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     @Override
     @Transactional
     public CourseReviewDto createOrUpdateReview(UUID userId, CourseReviewRequestDto requestDto) {
+        // Validation (giữ nguyên)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + userId));
 
         Course course = courseRepository.findById(requestDto.getCourseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học với ID: " + requestDto.getCourseId()));
 
-        // Kiểm tra người dùng đã đăng ký khóa học chưa
         if (!isUserEnrolledInCourse(userId, course.getId())) {
             throw new UnauthorizedException();
         }
 
-        // Kiểm tra xem người dùng đã đánh giá khóa học này chưa
-        CourseReview courseReview = courseReviewRepository.findByCourseIdAndUserId(course.getId(), userId)
-                .orElse(null);
+        CourseReview courseReview;
+        Optional<CourseReview> existingReview = courseReviewRepository.findByCourseIdAndUserId(course.getId(), userId);
 
-        if (courseReview == null) {
-            // Tạo đánh giá mới
+        if (existingReview.isEmpty()) {
+            // Tạo mới - dùng save()
             courseReview = CourseReviewMapper.INSTANCE.toEntity(requestDto, user, course);
             courseReview = courseReviewRepository.save(courseReview);
         } else {
-            // Cập nhật đánh giá hiện có
-            CourseReviewMapper.INSTANCE.updateEntityFromDto(requestDto, courseReview);
-            courseReview = courseReviewRepository.save(courseReview);
+            // Update - dùng update query riêng
+            courseReview = existingReview.get();
+            int updatedRows = courseReviewRepository.updateReview(
+                courseReview.getId(),
+                requestDto.getRating(),
+                requestDto.getReview(),
+                LocalDateTime.now()
+            );
+            
+            if (updatedRows == 0) {
+                throw new RuntimeException("Không thể cập nhật đánh giá");
+            }
+            
+            // Refresh entity để có data mới nhất
+            courseReview = courseReviewRepository.findById(courseReview.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đánh giá sau khi cập nhật"));
         }
 
-        // Cập nhật đánh giá trung bình của khóa học
+        // Cập nhật rating trung bình
         updateCourseAverageRating(course.getId());
 
         return CourseReviewMapper.INSTANCE.toDto(courseReview);
