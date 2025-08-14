@@ -36,7 +36,7 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
 
     @Modifying
     @Query("UPDATE CourseReview cr SET cr.rating = :rating, cr.review = :review, " +
-           "cr.updatedDate = :updatedAt WHERE cr.id = :id")
+           "cr.updatedDate = :updatedDate WHERE cr.id = :id")
     int updateReview(@Param("id") Long id, 
                     @Param("rating") Integer rating, 
                     @Param("review") String review, 
