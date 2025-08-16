@@ -159,6 +159,8 @@ public class SectionServiceImpl implements SectionService {
     public void reorderSections(UUID courseId, List<UUID> sectionIds) {
         log.debug("Reordering sections for course id: {}", courseId);
         Course course = findCourseById(courseId);
+     // Check if user has permission to modify this course
+        checkCoursePermission(course);
         reorderSectionsForCourse(course, sectionIds);
     }
 
@@ -167,6 +169,8 @@ public class SectionServiceImpl implements SectionService {
     public void reorderSectionsBySlug(String courseSlug, List<UUID> sectionIds) {
         log.debug("Reordering sections for course slug: {}", courseSlug);
         Course course = findCourseBySlug(courseSlug);
+     // Check if user has permission to modify this course
+        checkCoursePermission(course);
         reorderSectionsForCourse(course, sectionIds);
     }
 
