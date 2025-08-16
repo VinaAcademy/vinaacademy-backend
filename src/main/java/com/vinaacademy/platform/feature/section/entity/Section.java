@@ -36,6 +36,7 @@ public class Section extends BaseEntity {
     private int orderIndex;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "order_index")
     private List<Lesson> lessons = new ArrayList<>();
 
     public void addLesson(Lesson lesson) {
@@ -52,7 +53,7 @@ public class Section extends BaseEntity {
             lesson.setSection(null);
         }
     }
-    
+
     // Custom builder to ensure the lessons list is always initialized
     @Builder
     public static Section createSection(UUID id, Course course, String title, int orderIndex, List<Lesson> lessons) {
