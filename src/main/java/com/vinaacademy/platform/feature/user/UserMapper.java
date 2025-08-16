@@ -23,6 +23,7 @@ public interface UserMapper {
     @Mapping(expression = "java(viewMappingDto.countCourseEnroll)", target = "countCourseEnroll")
     @Mapping(expression = "java(viewMappingDto.countCourseEnrollComplete)", target = "countCourseEnrollComplete")
     @Mapping(target = "isActive", ignore = true)
-    @Mapping(target = "isCollaborator", ignore = true)
-    UserViewDto toViewDto(User user, @Context ViewMappingDto viewMappingDto);
+    @Mapping(target = "isCollaborator", ignore = true) 
+    UserViewDto toViewDto(User user, @Context ViewMappingDto viewMappingDto);  
+
 }
