@@ -4,6 +4,7 @@ import com.vinaacademy.platform.feature.section.dto.SectionDto;
 import com.vinaacademy.platform.feature.section.dto.SectionRequest;
 import com.vinaacademy.platform.feature.section.entity.Section;
 import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SectionMapper {
+    SectionMapper INSTANCE = Mappers.getMapper(SectionMapper.class);
 
     /**
      * Maps a Section entity to a SectionDto

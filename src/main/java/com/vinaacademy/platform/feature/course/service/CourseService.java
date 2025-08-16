@@ -8,10 +8,18 @@ import com.vinaacademy.platform.feature.course.dto.CourseSearchRequest;
 import com.vinaacademy.platform.feature.course.dto.CourseStatusRequest;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Main course service interface that delegates to command and query services.
+ * This interface is kept for backward compatibility during the refactoring process.
+ * 
+ * @deprecated Use CourseCommandService and CourseQueryService directly for new code.
+ */
+@Deprecated(since = "2.0", forRemoval = true)
 public interface CourseService {
 
         Boolean isInstructorOfCourse(UUID courseId, UUID instructorId);
@@ -21,41 +29,26 @@ public interface CourseService {
         List<CourseDto> getCoursesByCategory(String slug);
 
         Page<CourseDto> getCoursesPaginated(
-                        int page,
-                        int size,
-                        String sortBy,
-                        String sortDirection,
                         String categorySlug,
-                        double minRating);
+                        double minRating,
+                        Pageable pageable);
 
         Page<CourseDto> searchCourses(
                         CourseSearchRequest searchRequest,
-                        int page,
-                        int size,
-                        String sortBy,
-                        String sortDirection);
+                        Pageable pageable);
 
         Page<CourseDto> getCoursesByInstructor(
                         UUID instructorId,
-                        int page,
-                        int size,
-                        String sortBy,
-                        String sortDirection);
+                        Pageable pageable);
 
         Page<CourseDto> searchInstructorCourses(
                         UUID instructorId,
                         CourseSearchRequest searchRequest,
-                        int page,
-                        int size,
-                        String sortBy,
-                        String sortDirection);
+                        Pageable pageable);
 
         Page<CourseDto> getPublishedCoursesByInstructor(
                         UUID instructorId,
-                        int page,
-                        int size,
-                        String sortBy,
-                        String sortDirection);
+                        Pageable pageable);
 
         CourseDetailsResponse getCourse(String slug);
 
@@ -75,8 +68,7 @@ public interface CourseService {
 
         Boolean updateStatusCourse(CourseStatusRequest courseStatusRequest);
 
-        Page<CourseDetailsResponse> searchCourseDetails(CourseSearchRequest searchRequest, int page, int size,
-                        String sortBy, String sortDirection);
+        Page<CourseDetailsResponse> searchCourseDetails(CourseSearchRequest searchRequest, Pageable pageable);
 
         CourseCountStatusDto getCountCourses();
 }

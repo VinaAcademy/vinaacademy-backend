@@ -12,6 +12,9 @@ import com.vinaacademy.platform.feature.review.entity.CourseReview;
 import com.vinaacademy.platform.feature.section.entity.Section;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,9 +29,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "courses", indexes = {
-        @Index(name = "inx_course_slug", columnList = "slug")
-})
+@Table(name = "courses", indexes = {@Index(name = "inx_course_slug", columnList = "slug")})
 public class Course extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -80,26 +81,23 @@ public class Course extends BaseEntity {
     private long totalLesson = 0;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "order_index")
     private List<Section> sections = new ArrayList<>();
 
     public void addSection(Section section) {
         sections.add(section);
         section.setCourse(this);
         totalSection = sections.size();
-        totalLesson = sections.stream()
-                              .mapToLong(s -> s.getLessons().size())
-                              .sum();
+        totalLesson = sections.stream().mapToLong(s -> s.getLessons().size()).sum();
     }
 
     public void removeSection(Section section) {
         sections.remove(section);
         section.setCourse(null);
         totalSection = sections.size();
-        totalLesson = sections.stream()
-                              .mapToLong(s -> s.getLessons().size())
-                              .sum();
+        totalLesson = sections.stream().mapToLong(s -> s.getLessons().size()).sum();
     }
-    
+
     public void addEnrollment(Enrollment enrollment) {
         if (enrollments == null) {
             enrollments = new ArrayList<>();
@@ -135,10 +133,7 @@ public class Course extends BaseEntity {
             totalRating = 0;
         } else {
             totalRating = courseReviews.size();
-            rating = courseReviews.stream()
-                                  .mapToDouble(CourseReview::getRating)
-                                  .average()
-                                  .orElse(0.0);
+            rating = courseReviews.stream().mapToDouble(CourseReview::getRating).average().orElse(0.0);
         }
     }
 
@@ -146,12 +141,16 @@ public class Course extends BaseEntity {
     private List<Enrollment> enrollments;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     private List<CourseInstructor> instructors = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     private List<CourseReview> courseReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
