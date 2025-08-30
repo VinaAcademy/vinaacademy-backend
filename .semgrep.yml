@@ -43,13 +43,26 @@ rules:
 
   # 5) Rò rỉ IO stream (quên close)
   - id: io-not-closed
-    message: "Nhớ đóng InputStream/Reader trong try-with-resources."
+    message: "Nhớ đóng InputStream/OutputStream/Reader/Writer trong try-with-resources."
     severity: WARNING
     languages: [ java ]
-    pattern: |
-      InputStream $S = $X.openStream();
-      ...
-      // không có try-with-resources
+    pattern-either:
+      - pattern: |
+          InputStream $S = $X.openStream();
+          ...
+          // không có try-with-resources
+      - pattern: |
+          OutputStream $S = $X.getOutputStream();
+          ...
+          // không có try-with-resources
+      - pattern: |
+          Reader $S = $X.getReader();
+          ...
+          // không có try-with-resources
+      - pattern: |
+          Writer $S = $X.getWriter();
+          ...
+          // không có try-with-resources
 
   # 6) Logging secrets/PII
   - id: log-secrets
