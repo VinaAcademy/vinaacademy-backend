@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset
+  name="BugRiskOnly"
+  xmlns="https://pmd.github.io/pmd-7.0.0/ruleset/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://pmd.github.io/pmd-7.0.0/ruleset/2.0.0 https://pmd.github.io/pmd-7.0.0/ruleset_2_0_0.xsd">
+  <description>Only correctness/security/concurrency/resource-leak/perf risks</description>
+
+  <!-- Correctness / robustness -->
+  <rule ref="category/java/errorprone.xml/NullAssignment"/>
+  <rule ref="category/java/errorprone.xml/AvoidCatchingGenericException"/>
+  <rule ref="category/java/errorprone.xml/CloseResource"/>
+  <rule ref="category/java/errorprone.xml/DoNotCallGarbageCollectionExplicitly"/>
+  <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>
+  <rule ref="category/java/errorprone.xml/MissingBreakInSwitch"/>
+
+  <!-- Performance with failure risk -->
+  <rule ref="category/java/performance.xml/InefficientEmptyStringCheck"/>
+  <rule ref="category/java/performance.xml/TooFewBranchesForSwitch"/>
+
+  <!-- Security-ish -->
+  <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP"/>
+  <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters"/>
+</ruleset>
