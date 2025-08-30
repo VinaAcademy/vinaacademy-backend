@@ -1,0 +1,61 @@
+rules:
+  # 1) SQL injection (nối chuỗi trong JPA/SQL)
+  - id: java-sql-concat
+    message: "Tránh nối chuỗi để tạo SQL/JPQL -> dùng bind parameters."
+    severity: ERROR
+    languages: [ java ]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              String $q = "..." + $X + "...";
+              ... = $EM.createQuery($q, ...);
+          - pattern: |
+              $ST.executeQuery("..." + $X + "...")
+    metadata: { owasp: A03, cwe: "CWE-89" }
+
+  # 2) @CrossOrigin("*")
+  - id: spring-cors-all
+    message: "@CrossOrigin(\"*\") mở CORS toàn cục -> giới hạn origin cụ thể."
+    severity: ERROR
+    languages: [ java ]
+    pattern: |
+      @CrossOrigin("*") @AnnotatedClassOrMethod
+    metavariable-pattern:
+      metavariable: AnnotatedClassOrMethod
+      language: generic
+      pattern: ( class $C { ... } | @$M )
+
+  # 3) Tắt CSRF trên toàn bộ ứng dụng
+  - id: spring-disable-csrf
+    message: "Đang disable CSRF trên toàn app. Xem lại lý do và bù biện pháp khác."
+    severity: WARNING
+    languages: [ java ]
+    pattern: |
+      http.csrf().disable()
+
+  # 4) Bắt try/catch nuốt exception
+  - id: swallow-exception
+    message: "Đừng nuốt exception (catch rồi bỏ trống)."
+    severity: WARNING
+    languages: [ java ]
+    pattern: |
+      try { ... } catch ($E) { }
+
+  # 5) Rò rỉ IO stream (quên close)
+  - id: io-not-closed
+    message: "Nhớ đóng InputStream/Reader trong try-with-resources."
+    severity: WARNING
+    languages: [ java ]
+    pattern: |
+      InputStream $S = $X.openStream();
+      ...
+      // không có try-with-resources
+
+  # 6) Logging secrets/PII
+  - id: log-secrets
+    message: "Tránh log accessToken/secret/apiKey/password."
+    severity: WARNING
+    languages: [ java ]
+    pattern-either:
+      - pattern: Logger $L = ...; $L.info("...password..." , ... )
+      - pattern: Logger $L = ...; $L.warn("...accessToken..." , ... )

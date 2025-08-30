@@ -1,0 +1,80 @@
+# .coderabbit.yaml
+language: vi-VN
+
+tone_instructions: "Vui lòng nói thẳng vấn đề và thẳng thắn"
+
+reviews:
+  profile: assertive
+  high_level_summary: false
+  collapse_walkthrough: true
+  changed_files_summary: false
+  sequence_diagrams: true         # tự vẽ sequence diagram trong Walkthrough
+  suggested_labels: false
+  suggested_reviewers: false
+  related_issues: false
+  related_prs: false
+  assess_linked_issues: false
+  estimate_code_review_effort: false
+  poem: false
+
+  # Chỉ rõ phạm vi & cách review cho thư mục src/**
+  path_instructions:
+    - path: "src/**"
+      instructions: |
+        Chỉ review file trong thư mục src/**.
+        Mục tiêu duy nhất: phát hiện và mô tả CÁC LỖ HỔNG NGHIÊM TRỌNG (security/bug risk) như mô tả trong tone_instructions.
+        KHÔNG:
+          - không gợi ý refactor/clean code/perf vi mô/style.
+          - không nhận xét naming/comment/format.
+        CẦN:
+          - vẽ sequence diagram mô tả data flow/attack path nếu có.
+          - chỉ ra vị trí mã nguồn, điều kiện kích hoạt, tác động.
+          - đề xuất biện pháp giảm thiểu ở mức bảo mật/cấu hình (ngắn gọn), tránh refactor code không cần thiết.
+
+  path_filters:
+    - "src/**"
+    - "!**/test/**"
+    - "!**/*.md"
+    - "!docs/**"
+
+  auto_review:
+    enabled: true
+    drafts: false
+    ignore_title_keywords:
+      - "chore"
+      - "docs"
+      - "refactor"
+
+  tools:
+    # ---- Security / secrets / infra ----
+    gitleaks:
+      enabled: true
+    hadolint:
+      enabled: true
+    yamllint:
+      enabled: true
+    checkov:
+      enabled: false               # bật nếu repo có Terraform/K8s
+
+    # ---- Java bug risk (bật) ----
+    pmd:
+      enabled: true
+      # Dùng ruleset chỉ bắt lỗi rủi ro cao
+      config_file: ".pmd-ruleset.xml"
+
+    semgrep:
+      enabled: true
+      # Dùng rule local chỉ nhắm lỗ hổng nghiêm trọng
+      config_file: ".semgrep.yml"
+
+    # ---- Tắt các linter không liên quan để tránh nhiễu ----
+    eslint: { enabled: false }
+    ruff: { enabled: false }
+    golangci-lint: { enabled: false }
+    markdownlint: { enabled: false }
+    languagetool: { enabled: false }
+    phpcs: { enabled: false }
+    phpmd: { enabled: false }
+    phpstan: { enabled: false }
+    swiftlint: { enabled: false }
+    oxc: { enabled: false }
