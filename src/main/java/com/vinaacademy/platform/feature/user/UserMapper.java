@@ -5,13 +5,12 @@ import com.vinaacademy.platform.feature.user.dto.UserDto;
 import com.vinaacademy.platform.feature.user.dto.UserViewDto;
 import com.vinaacademy.platform.feature.user.dto.ViewMappingDto;
 import com.vinaacademy.platform.feature.user.entity.User;
-
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
