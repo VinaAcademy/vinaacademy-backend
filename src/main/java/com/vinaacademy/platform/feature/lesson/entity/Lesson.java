@@ -6,11 +6,10 @@ import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.storage.entity.MediaFile;
 import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Getter
@@ -31,6 +30,7 @@ public abstract class Lesson extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "section_id", nullable = false)
+    @ToString.Exclude
     protected Section section;
 
     @Column(name = "title")
@@ -51,6 +51,7 @@ public abstract class Lesson extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
     protected User author;
 
     @Version
@@ -58,6 +59,7 @@ public abstract class Lesson extends BaseEntity {
     private Long version;
 
     @OneToMany(mappedBy = "lesson", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @ToString.Exclude
     protected List<UserProgress> progressList;
 
     @ManyToMany
@@ -66,6 +68,7 @@ public abstract class Lesson extends BaseEntity {
             joinColumns = @JoinColumn(name = "lesson_id"),
             inverseJoinColumns = @JoinColumn(name = "media_file_id")
     )
+    @ToString.Exclude
     protected List<MediaFile> mediaFiles;
 
 }
