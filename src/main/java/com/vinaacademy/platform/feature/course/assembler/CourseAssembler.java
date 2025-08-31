@@ -17,6 +17,8 @@ import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.section.mapper.SectionMapper;
 import com.vinaacademy.platform.feature.user.UserMapper;
 import com.vinaacademy.platform.feature.user.entity.User;
+import jakarta.validation.constraints.NotNull;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,7 +45,7 @@ public class CourseAssembler {
    * @param course The course entity
    * @return Complete course details response
    */
-  public CourseDetailsResponse assembleCourseDetailsResponse(Course course) {
+  public CourseDetailsResponse assembleCourseDetailsResponse(@NotNull Course course) {
     log.debug("Assembling course details response for course: {}", course.getId());
 
     // Use CourseMapper to create the base course details
@@ -101,7 +103,7 @@ public class CourseAssembler {
       ownerUser =
           projections.stream()
               .filter(Objects::nonNull)
-              .filter(InstructorInfo::getIsOwner)
+              .filter(ci -> Boolean.TRUE.equals(ci.getIsOwner()))
               .map(InstructorInfo::getInstructor)
               .filter(Objects::nonNull)
               .findFirst();
@@ -123,14 +125,19 @@ public class CourseAssembler {
     }
 
     return sections.stream()
-        .sorted(java.util.Comparator.comparing(Section::getOrderIndex))
+        .sorted(
+            Comparator.comparing(
+                Section::getOrderIndex, Comparator.nullsLast(Comparator.naturalOrder())))
         .map(
             section -> {
               SectionDto sectionDto = SectionMapper.INSTANCE.toDto(section);
               // Fetch and map lessons for each section
               sectionDto.setLessons(
                   section.getLessons().stream()
-                      .sorted(java.util.Comparator.comparing(Lesson::getOrderIndex))
+                      .sorted(
+                          Comparator.comparing(
+                              Lesson::getOrderIndex,
+                              Comparator.nullsLast(Comparator.naturalOrder())))
                       .map(LessonMapper.INSTANCE::lessonToLessonDto)
                       .toList());
               return sectionDto;

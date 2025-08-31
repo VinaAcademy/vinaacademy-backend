@@ -6,7 +6,7 @@ tone_instructions: "Vui lòng nói thẳng vấn đề và thẳng thắn"
 reviews:
   profile: assertive
   high_level_summary: false
-  collapse_walkthrough: true
+  collapse_walkthrough: false
   changed_files_summary: false
   sequence_diagrams: true         # tự vẽ sequence diagram trong Walkthrough
   suggested_labels: false
