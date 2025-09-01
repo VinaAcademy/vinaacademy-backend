@@ -120,11 +120,26 @@ vinaacademy-backend/
 - **API Documentation**: Use Swagger annotations (`@Operation`, `@ApiResponses`, `@Schema`)
 
 ### MapStruct Configuration
-All mappers must use consistent configuration:
+
+All mappers must use the `INSTANCE` approach for consistent configuration:
+
 ```java
-@Mapper(componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper
+public interface UserMapper {
+
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    User toUser(RegisterRequest registerRequest);
+
+    UserDto toDto(User user);
+
+    @Mapping(expression = "java(viewMappingDto.countCourseCreate)", target = "countCourseCreate")
+    @Mapping(expression = "java(viewMappingDto.countCourseEnroll)", target = "countCourseEnroll")
+    @Mapping(expression = "java(viewMappingDto.countCourseEnrollComplete)", target = "countCourseEnrollComplete")
+    @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "isCollaborator", ignore = true)
+    UserViewDto toViewDto(User user, @Context ViewMappingDto viewMappingDto);
+}
 ```
 
 ### Exception Handling
@@ -184,11 +199,24 @@ feature/{domain}/
 ```
 
 ### MapStruct Configuration
-All mappers use Spring component model with consistent configuration:
+All mappers must use the `INSTANCE` approach for consistent configuration:
 ```java
-@Mapper(componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper
+public interface UserMapper {
+
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    User toUser(RegisterRequest registerRequest);
+
+    UserDto toDto(User user);
+
+    @Mapping(expression = "java(viewMappingDto.countCourseCreate)", target = "countCourseCreate")
+    @Mapping(expression = "java(viewMappingDto.countCourseEnroll)", target = "countCourseEnroll")
+    @Mapping(expression = "java(viewMappingDto.countCourseEnrollComplete)", target = "countCourseEnrollComplete")
+    @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "isCollaborator", ignore = true)
+    UserViewDto toViewDto(User user, @Context ViewMappingDto viewMappingDto);
+}
 ```
 
 ### Security & Authorization
