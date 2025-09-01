@@ -47,6 +47,23 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
     @Lazy
     private VideoProcessorService self;
 
+    /**
+     * Asynchronously converts a local video file to adaptive HLS, uploads the result to S3, updates the
+     * corresponding Video entity, and notifies the author of success or failure.
+     *
+     * <p>Side effects:
+     * - Converts the file at {@code inputFile} to adaptive HLS and uploads segments/manifests to S3 (stores the
+     *   returned S3 key prefix on the Video).
+     * - Generates and stores a thumbnail key if one is not already present.
+     * - Updates the Video status to READY on success or ERROR on failure and saves the entity.
+     * - Sends a success or failure notification to the video author.
+     * - Deletes the original input file when processing completes successfully.
+     *
+     * <p>This method runs asynchronously on the "videoTaskExecutor" and executes in a new transaction.
+     *
+     * @param videoId   ID of the Video entity to update
+     * @param inputFile local filesystem path to the source video file to be processed
+     */
     @Async("videoTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processVideo(UUID videoId, Path inputFile) {
@@ -77,6 +94,20 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
         }
     }
 
+    /**
+     * Apply successful processing results to a Video entity.
+     *
+     * Sets the video's status to READY, stores the S3 HLS key prefix, updates duration
+     * from the provided input file, and, if missing, assigns a generated thumbnail S3 key
+     * in the form "videos/thumbnails/{videoId}.jpg".
+     *
+     * @param video        the Video entity to update
+     * @param s3KeyPrefix  S3 key prefix where the generated HLS assets were uploaded
+     * @param thumbnailPath local thumbnail path (not persisted here; provided for callers that may need it)
+     * @param inputFile    original input file path used to derive the video's duration
+     * @throws IOException if reading the input file for duration fails
+     * @throws InterruptedException if duration extraction is interrupted
+     */
     private void updateVideoSuccess(Video video, String s3KeyPrefix, Path thumbnailPath, Path inputFile) throws IOException, InterruptedException {
         video.setStatus(VideoStatus.READY);
         // Store S3 key prefix instead of local path

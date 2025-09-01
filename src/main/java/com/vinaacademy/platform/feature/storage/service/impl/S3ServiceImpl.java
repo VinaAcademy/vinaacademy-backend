@@ -42,6 +42,15 @@ public class S3ServiceImpl implements S3Service {
   @Value("${minio.path-style:true}")
   private boolean pathStyle;
 
+  /**
+   * Uploads a local file to the configured S3 bucket and returns its public URL.
+   *
+   * @param key         the object key to use in the bucket (including any desired prefix)
+   * @param filePath    path to the local file to upload
+   * @param contentType the MIME content type to set for the uploaded object
+   * @return the public URL of the uploaded object (constructed from the configured endpoint, bucket, and key)
+   * @throws RuntimeException if the upload fails
+   */
   @Override
   public String uploadFile(String key, Path filePath, String contentType) {
     try {
@@ -65,6 +74,20 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Uploads data from an InputStream to the configured S3 bucket and returns a public URL for the stored object.
+   *
+   * <p>The provided stream is uploaded as an object identified by {@code key}. {@code contentLength} must be the
+   * precise number of bytes to read from the stream and is used to build the request. {@code contentType} is set as
+   * the object's MIME type (may be {@code null}).
+   *
+   * @param key destination object key (path) within the bucket
+   * @param inputStream source stream containing the object data
+   * @param contentLength exact length in bytes of the stream to upload
+   * @param contentType MIME type to assign to the stored object; may be {@code null}
+   * @return a publicly accessible URL for the uploaded object
+   * @throws RuntimeException if the upload fails
+   */
   @Override
   public String uploadFile(
       String key, InputStream inputStream, long contentLength, String contentType) {
@@ -100,6 +123,19 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Uploads all files under a local directory to the configured S3 bucket and returns the public URLs of the uploaded objects.
+   *
+   * The method normalizes the provided key prefix (ensuring it ends with '/'), uses the S3 Transfer Manager to perform
+   * a parallel, multipart upload of the directory contents, sets a safe `Content-Type` for each file, waits for completion,
+   * and logs any failed transfers. The returned URLs are constructed from the configured endpoint, bucket, and the uploaded
+   * objects' relative paths (using forward slashes).
+   *
+   * @param keyPrefix     S3 key prefix under which files will be uploaded (a trailing slash will be appended if missing)
+   * @param directoryPath local directory to upload (all regular files beneath this path will be uploaded, recursion enabled)
+   * @return a list of public URLs for the uploaded objects, preserving the directory's relative structure
+   * @throws RuntimeException if walking the local directory fails (wraps the underlying IOException)
+   */
   @Override
   public List<String> uploadDirectory(String keyPrefix, Path directoryPath) {
     // Chuẩn hoá prefix
@@ -155,6 +191,14 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Returns a safe MIME content type for the given file path, falling back to
+   * "application/octet-stream" when the type is unknown or cannot be determined.
+   *
+   * @param p the file system path to inspect
+   * @return the determined content type, or "application/octet-stream" if probing
+   *         fails or yields no usable result
+   */
   private static String determineContentTypeSafe(Path p) {
     try {
       String ct = Files.probeContentType(p);
@@ -164,7 +208,21 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
-  /** Tạo URL phù hợp MinIO (path-style). Ví dụ: <a href="https://minio.local:9000/bucket/key">https://minio.local:9000/bucket/key</a> */
+  /**
+   * Build the public URL for an object key using the configured endpoint and addressing style.
+   *
+   * <p>If path-style addressing is enabled, the URL will be:
+   *   <code>{endpoint}/{bucket}/{key}</code>.
+   * If virtual-host (bucket-in-host) addressing is used, the URL will be:
+   *   <code>{scheme}://{bucket}.{host}{:port}/{key}</code>.
+   *
+   * <p>Assumes the configured endpoint has the form <code>scheme://host[:port]</code> with no
+   * trailing slash. Virtual-host style requires DNS/host routing that resolves
+   * <code>{bucket}.{host}</code> to the same S3-compatible service.
+   *
+   * @param key object key/path to append to the generated URL
+   * @return fully qualified HTTP(S) URL for the object
+   */
   private String buildObjectUrl(String key) {
     // endpoint dạng https://host:port (không có trailing slash)
     if (pathStyle) {
@@ -180,6 +238,13 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Downloads an object from the configured bucket and returns its content as an InputStream.
+   *
+   * @param key the object key (path) within the bucket to download
+   * @return an InputStream for the object's data; the caller is responsible for closing the stream
+   * @throws RuntimeException if the object cannot be retrieved
+   */
   @Override
   public InputStream downloadFile(String key) {
     try {
@@ -201,6 +266,17 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Generate a presigned GET URL for an object stored in the configured bucket.
+   *
+   * The returned URL grants temporary, time-limited access to the object identified
+   * by `key`. The URL will expire after `expirationInSeconds` seconds.
+   *
+   * @param key the object key (path) in the bucket
+   * @param expirationInSeconds lifetime of the presigned URL in seconds
+   * @return a presigned GET URL as a string
+   * @throws RuntimeException if presigned URL generation fails
+   */
   @Override
   public String generatePresignedUrl(String key, int expirationInSeconds) {
     try {
@@ -236,6 +312,12 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Delete the object identified by the given key from the configured S3 bucket.
+   *
+   * @param key the object key (path) in the bucket to delete
+   * @throws RuntimeException if the deletion fails
+   */
   @Override
   public void deleteFile(String key) {
     try {
@@ -258,6 +340,15 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Deletes all objects in the configured bucket that have keys starting with the provided prefix.
+   *
+   * The method lists objects matching the prefix and issues a single bulk delete request for those
+   * objects. If no objects are found for the prefix, the method returns without error.
+   *
+   * @param keyPrefix prefix of object keys to remove (treated as a path-like prefix)
+   * @throws RuntimeException if listing or deletion from the S3 bucket fails
+   */
   @Override
   public void deleteDirectory(String keyPrefix) {
     try {
@@ -300,6 +391,13 @@ public class S3ServiceImpl implements S3Service {
     }
   }
 
+  /**
+   * Checks whether an object with the given key exists in the configured bucket.
+   *
+   * @param key the object key to check
+   * @return true if the object exists; false if the object does not exist
+   * @throws RuntimeException if an unexpected error occurs while checking existence
+   */
   @Override
   public boolean fileExists(String key) {
     try {
