@@ -1,13 +1,11 @@
 package com.vinaacademy.platform.feature.course.entity;
 
-import com.vinaacademy.platform.feature.cart.entity.CartItem;
 import com.vinaacademy.platform.feature.category.Category;
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
-import com.vinaacademy.platform.feature.order_payment.entity.OrderItem;
 import com.vinaacademy.platform.feature.review.entity.CourseReview;
 import com.vinaacademy.platform.feature.section.entity.Section;
 import jakarta.persistence.*;
@@ -85,49 +83,6 @@ public class Course extends BaseEntity {
   @OrderColumn(name = "order_index")
   private List<Section> sections = new ArrayList<>();
 
-  public void addSection(Section section) {
-    sections.add(section);
-    section.setCourse(this);
-    totalSection = sections.size();
-    totalLesson = sections.stream().mapToLong(s -> s.getLessons().size()).sum();
-  }
-
-  public void removeSection(Section section) {
-    sections.remove(section);
-    section.setCourse(null);
-    totalSection = sections.size();
-    totalLesson = sections.stream().mapToLong(s -> s.getLessons().size()).sum();
-  }
-
-  public void addEnrollment(Enrollment enrollment) {
-    if (enrollments == null) {
-      enrollments = new ArrayList<>();
-    }
-    enrollments.add(enrollment);
-    enrollment.setCourse(this);
-    totalStudent = enrollments.size();
-  }
-
-  public void removeEnrollment(Enrollment enrollment) {
-    if (enrollments != null) {
-      enrollments.remove(enrollment);
-      enrollment.setCourse(null);
-      totalStudent = enrollments.size();
-    }
-  }
-
-  public void addReview(CourseReview review) {
-    courseReviews.add(review);
-    review.setCourse(this);
-    recalculateRating();
-  }
-
-  public void removeReview(CourseReview review) {
-    courseReviews.remove(review);
-    review.setCourse(null);
-    recalculateRating();
-  }
-
   private void recalculateRating() {
     if (courseReviews.isEmpty()) {
       rating = 0.0;
@@ -144,20 +99,12 @@ public class Course extends BaseEntity {
   @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
   @Fetch(FetchMode.SUBSELECT)
   @BatchSize(size = 50)
-  @OrderColumn(name = "id")
+  @OrderBy("id ASC")
   private List<CourseInstructor> instructors = new ArrayList<>();
-
-  @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-  @OrderColumn(name = "id")
-  private List<CartItem> cartItems;
 
   @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
   @Fetch(FetchMode.SUBSELECT)
-  @OrderColumn(name = "created_date")
   @BatchSize(size = 50)
+  @OrderBy("createdDate DESC")
   private List<CourseReview> courseReviews = new ArrayList<>();
-
-  @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-  @OrderColumn(name = "id")
-  private List<OrderItem> orderItems;
 }

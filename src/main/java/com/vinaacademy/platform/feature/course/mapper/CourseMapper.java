@@ -25,8 +25,6 @@ public interface CourseMapper {
     CourseDetailsResponse toCourseDetailsResponse(Course course);
 
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "cartItems", ignore = true)
-    @Mapping(target = "orderItems", ignore = true)
     @Mapping(target = "courseReviews", ignore = true)
     @Mapping(target = "enrollments", ignore = true)
     @Mapping(target = "instructors", ignore = true)

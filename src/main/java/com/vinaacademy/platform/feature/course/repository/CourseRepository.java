@@ -4,6 +4,10 @@ import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.projection.CourseListProjection;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,11 +16,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecificationExecutor<Course> {
@@ -41,7 +40,7 @@ public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecif
      * Find course by ID with all related entities for course details page
      * Uses EntityGraph to avoid N+1 queries
      */
-    @EntityGraph(attributePaths = {"category", "instructors", "instructors.instructor", "sections", "sections.lessons", "courseReviews", "courseReviews.user"})
+    @EntityGraph(attributePaths = {"category", "sections", "sections.lessons"})
     @Query("SELECT c FROM Course c WHERE c.id = :id")
     Optional<Course> findByIdWithDetails(@Param("id") UUID id);
 
@@ -49,7 +48,7 @@ public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecif
      * Find course by slug for learning with sections and lessons
      * Uses EntityGraph to fetch necessary data for learning
      */
-    @EntityGraph(attributePaths = {"category", "instructors", "instructors.instructor", "sections", "sections.lessons"})
+    @EntityGraph(attributePaths = {"category", "sections", "sections.lessons"})
     @Query("SELECT c FROM Course c WHERE c.slug = :slug")
     Optional<Course> findBySlugForLearning(@Param("slug") String slug);
 
