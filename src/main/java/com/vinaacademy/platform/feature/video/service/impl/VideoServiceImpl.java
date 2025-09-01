@@ -46,6 +46,19 @@ public class VideoServiceImpl implements VideoService {
   @Autowired private VideoValidator videoValidator;
   @Autowired private SecurityHelper securityHelper;
 
+  /**
+   * Uploads a video file for a lesson, marks the video as processing and triggers asynchronous processing.
+   *
+   * Validates the uploaded file, checks that the current user has access to the lesson (instructor or admin),
+   * uploads the file to storage, updates and saves the Video entity (sets thumbnail, status=PROCESSING, duration=0, author),
+   * and starts asynchronous processing via the video processor service.
+   *
+   * @param file the uploaded video file
+   * @param videoRequest request data containing the target lesson ID and thumbnail URL
+   * @return the saved Video as a VideoDto (with updated status and metadata)
+   * @throws IOException if an I/O error occurs while uploading the file
+   * @throws BadRequestException when the lesson or video is not found, the user lacks access, or the video is already processing
+   */
   @Override
   public VideoDto uploadVideo(MultipartFile file, VideoRequest videoRequest) throws IOException {
     Video video =
@@ -83,6 +96,18 @@ public class VideoServiceImpl implements VideoService {
     return VideoMapper.INSTANCE.toDto(video);
   }
 
+  /**
+   * Return a redirect response to the video's thumbnail URL.
+   *
+   * If the stored thumbnail is an S3 key (not starting with "http://"/"https://"), verifies the object exists
+   * in S3 and returns a 302 redirect to a presigned URL (valid 86400s) with Cache-Control max-age=86400.
+   * If the stored thumbnail is an absolute URL, returns a 302 redirect directly to that URL with the same cache header.
+   *
+   * @param videoId the UUID of the video whose thumbnail is requested
+   * @return a 302 ResponseEntity that redirects the client to the thumbnail (presigned S3 URL or external URL)
+   * @throws BadRequestException if the video is not found, the thumbnail URL is missing, the thumbnail does not exist in storage,
+   *         or an error occurs while generating/serving the thumbnail
+   */
   @Override
   public ResponseEntity<Resource> getThumbnail(UUID videoId) {
     log.debug("Getting thumbnail for video: {}", videoId);
@@ -137,11 +162,16 @@ public class VideoServiceImpl implements VideoService {
   }
 
   /**
-   * Process playlist content to replace relative URLs with our streaming endpoints
+   * Rewrite an HLS playlist's relative segment and playlist references to backend streaming endpoints.
    *
-   * @param videoId the video UUID
-   * @param playlistContent the original playlist content
-   * @return modified playlist content with our streaming URLs
+   * <p>Lines that are empty or begin with '#' (comments/metadata) are preserved unchanged. Lines that
+   * end with ".ts" or ".m3u8" are replaced with a backend URL of the form
+   * "/api/v1/videos/{videoId}/{originalLine}". All other lines are left as-is. The method returns
+   * the transformed playlist content with newline separators preserved.
+   *
+   * @param videoId the UUID of the video used to build the backend streaming path
+   * @param playlistContent the original playlist text (UTF-8 HLS manifest) to be rewritten
+   * @return the playlist content with segment and playlist references rewritten to backend endpoints
    */
   private String processPlaylistUrls(UUID videoId, String playlistContent) {
     String[] lines = playlistContent.split("\n");
@@ -164,6 +194,17 @@ public class VideoServiceImpl implements VideoService {
     return modifiedPlaylist.toString();
   }
 
+  /**
+   * Returns a presigned S3 URL for streaming a specific HLS segment of a video.
+   *
+   * Validates the requested subPath, ensures the video exists and is READY, verifies the segment exists in S3,
+   * and generates a presigned URL valid for 1 hour.
+   *
+   * @param videoId the UUID of the video
+   * @param subPath the relative path to the HLS segment or manifest (must match [A-Za-z0-9_./-]+)
+   * @return a presigned URL that provides direct access to the requested segment for 1 hour
+   * @throws BadRequestException if the subPath is invalid, the video is not found, the video is not READY, or the segment does not exist
+   */
   @Override
   public String getSegmentStreaming(UUID videoId, String subPath) {
     if (!subPath.matches("[A-Za-z0-9_./-]+")) {
@@ -197,6 +238,19 @@ public class VideoServiceImpl implements VideoService {
     return presignedUrl;
   }
 
+  /**
+   * Downloads an HLS manifest for the given video, rewrites non-comment lines to backend-proxied paths, and returns the rewritten manifest.
+   *
+   * <p>All lines starting with `#` or empty lines are preserved. Non-comment lines are treated as segment or playlist references:
+   * - If a line is an absolute URL, only the final path component (filename) is extracted and used.
+   * - The resulting relative path (which may include subdirectories) is prefixed with {@code basePath} so the client will request segments via the backend.
+   *
+   * @param videoId the video UUID used to locate the HLS manifest in storage
+   * @param basePath the backend prefix to prepend to each non-comment manifest line (should include a trailing slash if needed)
+   * @param subPath the path under the video's HLS location identifying the manifest to rewrite
+   * @return a ByteArrayResource containing the rewritten manifest encoded as UTF-8
+   * @throws IOException if reading the original manifest from storage fails
+   */
   @Override
   public ByteArrayResource getRewriteManifestProxy(UUID videoId, String basePath, String subPath)
       throws IOException {

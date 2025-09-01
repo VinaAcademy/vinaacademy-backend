@@ -23,6 +23,24 @@ public class FFmpegUtils {
             new VideoVariant("1080p", "1920x1080", "3000k", "192k")
     );
 
+    /**
+     * Converts a source video into adaptive HLS (multiple variant playlists and a master playlist)
+     * and generates a thumbnail image.
+     *
+     * This method removes any existing outputBaseDir, creates the HLS output structure, encodes the
+     * input video into the configured set of variants (one directory per variant containing a
+     * playlist and segments), and writes a top-level master.m3u8 referencing each variant. A single
+     * thumbnail frame is also produced at timestamp 00:00:01 and written to thumbnailFilePath.
+     *
+     * @param inputFilePath     path to the source video file to be converted
+     * @param outputBaseDir     directory where variant subdirectories and master.m3u8 will be written;
+     *                          if it already exists it will be recursively deleted before use
+     * @param thumbnailFilePath path where the generated thumbnail image will be saved
+     * @return 0 on success
+     * @throws IOException if filesystem operations fail
+     * @throws InterruptedException if the FFmpeg/ffprobe subprocesses are interrupted
+     * @throws RuntimeException if FFmpeg fails to produce any required variant (non-zero exit code)
+     */
     public static int convertToAdaptiveHLS(Path inputFilePath, Path outputBaseDir, Path thumbnailFilePath) throws IOException, InterruptedException {
         if (Files.exists(outputBaseDir)) {
             deleteDirectoryRecursively(outputBaseDir);
@@ -60,14 +78,21 @@ public class FFmpegUtils {
     }
 
     /**
-     * Convert video to adaptive HLS and upload to MinIO
-     * @param inputFilePath input video file
-     * @param outputBaseDir temporary output directory
-     * @param thumbnailFilePath thumbnail file path
-     * @param s3Service S3 service for uploading to MinIO
-     * @param videoId video UUID for S3 key prefix
-     * @return MinIO path prefix for the uploaded HLS files
-     */
+         * Converts a source video into adaptive HLS locally, uploads the resulting HLS directory and optional thumbnail to S3/MinIO, and cleans up local files.
+         *
+         * The method first invokes local HLS generation. If conversion succeeds it uploads the generated HLS directory under the prefix
+         * "videos/hls/{videoId}" and, if present, uploads the thumbnail as "videos/thumbnails/{videoId}.jpg". Local output and thumbnail
+         * files are removed in a finally block; cleanup failures are logged but do not propagate.
+         *
+         * @param inputFilePath     path to the source video file
+         * @param outputBaseDir     temporary directory where HLS variants and playlists are generated
+         * @param thumbnailFilePath path to the generated thumbnail image (may not exist)
+         * @param videoId           UUID used to build the S3 key prefix (e.g., "videos/hls/{videoId}")
+         * @return the S3/MinIO key prefix where the HLS files were uploaded (e.g., "videos/hls/{videoId}")
+         * @throws IOException              if an I/O error occurs during upload or file operations
+         * @throws InterruptedException     if the invoked ffmpeg/ffprobe process is interrupted
+         * @throws RuntimeException         if the local FFmpeg HLS conversion fails (non-zero exit code)
+         */
     public static String convertToAdaptiveHLSAndUpload(Path inputFilePath, Path outputBaseDir, Path thumbnailFilePath, 
                                                       com.vinaacademy.platform.feature.storage.service.S3Service s3Service, 
                                                       java.util.UUID videoId) throws IOException, InterruptedException {
@@ -103,6 +128,19 @@ public class FFmpegUtils {
         }
     }
 
+    /**
+     * Encodes the input video into a single HLS variant using ffmpeg, writing a playlist and TS segments into the given directory.
+     *
+     * The method runs the external `ffmpeg` process with the variant's resolution and bitrate settings, producing
+     * a "playlist.m3u8" and segment files matching "segment_###.ts" inside {@code variantDir}.
+     *
+     * @param inputFilePath path to the source video file
+     * @param variant      video variant (resolution and bitrates) to produce
+     * @param variantDir   directory where the variant playlist and segments will be written
+     * @return the ffmpeg process exit code (0 indicates success)
+     * @throws IOException if starting the ffmpeg process or file path operations fail
+     * @throws InterruptedException if the current thread is interrupted while waiting for ffmpeg to finish
+     */
     private static int convertToVariantHLS(Path inputFilePath, VideoVariant variant, Path variantDir) throws IOException, InterruptedException {
         String playlistPath = variantDir.resolve("playlist.m3u8").toString().replace("\\", "/");
         String segmentPattern = variantDir.resolve("segment_%03d.ts").toString().replace("\\", "/");

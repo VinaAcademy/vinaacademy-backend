@@ -47,6 +47,14 @@ public class VideoController {
   private final VideoProcessorService videoProcessorService;
   private final S3Client s3Client;
 
+  /**
+   * Uploads a video file and associated metadata for a lesson, returning the created VideoDto.
+   *
+   * @param file the video file to upload (multipart/form-data)
+   * @param videoRequest metadata for the video; must include the target lesson ID and other validated fields
+   * @return ApiResponse containing the uploaded VideoDto on success
+   * @throws IOException if an I/O error occurs while processing the uploaded file
+   */
   @Operation(summary = "Upload a video", description = "Upload a video file for a lesson")
   @ApiResponses(
       value = {
@@ -83,6 +91,16 @@ public class VideoController {
         "Video uploaded successfully", videoService.uploadVideo(file, videoRequest));
   }
 
+  /**
+   * Initiates processing of a lesson video according to the given request.
+   *
+   * The request is validated and delegated to the video processing service; this method
+   * does not wait for processing to complete — it returns a success ApiResponse indicating
+   * that processing has been started.
+   *
+   * @param processVideoRequest contains the target video ID and processing options
+   * @return an ApiResponse with a success message (no payload)
+   */
   @Operation(summary = "Process video", description = "Process a video file for a lesson")
   @ApiResponses(
       value = {
@@ -112,6 +130,19 @@ public class VideoController {
     return ApiResponse.success("Video processing started successfully");
   }
 
+  /**
+   * Serve a video resource (HLS manifest or media segment) for streaming.
+   *
+   * <p>Determines the path segment after {videoId} from the incoming request. If the subpath ends
+   * with ".m3u8" the method returns a proxied and rewritten HLS manifest (200 OK,
+   * Content-Type "application/vnd.apple.mpegurl") with a short private cache. Otherwise it
+   * redirects (302 Found) to a short-lived presigned URL for the requested segment or static file.
+   *
+   * @param request the HTTP servlet request (used to extract the subpath after the {videoId})
+   * @param videoId the UUID of the video resource
+   * @return a ResponseEntity containing either the manifest resource (200) or a redirect (302)
+   * @throws IOException if an I/O error occurs while obtaining or rewriting the manifest or segment URL
+   */
   @Operation(summary = "Get video segment", description = "Get a video segment for streaming")
   @ApiResponses(
       value = {
@@ -166,6 +197,14 @@ public class VideoController {
         .build();
   }
 
+  /**
+   * Retrieve the thumbnail image for a video.
+   *
+   * Returns a ResponseEntity containing the thumbnail Resource when found.
+   *
+   * @param videoId UUID of the video whose thumbnail is requested
+   * @return ResponseEntity with the thumbnail Resource (200 if found, 404 if not)
+   */
   @Operation(summary = "Get video thumbnail", description = "Get the thumbnail of a video")
   @ApiResponses(
       value = {

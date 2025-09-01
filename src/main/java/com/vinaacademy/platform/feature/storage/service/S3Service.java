@@ -7,63 +7,86 @@ import java.util.List;
 public interface S3Service {
     
     /**
-     * Upload a file to S3/MinIO
-     * @param key the object key (path in bucket)
-     * @param filePath local file path to upload
-     * @param contentType MIME type of the file
-     * @return the public URL of the uploaded file
-     */
+ * Uploads a local file to S3/MinIO and returns its public URL.
+ *
+ * @param key the destination object key (path) to store the file under in the bucket
+ * @param filePath the local file system path of the file to upload
+ * @param contentType the MIME type of the file being uploaded
+ * @return the public URL of the uploaded object
+ */
     String uploadFile(String key, Path filePath, String contentType);
     
     /**
-     * Upload a file to S3/MinIO using InputStream
-     * @param key the object key (path in bucket)
-     * @param inputStream the input stream of the file
-     * @param contentLength the content length
-     * @param contentType MIME type of the file
-     * @return the public URL of the uploaded file
-     */
+ * Uploads data from an InputStream to S3/MinIO and returns the public URL of the stored object.
+ *
+ * @param key the object key (path within the bucket)
+ * @param inputStream stream providing the object's bytes; must be positioned at the start of the content
+ * @param contentLength length of the content in bytes
+ * @param contentType MIME type of the uploaded object (e.g., "image/png", "application/pdf")
+ * @return the public URL where the uploaded object can be accessed
+ */
     String uploadFile(String key, InputStream inputStream, long contentLength, String contentType);
     
     /**
-     * Upload multiple files in a directory to S3/MinIO
-     * @param keyPrefix the prefix for all object keys
-     * @param directoryPath the local directory path
-     * @return list of uploaded file URLs
-     */
+ * Uploads all files found under the given local directory to S3/MinIO using the provided key prefix.
+ *
+ * The implementation is expected to iterate the directory (including subdirectories), create object keys by
+ * joining {@code keyPrefix} with each file's relative path, and upload each file, returning their public URLs.
+ *
+ * @param keyPrefix     prefix to prepend to each object's key in the bucket (may be empty)
+ * @param directoryPath local directory whose files will be uploaded
+ * @return              a list of public URLs for the uploaded files
+ */
     List<String> uploadDirectory(String keyPrefix, Path directoryPath);
     
     /**
-     * Download a file from S3/MinIO as InputStream
-     * @param key the object key
-     * @return InputStream of the file
-     */
+ * Returns an InputStream to read the object identified by the given key from S3/MinIO.
+ *
+ * The returned stream provides the object's raw bytes and must be closed by the caller when
+ * finished to release underlying resources.
+ *
+ * @param key the object key (path/name) in the storage bucket
+ * @return an InputStream for reading the object's data
+ */
     InputStream downloadFile(String key);
     
     /**
-     * Generate a presigned URL for streaming
-     * @param key the object key
-     * @param expirationInSeconds expiration time in seconds
-     * @return presigned URL
-     */
+ * Creates a presigned URL that grants time-limited, streamable access to the object identified by the given key.
+ *
+ * The returned URL is valid for the specified number of seconds and can be used to stream or download the object
+ * without requiring direct credentials.
+ *
+ * @param key the object key in the bucket
+ * @param expirationInSeconds duration in seconds that the presigned URL remains valid
+ * @return a presigned HTTP URL for accessing the object
+ */
     String generatePresignedUrl(String key, int expirationInSeconds);
     
     /**
-     * Delete a file from S3/MinIO
-     * @param key the object key
-     */
+ * Delete the object identified by the given key from S3/MinIO.
+ *
+ * <p>The key is the object's S3 path within the configured bucket (for example
+ * "folder/subfolder/file.txt"). Implementations perform the removal operation
+ * against the configured storage backend.
+ *
+ * @param key the S3 object key (path) to delete
+ */
     void deleteFile(String key);
     
     /**
-     * Delete multiple files with the same prefix
-     * @param keyPrefix the prefix of object keys to delete
-     */
+ * Delete all objects whose keys start with the given prefix.
+ *
+ * <p>If no objects match the prefix the method performs no action.</p>
+ *
+ * @param keyPrefix prefix of object keys to delete (all objects with keys that begin with this value)
+ */
     void deleteDirectory(String keyPrefix);
     
     /**
-     * Check if a file exists in S3/MinIO
-     * @param key the object key
-     * @return true if exists, false otherwise
-     */
+ * Returns true if an object with the given S3/MinIO key exists.
+ *
+ * @param key the object's storage key (path) to check
+ * @return true if the object exists, false otherwise
+ */
     boolean fileExists(String key);
 }
