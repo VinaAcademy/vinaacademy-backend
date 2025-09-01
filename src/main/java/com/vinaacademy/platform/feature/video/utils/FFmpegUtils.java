@@ -1,5 +1,6 @@
 package com.vinaacademy.platform.feature.video.utils;
 
+import com.vinaacademy.platform.feature.storage.service.S3Service;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -55,6 +57,50 @@ public class FFmpegUtils {
 //        generateThumbnailAtHalfway(inputFilePath, thumbnailFilePath);
 //        log.info("Thumbnail generated at: {}", thumbnailFilePath);
         return 0;
+    }
+
+    /**
+     * Convert video to adaptive HLS and upload to MinIO
+     * @param inputFilePath input video file
+     * @param outputBaseDir temporary output directory
+     * @param thumbnailFilePath thumbnail file path
+     * @param s3Service S3 service for uploading to MinIO
+     * @param videoId video UUID for S3 key prefix
+     * @return MinIO path prefix for the uploaded HLS files
+     */
+    public static String convertToAdaptiveHLSAndUpload(Path inputFilePath, Path outputBaseDir, Path thumbnailFilePath, 
+                                                      com.vinaacademy.platform.feature.storage.service.S3Service s3Service, 
+                                                      java.util.UUID videoId) throws IOException, InterruptedException {
+        // First convert to HLS locally
+        int exitCode = convertToAdaptiveHLS(inputFilePath, outputBaseDir, thumbnailFilePath);
+        if (exitCode != 0) {
+            throw new RuntimeException("FFmpeg conversion failed with exit code: " + exitCode);
+        }
+
+        try {
+            // Upload HLS directory to MinIO
+            String s3KeyPrefix = "videos/hls/" + videoId.toString();
+            s3Service.uploadDirectory(s3KeyPrefix, outputBaseDir);
+            
+            // Upload thumbnail to MinIO
+            if (Files.exists(thumbnailFilePath)) {
+                String thumbnailKey = "videos/thumbnails/" + videoId.toString() + ".jpg";
+                s3Service.uploadFile(thumbnailKey, thumbnailFilePath, "image/jpeg");
+            }
+            
+            log.info("Successfully uploaded HLS files and thumbnail to MinIO for video: {}", videoId);
+            return s3KeyPrefix;
+            
+        } finally {
+            // Clean up local files
+            try {
+                deleteDirectoryRecursively(outputBaseDir);
+                Files.deleteIfExists(thumbnailFilePath);
+                log.debug("Cleaned up local HLS files for video: {}", videoId);
+            } catch (Exception e) {
+                log.warn("Failed to clean up local files for video {}: {}", videoId, e.getMessage());
+            }
+        }
     }
 
     private static int convertToVariantHLS(Path inputFilePath, VideoVariant variant, Path variantDir) throws IOException, InterruptedException {

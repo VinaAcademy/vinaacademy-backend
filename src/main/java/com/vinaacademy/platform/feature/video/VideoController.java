@@ -19,9 +19,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,10 +34,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.UUID;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @RestController
 @RequestMapping("/api/v1/videos")
@@ -41,85 +43,143 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Videos", description = "Video management APIs")
 public class VideoController {
-    private final VideoService videoService;
-    private final VideoProcessorService videoProcessorService;
+  private final VideoService videoService;
+  private final VideoProcessorService videoProcessorService;
+  private final S3Client s3Client;
 
-    @Operation(summary = "Upload a video", description = "Upload a video file for a lesson")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Video uploaded successfully",
-                    content = @Content(schema = @Schema(implementation = VideoDto.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Unauthorized access"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Không tìm thấy bài học")
-    })
-    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE})
-    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<VideoDto> uploadVideo(
-            @Parameter(description = "Video file")
-            @RequestParam("file")
-            MultipartFile file,
-            @Parameter(description = "Metadata JSON", content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = VideoRequest.class)))
-            @RequestPart("metadata") @Valid
-            VideoRequest videoRequest) throws IOException {
-        log.debug("Uploading video for lesson: {}", videoRequest.getLessonId());
-        return ApiResponse.success("Video uploaded successfully",
-                videoService.uploadVideo(file, videoRequest));
+  @Operation(summary = "Upload a video", description = "Upload a video file for a lesson")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Video uploaded successfully",
+            content = @Content(schema = @Schema(implementation = VideoDto.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "Invalid request"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "403",
+            description = "Unauthorized access"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "Không tìm thấy bài học")
+      })
+  @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE})
+  @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ApiResponse<VideoDto> uploadVideo(
+      @Parameter(description = "Video file") @RequestParam("file") MultipartFile file,
+      @Parameter(
+              description = "Metadata JSON",
+              content =
+                  @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = VideoRequest.class)))
+          @RequestPart("metadata")
+          @Valid
+          VideoRequest videoRequest)
+      throws IOException {
+    log.debug("Uploading video for lesson: {}", videoRequest.getLessonId());
+    return ApiResponse.success(
+        "Video uploaded successfully", videoService.uploadVideo(file, videoRequest));
+  }
+
+  @Operation(summary = "Process video", description = "Process a video file for a lesson")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Video processed successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "Invalid request"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "403",
+            description = "Unauthorized access"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "Video not found")
+      })
+  @PostMapping("/process")
+  @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE})
+  @RequiresResourcePermission(
+      resourceType = ResourceConstants.LESSON,
+      idParam = "processVideoRequest.videoId",
+      permission = ResourceConstants.EDIT)
+  public ApiResponse<Void> processVideo(
+      @RequestBody @Valid ProcessVideoRequest processVideoRequest) {
+    log.debug("Processing video: {}", processVideoRequest.getVideoId());
+    videoProcessorService.processVideo(processVideoRequest);
+    return ApiResponse.success("Video processing started successfully");
+  }
+
+  @Operation(summary = "Get video segment", description = "Get a video segment for streaming")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Video segment retrieved successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized access"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "Video segment not found")
+      })
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/{videoId}/**")
+  @RequiresResourcePermission(resourceType = ResourceConstants.LESSON, idParam = "videoId")
+  public ResponseEntity<Resource> getSegment(
+      HttpServletRequest request, @PathVariable UUID videoId) throws IOException {
+
+    // 1) Lấy subPath sau {videoId} (vd: "720p/segment001.ts" hoặc "master.m3u8")
+    String fullPath =
+        (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+    String bestMatchPattern =
+        (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+    String subPath = new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, fullPath);
+
+    log.debug("Streaming entry: videoId={}, subPath={}", videoId, subPath);
+
+    // 2) Nếu là manifest (.m3u8) -> proxy + rewrite
+    if (subPath.endsWith(".m3u8")) {
+      String requestUri = request.getRequestURI();
+      int cut = requestUri.lastIndexOf("/") + 1;
+      String basePath = cut > 0 ? requestUri.substring(0, cut) : requestUri;
+      if (!basePath.endsWith("/")) basePath += "/";
+
+      ByteArrayResource body = videoService.getRewriteManifestProxy(videoId, basePath, subPath);
+
+      return ResponseEntity.ok()
+          .header(HttpHeaders.CONTENT_TYPE, "application/vnd.apple.mpegurl")
+          // Cache ngắn để hạn chế bị share link manifest
+          .header(HttpHeaders.CACHE_CONTROL, "private, max-age=10")
+          .body(body);
     }
 
-    @Operation(summary = "Process video", description = "Process a video file for a lesson")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Video processed successfully"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Unauthorized access"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Video not found")
-    })
-    @PostMapping("/process")
-    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE})
-    @RequiresResourcePermission(resourceType = ResourceConstants.LESSON,
-            idParam = "processVideoRequest.videoId",
-            permission = ResourceConstants.EDIT)
-    public ApiResponse<Void> processVideo(
-            @RequestBody @Valid ProcessVideoRequest processVideoRequest) {
-        log.debug("Processing video: {}", processVideoRequest.getVideoId());
-        videoProcessorService.processVideo(processVideoRequest);
-        return ApiResponse.success("Video processing started successfully");
-    }
+    // 3) Ngược lại: segment hoặc file tĩnh -> 302 redirect sang presigned URL (expire ngắn)
+    String presignedUrl = videoService.getSegmentStreaming(videoId, subPath);
 
+    return ResponseEntity.status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, presignedUrl)
+        // Cache cực ngắn ở client để giảm request lặp (tùy chỉnh)
+        .header(HttpHeaders.CACHE_CONTROL, "private, max-age=5")
+        .build();
+  }
 
-    @Operation(summary = "Get video segment", description = "Get a video segment for streaming")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Video segment retrieved successfully"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Video segment not found")
-    })
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{videoId}/**")
-    @RequiresResourcePermission(resourceType = ResourceConstants.LESSON,
-            idParam = "videoId",
-            permission = ResourceConstants.VIEW)
-    public ResponseEntity<Resource> getSegment(HttpServletRequest request,
-                                               @PathVariable UUID videoId) throws MalformedURLException {
-
-        // Extract path after videoId (e.g., 720p/playlist.m3u8)
-        String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        String subPath = new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, fullPath);
-
-        // Delegate to service for getting the video segment
-        return videoService.getVideoSegment(videoId, subPath);
-    }
-
-    @Operation(summary = "Get video thumbnail", description = "Get the thumbnail of a video")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Thumbnail retrieved successfully"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Thumbnail not found")
-    })
-    @GetMapping("/{videoId}/thumbnail")
-    public ResponseEntity<Resource> getThumbnail(
-            @Parameter(description = "ID of the video")
-            @PathVariable UUID videoId) throws MalformedURLException {
-        log.debug("Getting thumbnail for video: {}", videoId);
-        return videoService.getThumbnail(videoId);
-    }
+  @Operation(summary = "Get video thumbnail", description = "Get the thumbnail of a video")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Thumbnail retrieved successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "404",
+            description = "Thumbnail not found")
+      })
+  @GetMapping("/{videoId}/thumbnail")
+  public ResponseEntity<Resource> getThumbnail(
+      @Parameter(description = "ID of the video") @PathVariable UUID videoId) {
+    log.debug("Getting thumbnail for video: {}", videoId);
+    return videoService.getThumbnail(videoId);
+  }
 }

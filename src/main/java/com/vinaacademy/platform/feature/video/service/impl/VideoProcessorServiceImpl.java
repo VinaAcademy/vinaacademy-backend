@@ -7,11 +7,18 @@ import com.vinaacademy.platform.feature.request.ProcessVideoRequest;
 import com.vinaacademy.platform.feature.storage.entity.MediaFile;
 import com.vinaacademy.platform.feature.storage.properties.StorageProperties;
 import com.vinaacademy.platform.feature.storage.repository.MediaFileRepository;
+import com.vinaacademy.platform.feature.storage.service.S3Service;
 import com.vinaacademy.platform.feature.video.entity.Video;
 import com.vinaacademy.platform.feature.video.enums.VideoStatus;
 import com.vinaacademy.platform.feature.video.repository.VideoRepository;
+import com.vinaacademy.platform.feature.video.service.VideoProcessorService;
 import com.vinaacademy.platform.feature.video.utils.FFmpegUtils;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +29,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VideoProcessorService implements com.vinaacademy.platform.feature.video.service.VideoProcessorService {
+public class VideoProcessorServiceImpl implements VideoProcessorService {
 
     private final VideoRepository videoRepository;
     private final MediaFileRepository mediaFileRepository;
-
     private final NotificationService notificationService;
     private final StorageProperties storageProperties;
+    private final S3Service s3Service;
 
     @Value("${application.url.frontend}")
     private String frontendUrl;
 
     @Autowired
     @Lazy
-    private com.vinaacademy.platform.feature.video.service.VideoProcessorService self;
+    private VideoProcessorService self;
 
     @Async("videoTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -53,12 +54,13 @@ public class VideoProcessorService implements com.vinaacademy.platform.feature.v
         Path thumbnailPath = Paths.get(storageProperties.getThumbnailDir(), videoId + ".jpg");
 
         try {
-            int exitCode = FFmpegUtils.convertToAdaptiveHLS(inputFile, outputDir, thumbnailPath);
-            if (exitCode != 0) throw new RuntimeException("FFmpeg exited with code " + exitCode);
+            // Convert to HLS and upload to MinIO
+            String s3KeyPrefix = FFmpegUtils.convertToAdaptiveHLSAndUpload(inputFile, outputDir, thumbnailPath, s3Service, videoId);
+            
             Video video = videoRepository.findByIdWithLock(videoId)
                     .orElseThrow(() -> BadRequestException.message("Không tìm thấy video"));
 
-            updateVideoSuccess(video, outputDir, thumbnailPath, inputFile);
+            updateVideoSuccess(video, s3KeyPrefix, thumbnailPath, inputFile);
             notifySuccess(video);
             log.debug("✅ Video {} processed successfully.", videoId);
             videoRepository.save(video);
@@ -75,12 +77,15 @@ public class VideoProcessorService implements com.vinaacademy.platform.feature.v
         }
     }
 
-    private void updateVideoSuccess(Video video, Path hlsPath, Path thumbnailPath, Path inputFile) throws IOException, InterruptedException {
+    private void updateVideoSuccess(Video video, String s3KeyPrefix, Path thumbnailPath, Path inputFile) throws IOException, InterruptedException {
         video.setStatus(VideoStatus.READY);
-        video.setHlsPath(hlsPath.toString());
+        // Store S3 key prefix instead of local path
+        video.setHlsPath(s3KeyPrefix);
         video.setDuration(FFmpegUtils.getVideoDurationInSeconds(inputFile));
         if (video.getThumbnailUrl() == null) {
-            video.setThumbnailUrl(thumbnailPath.toString());
+            // Store MinIO thumbnail URL
+            String thumbnailKey = "videos/thumbnails/" + video.getId().toString() + ".jpg";
+            video.setThumbnailUrl(thumbnailKey);
         }
     }
 
