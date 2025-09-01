@@ -4,7 +4,7 @@ language: vi-VN
 tone_instructions: "Vui lòng nói thẳng vấn đề và thẳng thắn"
 
 reviews:
-  profile: assertive
+  profile: chill
   high_level_summary: false
   collapse_walkthrough: false
   changed_files_summary: false

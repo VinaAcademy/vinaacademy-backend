@@ -40,10 +40,14 @@ public class CourseAssembler {
   private final CourseInstructorRepository courseInstructorRepository;
 
   /**
-   * Assemble course details response with instructors, sections, lessons, and reviews
+   * Build a complete CourseDetailsResponse for the given Course.
    *
-   * @param course The course entity
-   * @return Complete course details response
+   * <p>Maps the Course to a CourseDetailsResponse, populates instructors (and owner) using either
+   * the initialized association or repository-backed projections, processes ordered sections and
+   * their ordered lessons, and includes any course reviews.
+   *
+   * @param course the non-null Course entity to assemble details from
+   * @return a fully populated CourseDetailsResponse
    */
   public CourseDetailsResponse assembleCourseDetailsResponse(@NotNull Course course) {
     log.debug("Assembling course details response for course: {}", course.getId());
@@ -68,6 +72,19 @@ public class CourseAssembler {
     return response;
   }
 
+  /**
+   * Populates the given CourseDetailsResponse with the course's instructors and the owner instructor.
+   *
+   * <p>If the course's instructors association is already initialized, this method extracts User
+   * entities from CourseInstructor entries; otherwise it queries CourseInstructorRepository for
+   * InstructorInfo projections. In both flows it performs null-safe filtering, identifies the owner
+   * using {@code Boolean.TRUE.equals(...)} on the "isOwner" flag, maps users to DTOs via
+   * {@code UserMapper}, sets the instructors list on the response, and sets the owner instructor if
+   * present.
+   *
+   * @param course the Course to read instructors from
+   * @param response the CourseDetailsResponse to populate with instructor DTOs
+   */
   private void buildInstructorsResponse(Course course, CourseDetailsResponse response) {
     boolean isFetchInstructors = Hibernate.isInitialized(course.getInstructors());
 
@@ -114,10 +131,14 @@ public class CourseAssembler {
   }
 
   /**
-   * Process sections and their lessons, creating DTOs with sorted order
+   * Convert a list of Section entities into SectionDto objects with their lessons mapped and ordered.
    *
-   * @param sections List of section entities
-   * @return List of section DTOs with ordered lessons
+   * <p>Returns an empty list if {@code sections} is null or empty. Sections and lessons are sorted
+   * by their {@code orderIndex} with null indices placed last. Each Section's lessons are mapped to
+   * LessonDto via {@code LessonMapper}.
+   *
+   * @param sections the sections to process (may be null)
+   * @return an ordered list of SectionDto objects with ordered LessonDto lists
    */
   public List<SectionDto> processSectionsAndLessons(List<Section> sections) {
     if (sections == null || sections.isEmpty()) {
@@ -146,11 +167,17 @@ public class CourseAssembler {
   }
 
   /**
-   * Process sections and lessons with user progress information
+   * Builds ordered SectionDto objects whose LessonDto children are annotated with per-user progress.
    *
-   * @param sections List of section entities
-   * @param progressMap Map of lesson ID to user progress
-   * @return List of section DTOs with lessons including progress
+   * Sections and lessons are sorted by their `orderIndex` (ascending). If `sections` is null or empty,
+   * an empty list is returned. For each lesson, the method looks up progress in `progressMap` by the
+   * lesson's UUID; if no entry is present, an empty `UserProgress` is attached.
+   *
+   * @param sections list of Section entities to convert (may be null)
+   * @param progressMap mapping from lesson UUID to the user's progress for that lesson; missing keys
+   *     result in a default, empty UserProgress being set on the LessonDto
+   * @return an ordered list of SectionDto with lessons populated and each LessonDto carrying its
+   *     currentUserProgress
    */
   public List<SectionDto> processSectionsAndLessonsWithProgress(
       List<Section> sections, Map<UUID, UserProgress> progressMap) {
