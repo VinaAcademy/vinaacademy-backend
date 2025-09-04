@@ -116,29 +116,17 @@ public class Course extends BaseEntity {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null) return false;
+    // Avoid issues when comparing Hibernate proxies
+    if (org.hibernate.Hibernate.getClass(this) != org.hibernate.Hibernate.getClass(o)) return false;
     Course course = (Course) o;
-    return Objects.equals(id, course.id);
+    // Do not treat two new (id == null) entities as equal
+    return this.id != null && this.id.equals(course.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
-  }
-
-  @Override
-  public String toString() {
-    return "Course{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", slug='" + slug + '\'' +
-        ", status=" + status +
-        ", level=" + level +
-        ", price=" + price +
-        ", rating=" + rating +
-        ", totalStudent=" + totalStudent +
-        ", totalSection=" + totalSection +
-        ", totalLesson=" + totalLesson +
-        '}';
+    // Stable across proxies and before persisting (when id is null)
+    return getClass().hashCode();
   }
 }
