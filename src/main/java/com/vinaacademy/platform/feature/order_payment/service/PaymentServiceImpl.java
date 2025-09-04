@@ -65,7 +65,8 @@ public class PaymentServiceImpl implements PaymentService {
 		User user = securityHelper.getCurrentUser();
 		if (user.getId() != order.getUser().getId())
 			throw BadRequestException.message("Bạn không phải người sở hữu order này");
-		if (!utils.isCouponValid(order.getCoupon(), order.getTotalAmount()))
+		
+		if (order.getCoupon() != null && !utils.isCouponValid(order.getCoupon(), order.getTotalAmount()))
 			throw BadRequestException.message("Coupon không hợp lệ, vui lòng thử lại");
 		
 		String url = vnPayConfig.createPaymentRedirect(order.getTotalAmount().longValue(),
