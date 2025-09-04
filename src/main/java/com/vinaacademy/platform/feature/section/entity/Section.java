@@ -44,14 +44,16 @@ public class Section extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Section section = (Section) o;
-        return Objects.equals(id, section.id);
+        if (o == null || org.hibernate.Hibernate.getClass(this) != org.hibernate.Hibernate.getClass(o)) return false;
+        Section that = (Section) o;
+        return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return (id != null)
+            ? id.hashCode()
+            : org.hibernate.Hibernate.getClass(this).hashCode();
     }
 
     @Override
