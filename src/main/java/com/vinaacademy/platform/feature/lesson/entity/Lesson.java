@@ -72,16 +72,12 @@ public abstract class Lesson extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
+        if (this == o) return true;
+        if (o == null
+            || org.hibernate.Hibernate.getClass(this) != org.hibernate.Hibernate.getClass(o))
             return false;
-        if (!super.equals(o))
-            return false;
-        if (id == null) {
-            return super.equals(o);
-        }
-
-        Lesson lesson = (Lesson) o;
-        return id.equals(lesson.id);
+        Lesson that = (Lesson) o;
+        return id != null && id.equals(that.id);
     }
 
     @Override
