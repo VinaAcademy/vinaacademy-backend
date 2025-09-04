@@ -159,4 +159,10 @@ public class User extends BaseEntity {
                 "id=" + id +
                 '}';
     }
+    
+    @PostLoad
+    public void afterLoad() {
+        // Logic xử lý sẽ chạy ngay sau khi entity được tải
+        System.out.println("Giá trị đã được set sau khi tải");
+    }
 }
