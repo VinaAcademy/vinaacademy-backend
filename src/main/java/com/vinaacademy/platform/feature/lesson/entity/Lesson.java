@@ -82,11 +82,8 @@ public abstract class Lesson extends BaseEntity {
 
     @Override
     public int hashCode() {
-        if (id == null) {
-            return super.hashCode();
-        }
-        int result = super.hashCode();
-        result = 31 * result + id.hashCode();
-        return result;
+        return (id != null)
+            ? id.hashCode()
+            : org.hibernate.Hibernate.getClass(this).hashCode();
     }
 }
