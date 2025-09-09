@@ -22,14 +22,15 @@ import java.util.*;
 @Component
 public class VNPayConfig {
     public String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    @Value("${vnpay.tmn-code}")
+    @Value("${vnpay.tmn-code}") 
     public String vnp_TmnCode;
     @Value("${vnpay.hash-secret}") 
     public String vnp_HashSecret;
     public String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-    public String urlReturn = "https://vinaacademy.huuloc.id.vn/transaction";
+    @Value("${vnpay.url-return}") 
+    public String urlReturn;
 
-    public String md5(String message) {
+    public String md5(String message) { 
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -139,7 +140,7 @@ public class VNPayConfig {
 		String vnp_Command = "pay";
 		String vnp_TxnRef = idRef;
 		String vnp_IpAddr = getIpAddress(request);
-		String orderType = "other";
+		String orderType = "other";	
 		
 		Map<String, String> vnp_Params = new HashMap<>();
 		vnp_Params.put("vnp_Version", vnp_Version);
@@ -147,7 +148,6 @@ public class VNPayConfig {
 		vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
 		vnp_Params.put("vnp_Amount", String.valueOf(total*100));
 		vnp_Params.put("vnp_CurrCode", "VND");
-
 		vnp_Params.put("vnp_TxnRef", vnp_TxnRef); 
 		vnp_Params.put("vnp_OrderInfo", orderInfor);
 		log.debug("OrderInfo: "+orderInfor);

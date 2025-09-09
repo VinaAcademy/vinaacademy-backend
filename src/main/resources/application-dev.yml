@@ -97,8 +97,9 @@ server:
     mime-types: application/x-mpegURL, text/plain
     min-response-size: 1024
 vnpay:
-  tmn-code: 2JVRHVF9
-  hash-secret: 4TD8VD92KMWZ6E1VCUDJ4HF78LX7D1FD
+  tmn-code: 4V0UG95A
+  hash-secret: 9UUN29DW7VXYOZEYV9F670QUJPDY3I5E
+  url-return: http://localhost:3000/transaction
 
 minio:
   endpoint: ${MINIO_ENDPOINT:http://localhost:9000}

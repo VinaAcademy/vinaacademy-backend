@@ -31,7 +31,7 @@ public class testVNpayController {
 //    public ApiResponse<String> getPaymentUrl() {
 //    	return ApiResponse.success(paymentService.testApi());
 //    }
-    
+//    
 //    @GetMapping("/submitOrder")
 //    public String submidOrder(@RequestParam("amount") int orderTotal,
 //                            @RequestParam("orderInfo") String orderInfo,
