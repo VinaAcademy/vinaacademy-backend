@@ -72,13 +72,12 @@ public class AdminRevenueController {
      */
     @PutMapping("/payout/approve")
     public ResponseEntity<ApiResponse<PayoutRequest>> approvePayoutRequest(
-            @RequestHeader("X-Admin-ID") UUID adminId,
             @Valid @RequestBody PayoutApprovalRequest approvalRequest) {
         // Ghi log thao tác duyệt/từ chối
-        log.info("Admin {} processing payout request: {}, approved: {}", 
-                adminId, approvalRequest.getPayoutRequestId(), approvalRequest.getApproved());
+        log.info("Admin processing payout request: {}, approved: {}", 
+                approvalRequest.getPayoutRequestId(), approvalRequest.getApproved());
         // Xử lý duyệt/từ chối yêu cầu rút tiền
-        PayoutRequest processedRequest = payoutService.approvePayoutRequest(approvalRequest, adminId);
+        PayoutRequest processedRequest = payoutService.approvePayoutRequest(approvalRequest);
         String message = approvalRequest.getApproved() ? "Duyệt yêu cầu rút tiền thành công" : "Từ chối yêu cầu rút tiền thành công";
         return ResponseEntity.ok(ApiResponse.success(message, processedRequest));
     }

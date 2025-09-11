@@ -141,7 +141,8 @@ public class PayoutServiceImpl implements PayoutService {
      * @throws InvalidPayoutStatusException nếu trạng thái không hợp lệ
      */
 	@Override
-	public PayoutRequest approvePayoutRequest(PayoutApprovalRequest approvalRequest, UUID adminId) {
+	public PayoutRequest approvePayoutRequest(PayoutApprovalRequest approvalRequest) {
+		var user = securityHelper.getCurrentUser();
 		log.info("Processing payout approval. Request ID: {}, Approved: {}", 
                 approvalRequest.getPayoutRequestId(), approvalRequest.getApproved());
         
@@ -162,17 +163,17 @@ public class PayoutServiceImpl implements PayoutService {
             // 4a. Duyệt yêu cầu: cập nhật trạng thái APPROVED, gọi processPayment để xử lý thanh toán
             payoutRequest.setStatus(PayoutStatus.APPROVED);
             payoutRequest.setProcessedAt(LocalDateTime.now());
-            payoutRequest.setProcessedBy(adminId.getMostSignificantBits()); // Convert UUID to Long for demo
+            payoutRequest.setProcessedBy(user.getId().getMostSignificantBits()); // Convert UUID to Long for demo
             
             // Xử lý thanh toán ngay (sandbox)
-            processPayment(payoutRequest, adminId);
+            processPayment(payoutRequest);
             
         } else {
             // 4b. Từ chối: cập nhật trạng thái REJECTED, giải phóng số tiền pending
             payoutRequest.setStatus(PayoutStatus.REJECTED);
             payoutRequest.setRejectionReason(approvalRequest.getRejectionReason());
             payoutRequest.setProcessedAt(LocalDateTime.now());
-            payoutRequest.setProcessedBy(adminId.getMostSignificantBits());
+            payoutRequest.setProcessedBy(user.getId().getMostSignificantBits());
             
             // Giải phóng số tiền pending trong ví
             wallet.setPendingWithdraw(wallet.getPendingWithdraw().subtract(payoutRequest.getAmount()));
@@ -207,7 +208,8 @@ public class PayoutServiceImpl implements PayoutService {
      * @throws RuntimeException nếu không tìm thấy ví giảng viên
      */
 	@Override
-	public void processPayment(PayoutRequest payoutRequest, UUID adminId) {
+	public void processPayment(PayoutRequest payoutRequest) {
+		var user = securityHelper.getCurrentUser();
 
 		log.info("Processing payment for payout request: {}", payoutRequest.getId());
         
@@ -223,7 +225,7 @@ public class PayoutServiceImpl implements PayoutService {
             .bankName(payoutRequest.getBankName())
             .bankAccount(payoutRequest.getBankAccount())
             .accountHolder(payoutRequest.getAccountHolder())
-            .processedBy(adminId)
+            .processedBy(user.getId())
             .note("Sandbox payment processed successfully")
             .build();
             
