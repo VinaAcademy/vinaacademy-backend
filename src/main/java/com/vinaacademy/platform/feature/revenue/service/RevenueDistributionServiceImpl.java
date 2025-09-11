@@ -82,7 +82,7 @@ public class RevenueDistributionServiceImpl implements RevenueDistributionServic
 
     private UUID getInstructorIdFromCourseInstructor(UUID courseId) {
         // Tìm Instructor đầu tiên trong danh sách CourseInstructor
-        CourseInstructor courseInstructor = courseInstructorRepository.findByCourseId(courseId)
+        CourseInstructor courseInstructor = courseInstructorRepository.findAllByCourseId(courseId)
                 .stream().findFirst().orElse(null);
         
         return courseInstructor != null ? courseInstructor.getInstructor().getId() : null;
