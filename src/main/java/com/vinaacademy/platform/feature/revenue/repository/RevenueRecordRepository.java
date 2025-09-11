@@ -51,4 +51,9 @@ public interface RevenueRecordRepository extends JpaRepository<RevenueRecord, Lo
      */
     Page<RevenueRecord> findByInstructorId(UUID instructorId, Pageable pageable);
 
+    /**
+     * Tìm bản ghi doanh thu theo paymentId, instructorId, courseId.
+     */
+    Optional<RevenueRecord> findByPaymentIdAndInstructorIdAndCourseId(UUID paymentId, UUID instructorId, UUID courseId);
+
 }
