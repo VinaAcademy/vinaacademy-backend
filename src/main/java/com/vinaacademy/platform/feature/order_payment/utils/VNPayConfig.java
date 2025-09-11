@@ -160,7 +160,7 @@ public class VNPayConfig {
 		vnp_Params.put("vnp_Locale", locate);
 
 		vnp_Params.put("vnp_ReturnUrl", urlReturn);
-		vnp_Params.put("vnp_IpnUrl", "vnp_IpnUrl");
+		vnp_Params.put("vnp_IpnUrl", ipnUrl);
 		vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
 		Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
