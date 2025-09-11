@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +19,8 @@ import com.vinaacademy.platform.feature.revenue.dto.RevenueDashboardDto;
 import com.vinaacademy.platform.feature.revenue.entity.PayoutRequest;
 import com.vinaacademy.platform.feature.revenue.service.PayoutService;
 import com.vinaacademy.platform.feature.revenue.service.RevenueService;
+import com.vinaacademy.platform.feature.user.auth.annotation.HasAnyRole;
+import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/v1/admin/revenue")
 @RequiredArgsConstructor
+@HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
 public class AdminRevenueController {
 
     private final PayoutService payoutService;
