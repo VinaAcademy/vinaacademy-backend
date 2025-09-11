@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -15,9 +17,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Data
 @SuperBuilder
@@ -30,19 +29,19 @@ public abstract class BaseEntity implements Serializable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @CreationTimestamp
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    protected LocalDateTime createdDate;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @UpdateTimestamp
     @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
+    protected LocalDateTime updatedDate;
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    private String createdBy;
+    protected String createdBy;
 
     @LastModifiedBy
     @Column(name = "updated_by")
-    private String lastModifiedBy;
+    protected String lastModifiedBy;
 }

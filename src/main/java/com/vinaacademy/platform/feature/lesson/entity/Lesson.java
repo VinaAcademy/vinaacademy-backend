@@ -17,7 +17,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "lesson_type", discriminatorType = DiscriminatorType.STRING)
@@ -71,4 +70,20 @@ public abstract class Lesson extends BaseEntity {
     @ToString.Exclude
     protected List<MediaFile> mediaFiles;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null
+            || org.hibernate.Hibernate.getClass(this) != org.hibernate.Hibernate.getClass(o))
+            return false;
+        Lesson that = (Lesson) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+            ? id.hashCode()
+            : org.hibernate.Hibernate.getClass(this).hashCode();
+    }
 }

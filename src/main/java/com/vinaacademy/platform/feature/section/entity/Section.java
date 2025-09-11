@@ -4,20 +4,17 @@ import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.*;
 
 @Builder
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "sections")
 public class Section extends BaseEntity {
@@ -37,7 +34,36 @@ public class Section extends BaseEntity {
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "order_index")
+    @Builder.Default
     private List<Lesson> lessons = new ArrayList<>();
+
+    /**
+     * Override equals and hashCode to prevent circular reference issues
+     * Only use ID field for comparison to avoid infinite loops with bidirectional relationships
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || org.hibernate.Hibernate.getClass(this) != org.hibernate.Hibernate.getClass(o)) return false;
+        Section that = (Section) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+            ? id.hashCode()
+            : org.hibernate.Hibernate.getClass(this).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+            "id=" + id +
+            ", title='" + title + '\'' +
+            ", orderIndex=" + orderIndex +
+            '}';
+    }
 
     public void addLesson(Lesson lesson) {
         if (lessons == null) {
