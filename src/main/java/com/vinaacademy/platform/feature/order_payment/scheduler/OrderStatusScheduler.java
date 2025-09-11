@@ -14,6 +14,7 @@ import com.vinaacademy.platform.feature.order_payment.enums.PaymentStatus;
 import com.vinaacademy.platform.feature.order_payment.repository.OrderRepository;
 import com.vinaacademy.platform.feature.order_payment.repository.PaymentRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,21 +27,22 @@ public class OrderStatusScheduler {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
 
-    @Scheduled(fixedRate = 15000) // mỗi 15s
+    @Scheduled(fixedRate = 120000) // mỗi 2p
+    @Transactional
     public void checkPendingOrders() {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(15);
-        LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
-        List <Payment> pendingPayments = paymentRepository.findPendingPaymentsCreatedBefore(PaymentStatus.PENDING, cutoffTime);
-        for (Payment pay : pendingPayments) {
-        	pay.setPaymentStatus(PaymentStatus.CANCELLED);
-        	pay.getOrder().setStatus(OrderStatus.FAILED);
-        	paymentRepository.save(pay);
-        }
-        
-        List <Order> pendingOrderNullPayment = orderRepository.findUnpaidPendingOrdersUpdatedBefore(OrderStatus.PENDING, oneDayAgo);
-        for (Order order : pendingOrderNullPayment) {
-        	orderRepository.delete(order);
-        }
-    
+    	LocalDateTime cutoffPayment = LocalDateTime.now().minusMinutes(15); //15p truoc
+        LocalDateTime cutoffOrder   = LocalDateTime.now().minusMinutes(90); //90p truoc
+
+        int cancelled = paymentRepository.cancelExpiredPendingPayments(
+                PaymentStatus.CANCELLED,
+                PaymentStatus.PENDING,
+                cutoffPayment); 
+
+        int failed = orderRepository.failOldUnpaidOrders(
+                OrderStatus.FAILED,
+                OrderStatus.PENDING,
+                cutoffOrder);
+
+        log.info("Scheduler: {} payments cancelled, {} orders failed", cancelled, failed);
     }
 }

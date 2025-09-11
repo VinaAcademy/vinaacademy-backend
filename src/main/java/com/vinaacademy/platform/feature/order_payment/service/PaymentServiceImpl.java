@@ -123,6 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
+	@Transactional
 	public PaymentStatus validPayment(Map<String, String> requestParams) {
 		Optional<Payment> payment = null;
 
