@@ -1,4 +1,16 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/x-mpegURL, text/plain
+    min-response-size: 1024
 spring:
+  grpc:
+    server:
+      port: 9090
+      reflection:
+        enabled: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
     password: postgres
@@ -66,7 +78,6 @@ application:
     secret: super-secret-key-for-hmac
   storage:
     uploadDir: ${UPLOAD_DIR:/vinaacademy/uploads}
-    hlsOutputDir: ${HLS_OUTPUT_DIR:/vinaacademy/hls}
   video:
     maxSize: 1073741824
   url:
@@ -90,12 +101,6 @@ logging:
               BasicBinder: TRACE
           nodeValue: TRACE
         SQL: DEBUG
-server:
-  port: 8080
-  compression:
-    enabled: true
-    mime-types: application/x-mpegURL, text/plain
-    min-response-size: 1024
 vnpay:
   tmn-code: 2JVRHVF9
   hash-secret: 4TD8VD92KMWZ6E1VCUDJ4HF78LX7D1FD

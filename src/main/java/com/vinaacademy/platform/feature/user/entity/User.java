@@ -10,16 +10,18 @@ import com.vinaacademy.platform.feature.review.entity.CourseReview;
 import com.vinaacademy.platform.feature.user.role.entity.Role;
 import com.vinaacademy.platform.feature.video.entity.VideoNote;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.ColumnDefault;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
 @Builder
@@ -31,7 +33,7 @@ import java.util.UUID;
         @UniqueConstraint(columnNames = "username")
 })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
@@ -85,52 +87,22 @@ public class User extends BaseEntity {
     private int failedAttempts;
 
     @Column(name = "is_locked")
-    private boolean isLocked = false;
+    @ColumnDefault("false")
+    private Boolean isLocked = false;
     @Column(name = "lock_time")
     private LocalDateTime lockTime;
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Log> logs;
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<PasswordReset> passwordResets;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @BatchSize(size = 20)
     private List<VideoNote> videoNotes = new ArrayList<>();
 
-    public void addVideoNote(VideoNote videoNote) {
-        videoNotes.add(videoNote);
-        videoNote.setUser(this);
-    }
-
-    public void removeVideoNote(VideoNote videoNote) {
-        videoNotes.remove(videoNote);
-        videoNote.setUser(null);
-    }
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @BatchSize(size = 20)
     private List<Enrollment> enrollments = new ArrayList<>();
 
-    public void addEnrollment(Enrollment enrollment) {
-        enrollments.add(enrollment);
-        enrollment.setUser(this);
-    }
-
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @BatchSize(size = 20)
     private List<CourseInstructor> coursesTaught = new ArrayList<>();
-
-    public void addCourseTaught(CourseInstructor courseInstructor) {
-        coursesTaught.add(courseInstructor);
-        courseInstructor.setInstructor(this);
-    }
-
-    public void removeCourseTaught(CourseInstructor courseInstructor) {
-        coursesTaught.remove(courseInstructor);
-        courseInstructor.setInstructor(null);
-    }
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
@@ -138,16 +110,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @BatchSize(size = 20)
     private List<CourseReview> courseReviews = new ArrayList<>();
-
-    public void addCourseReview(CourseReview courseReview) {
-        courseReviews.add(courseReview);
-        courseReview.setUser(this);
-    }
-
-    public void removeCourseReview(CourseReview courseReview) {
-        courseReviews.remove(courseReview);
-        courseReview.setUser(null);
-    }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @BatchSize(size = 20)
@@ -164,5 +126,33 @@ public class User extends BaseEntity {
     public void afterLoad() {
         // Logic xử lý sẽ chạy ngay sau khi entity được tải
         System.out.println("Giá trị đã được set sau khi tải");
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (roles == null || roles.isEmpty()) {
+            return List.of();
+        }
+        return roles.stream()
+            .map(Role::getAuthorities)
+            .flatMap(Collection::stream)
+            .toList();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        if (isLocked != null && isLocked) {
+            return false;
+        }
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
     }
 }

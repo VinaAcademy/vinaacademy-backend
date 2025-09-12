@@ -2,6 +2,7 @@ package com.vinaacademy.platform.feature.user.auth.service;
 
 import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.exception.RetryableException;
+import com.vinaacademy.platform.feature.common.constant.RetryConstants;
 import com.vinaacademy.platform.feature.common.utils.RandomUtils;
 import com.vinaacademy.platform.feature.email.config.UrlBuilder;
 import com.vinaacademy.platform.feature.email.service.EmailService;
@@ -21,8 +22,11 @@ import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -33,10 +37,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      */
     @Transactional
     public void register(RegisterRequest registerRequest) {
-        if (!StringUtils.equals(registerRequest.getPassword(), registerRequest.getRetypedPassword())) {
+        if (!Strings.CI.equals(registerRequest.getPassword(), registerRequest.getRetypedPassword())) {
             throw BadRequestException.message("Mật khẩu không khớp");
         }
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -95,7 +95,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailService.sendVerificationEmail(user.getEmail(), actionToken.getToken());
     }
 
-    @Retryable(retryFor = {RetryableException.class}, maxAttempts = 3)
+    @Retryable(retryFor = {RetryableException.class}, maxAttempts = RetryConstants.DEFAULT_MAX_ATTEMPTS)
     private String generateUsername(String fullName) {
         String username = fullName.toLowerCase().replaceAll("\\s+", "");
         username = username.substring(0, Math.min(username.length(), 10))
@@ -114,9 +114,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * @throws BadRequestException if the user is not found, not enabled, or locked.
      */
     public AuthenticationResponse login(AuthenticationRequest loginRequest) {
-        Authentication authentication = authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+      authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
+      UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
         if (userDetails == null) {
             throw BadRequestException.message("Không tìm thấy người dùng: " + loginRequest.getEmail());
         }
@@ -145,13 +145,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationResponse(accessToken, refreshToken);
     }
 
-    private Authentication authenticateUser(String email, String password) {
+    private void authenticateUser(String email, String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return authentication;
 
         } catch (AuthenticationException ex) {
             String message = authenticationExceptionMessage(ex);
@@ -347,7 +346,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw BadRequestException.message("Token đã hết hạn");
         }
 
-        if (!StringUtils.equals(request.getPassword(), request.getRetypedPassword())) {
+        if (!Strings.CI.equals(request.getPassword(), request.getRetypedPassword())) {
             throw BadRequestException.message("Mật khẩu không khớp");
         }
 
@@ -364,7 +363,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public boolean changePassword(ChangePasswordRequest request) {
         User user = securityHelper.getCurrentUser();
-        if (!StringUtils.equals(request.getNewPassword(), request.getRetypedPassword())) {
+        if (!Strings.CI.equals(request.getNewPassword(), request.getRetypedPassword())) {
             throw BadRequestException.message("Mật khẩu mới không khớp");
         }
 
