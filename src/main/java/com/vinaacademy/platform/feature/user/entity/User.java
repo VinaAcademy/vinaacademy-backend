@@ -10,159 +10,189 @@ import com.vinaacademy.platform.feature.review.entity.CourseReview;
 import com.vinaacademy.platform.feature.user.role.entity.Role;
 import com.vinaacademy.platform.feature.video.entity.VideoNote;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.ColumnDefault;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email"),
-        @UniqueConstraint(columnNames = "username")
-})
+@Table(
+    name = "users",
+    uniqueConstraints = {
+      @UniqueConstraint(columnNames = "email"),
+      @UniqueConstraint(columnNames = "username")
+    })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class User extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include
-    private UUID id;
+public class User extends BaseEntity implements UserDetails {
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @EqualsAndHashCode.Include
+  private UUID id;
 
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+  @Column(name = "email", nullable = false, unique = true)
+  private String email;
 
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
+  @Column(name = "username", nullable = false, unique = true)
+  private String username;
 
-    @JsonIgnore
-    @Column(name = "password")
-    private String password;
+  @JsonIgnore
+  @Column(name = "password")
+  private String password;
 
-    @Column(name = "phone", unique = true)
-    private String phone;
+  @Column(name = "phone", unique = true)
+  private String phone;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+  @Column(name = "avatar_url")
+  private String avatarUrl;
 
-    @Column(name = "full_name")
-    private String fullName;
+  @Column(name = "full_name")
+  private String fullName;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+  @Column(name = "description", columnDefinition = "TEXT")
+  private String description;
 
-    @Column(name = "is_collaborator")
-    private boolean isCollaborator;
+  @Column(name = "is_collaborator")
+  private boolean isCollaborator;
 
-    @Column(name = "birthday")
-    private LocalDate birthday;
+  @Column(name = "birthday")
+  private LocalDate birthday;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    @BatchSize(size = 10)
-    private Set<Role> roles;
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @BatchSize(size = 10)
+  private Set<Role> roles;
 
-    @Column(name = "is_enabled")
-    private boolean enabled;
+  @Column(name = "is_enabled")
+  private boolean enabled;
 
-    @Column(name = "is_Using_2FA")
-    private boolean isUsing2FA = false;
+  @Column(name = "is_Using_2FA")
+  private boolean isUsing2FA = false;
 
-    @Column(name = "failed_attempts")
-    @ColumnDefault("0")
-    private int failedAttempts;
+  @Column(name = "failed_attempts")
+  @ColumnDefault("0")
+  private int failedAttempts;
 
-    @Column(name = "is_locked")
-    private boolean isLocked = false;
-    @Column(name = "lock_time")
-    private LocalDateTime lockTime;
+  @Column(name = "lock_time")
+  private LocalDateTime lockTime;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Log> logs;
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<PasswordReset> passwordResets;
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<VideoNote> videoNotes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<VideoNote> videoNotes = new ArrayList<>();
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<Enrollment> enrollments = new ArrayList<>();
 
-    public void addVideoNote(VideoNote videoNote) {
-        videoNotes.add(videoNote);
-        videoNote.setUser(this);
+  @OneToMany(
+      mappedBy = "instructor",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<CourseInstructor> coursesTaught = new ArrayList<>();
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Cart cart;
+
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<CourseReview> courseReviews = new ArrayList<>();
+
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<UserProgress> progressList;
+
+  /**
+   * Returns a concise string representation of the User containing only its id.
+   *
+   * This representation is intentionally minimal (format: {@code User{id=<id>}})
+   * to avoid exposing sensitive fields such as password or personal details.
+   *
+   * @return a string in the form {@code User{id=<id>}}
+   */
+  @Override
+  public String toString() {
+    return "User{" + "id=" + id + '}';
+  }
+
+  /**
+   * Returns the granted authorities for this user by aggregating authorities from all assigned roles.
+   *
+   * <p>If the user has no roles, an empty immutable collection is returned.</p>
+   *
+   * @return an immutable collection of GrantedAuthority derived from the user's roles
+   */
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    if (roles == null || roles.isEmpty()) {
+      return List.of();
     }
+    return roles.stream().map(Role::getAuthorities).flatMap(Collection::stream).toList();
+  }
 
-    public void removeVideoNote(VideoNote videoNote) {
-        videoNotes.remove(videoNote);
-        videoNote.setUser(null);
-    }
+  /**
+   * Indicates whether the user's account has not expired.
+   *
+   * <p>Delegates to the default {@link org.springframework.security.core.userdetails.UserDetails}
+   * implementation.</p>
+   *
+   * @return {@code true} if the account is non-expired, {@code false} otherwise
+   */
+  @Override
+  public boolean isAccountNonExpired() {
+    return UserDetails.super.isAccountNonExpired();
+  }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<Enrollment> enrollments = new ArrayList<>();
+  /**
+   * Indicates whether the user account is not locked.
+   *
+   * <p>Returns true only if the account is enabled and there is no active lock in place
+   * (i.e., {@code lockTime} is null or is before the current time).</p>
+   *
+   * @return {@code true} when the account is enabled and not currently locked; {@code false} otherwise
+   */
+  @Override
+  public boolean isAccountNonLocked() {
+    return enabled && (lockTime == null || lockTime.isBefore(LocalDateTime.now()));
+  }
 
-    public void addEnrollment(Enrollment enrollment) {
-        enrollments.add(enrollment);
-        enrollment.setUser(this);
-    }
-
-    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<CourseInstructor> coursesTaught = new ArrayList<>();
-
-    public void addCourseTaught(CourseInstructor courseInstructor) {
-        coursesTaught.add(courseInstructor);
-        courseInstructor.setInstructor(this);
-    }
-
-    public void removeCourseTaught(CourseInstructor courseInstructor) {
-        coursesTaught.remove(courseInstructor);
-        courseInstructor.setInstructor(null);
-    }
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Cart cart;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<CourseReview> courseReviews = new ArrayList<>();
-
-    public void addCourseReview(CourseReview courseReview) {
-        courseReviews.add(courseReview);
-        courseReview.setUser(this);
-    }
-
-    public void removeCourseReview(CourseReview courseReview) {
-        courseReviews.remove(courseReview);
-        courseReview.setUser(null);
-    }
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<UserProgress> progressList;
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                '}';
-    }
-    
-    @PostLoad
-    public void afterLoad() {
-        // Logic xử lý sẽ chạy ngay sau khi entity được tải
-        System.out.println("Giá trị đã được set sau khi tải");
-    }
+  /**
+   * Returns whether the user's credentials (e.g., password) are non-expired.
+   *
+   * <p>This implementation delegates to the {@link org.springframework.security.core.userdetails.UserDetails}
+   * default.</p>
+   *
+   * @return true if the user's credentials are valid (not expired), otherwise false
+   */
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return UserDetails.super.isCredentialsNonExpired();
+  }
 }

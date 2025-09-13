@@ -2,11 +2,14 @@ package com.vinaacademy.platform.feature.user.role.entity;
 
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.util.stream.Stream;
+import lombok.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Data
@@ -29,25 +32,31 @@ public class Role extends BaseEntity {
     private String code;
 
     @ToString.Exclude
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_permission", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private Set<Permission> permissions = new HashSet<>();
 
-//    @ManyToMany(mappedBy = "roles")
-//    private Set<User> users = new HashSet<>();
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (!(o instanceof Role)) return false;
-//        Role role = (Role) o;
-//        // So sánh dựa trên ID hoặc một thuộc tính duy nhất
-//        return Objects.equals(id, role.id);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        // Nên dựa vào ID
-//        return (id == null) ? 0 : id.hashCode();
-//    }
+    /**
+     * Builds the collection of Spring Security GrantedAuthority entries for this role.
+     *
+     * <p>Returns an empty collection if the role's code is blank. If the role has no
+     * permissions, returns a single authority named "ROLE_{code}". Otherwise returns
+     * an authority for the role ("ROLE_{code}") plus one authority per associated
+     * permission code. All authorities are represented as SimpleGrantedAuthority.
+     *
+     * @return a collection of GrantedAuthority representing the role and its permissions
+     */
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (StringUtils.isBlank(this.getCode())) {
+            return Set.of();
+        }
+        if (this.permissions == null || this.permissions.isEmpty()) {
+            return Set.of(new SimpleGrantedAuthority("ROLE_" + this.getCode()));
+        }
+        Stream<String> role = Stream.of("ROLE_" + this.getCode());
+        Stream<String> permissions = this.getPermissions().stream().map(Permission::getCode);
+        return Stream.concat(role, permissions)
+            .map(SimpleGrantedAuthority::new)
+            .toList();
+    }
 }

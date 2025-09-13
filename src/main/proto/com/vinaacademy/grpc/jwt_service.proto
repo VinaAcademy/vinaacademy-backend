@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package com.vinaacademy.grpc;
+
+option java_package = "com.vinaacademy.grpc";
+option java_outer_classname = "JwtServiceProto";
+option java_multiple_files = true;
+
+service JwtService {
+  rpc validateToken(TokenRequest) returns (ValidateTokenResponse);
+}
+
+message TokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool isValid = 1;
+  string message = 2; // Optional message for additional context
+  string userId = 3; // Optional user ID if the token is valid
+  string email = 4; // Optional email if the token is valid
+  string roles = 5; // Optional roles if the token is valid
+  string avatarUrl = 6; // Optional avatar URL if the token is valid
+  string fullName = 7; // Optional full name if the token is valid
+}
