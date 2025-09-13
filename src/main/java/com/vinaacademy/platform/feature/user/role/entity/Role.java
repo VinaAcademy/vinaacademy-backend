@@ -36,6 +36,16 @@ public class Role extends BaseEntity {
     @JoinTable(name = "role_permission", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private Set<Permission> permissions = new HashSet<>();
 
+    /**
+     * Builds the collection of Spring Security GrantedAuthority entries for this role.
+     *
+     * <p>Returns an empty collection if the role's code is blank. If the role has no
+     * permissions, returns a single authority named "ROLE_{code}". Otherwise returns
+     * an authority for the role ("ROLE_{code}") plus one authority per associated
+     * permission code. All authorities are represented as SimpleGrantedAuthority.
+     *
+     * @return a collection of GrantedAuthority representing the role and its permissions
+     */
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (StringUtils.isBlank(this.getCode())) {
             return Set.of();

@@ -17,6 +17,15 @@ public class JwtServiceGrpcImpl extends JwtServiceGrpc.JwtServiceImplBase {
   private final JwtService jwtService;
 
 
+  /**
+   * Validates a JWT from the incoming TokenRequest and returns a detailed
+   * ValidateTokenResponse via the provided gRPC response observer.
+   *
+   * <p>The response includes a boolean validity flag, a human-readable message,
+   * and token-derived claims: userId, email, roles, avatarUrl, and fullName.
+   *
+   * @param request TokenRequest containing the JWT to validate (request.getToken()).
+   */
   @PreAuthorize("hasAuthority('SCOPE_api.read')")
   @Override
   public void validateToken(
