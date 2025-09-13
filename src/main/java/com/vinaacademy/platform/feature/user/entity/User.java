@@ -28,131 +28,132 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email"),
-        @UniqueConstraint(columnNames = "username")
-})
+@Table(
+    name = "users",
+    uniqueConstraints = {
+      @UniqueConstraint(columnNames = "email"),
+      @UniqueConstraint(columnNames = "username")
+    })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class User extends BaseEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @EqualsAndHashCode.Include
+  private UUID id;
 
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+  @Column(name = "email", nullable = false, unique = true)
+  private String email;
 
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
+  @Column(name = "username", nullable = false, unique = true)
+  private String username;
 
-    @JsonIgnore
-    @Column(name = "password")
-    private String password;
+  @JsonIgnore
+  @Column(name = "password")
+  private String password;
 
-    @Column(name = "phone", unique = true)
-    private String phone;
+  @Column(name = "phone", unique = true)
+  private String phone;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+  @Column(name = "avatar_url")
+  private String avatarUrl;
 
-    @Column(name = "full_name")
-    private String fullName;
+  @Column(name = "full_name")
+  private String fullName;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+  @Column(name = "description", columnDefinition = "TEXT")
+  private String description;
 
-    @Column(name = "is_collaborator")
-    private boolean isCollaborator;
+  @Column(name = "is_collaborator")
+  private boolean isCollaborator;
 
-    @Column(name = "birthday")
-    private LocalDate birthday;
+  @Column(name = "birthday")
+  private LocalDate birthday;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    @BatchSize(size = 10)
-    private Set<Role> roles;
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @BatchSize(size = 10)
+  private Set<Role> roles;
 
-    @Column(name = "is_enabled")
-    private boolean enabled;
+  @Column(name = "is_enabled")
+  private boolean enabled;
 
-    @Column(name = "is_Using_2FA")
-    private boolean isUsing2FA = false;
+  @Column(name = "is_Using_2FA")
+  private boolean isUsing2FA = false;
 
-    @Column(name = "failed_attempts")
-    @ColumnDefault("0")
-    private int failedAttempts;
+  @Column(name = "failed_attempts")
+  @ColumnDefault("0")
+  private int failedAttempts;
 
-    @Column(name = "is_locked")
-    @ColumnDefault("false")
-    private Boolean isLocked = false;
-    @Column(name = "lock_time")
-    private LocalDateTime lockTime;
+  @Column(name = "lock_time")
+  private LocalDateTime lockTime;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<VideoNote> videoNotes = new ArrayList<>();
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<VideoNote> videoNotes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<Enrollment> enrollments = new ArrayList<>();
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<Enrollment> enrollments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<CourseInstructor> coursesTaught = new ArrayList<>();
+  @OneToMany(
+      mappedBy = "instructor",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<CourseInstructor> coursesTaught = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Cart cart;
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Cart cart;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<CourseReview> courseReviews = new ArrayList<>();
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<CourseReview> courseReviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
-    private List<UserProgress> progressList;
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @BatchSize(size = 20)
+  private List<UserProgress> progressList;
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                '}';
+  @Override
+  public String toString() {
+    return "User{" + "id=" + id + '}';
+  }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    if (roles == null || roles.isEmpty()) {
+      return List.of();
     }
-    
-    @PostLoad
-    public void afterLoad() {
-        // Logic xử lý sẽ chạy ngay sau khi entity được tải
-        System.out.println("Giá trị đã được set sau khi tải");
-    }
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (roles == null || roles.isEmpty()) {
-            return List.of();
-        }
-        return roles.stream()
-            .map(Role::getAuthorities)
-            .flatMap(Collection::stream)
-            .toList();
-    }
+    return roles.stream().map(Role::getAuthorities).flatMap(Collection::stream).toList();
+  }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
+  @Override
+  public boolean isAccountNonExpired() {
+    return UserDetails.super.isAccountNonExpired();
+  }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        if (isLocked != null && isLocked) {
-            return false;
-        }
-        return UserDetails.super.isAccountNonLocked();
-    }
+  @Override
+  public boolean isAccountNonLocked() {
+    return enabled && (lockTime == null || lockTime.isBefore(LocalDateTime.now()));
+  }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return UserDetails.super.isCredentialsNonExpired();
+  }
 }
