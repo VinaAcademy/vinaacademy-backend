@@ -24,6 +24,19 @@ public class RegisteredClientConfig {
   @Value("${security.oauth2.client-secret:grpc-secret}")
   private String clientSecret;
 
+  /**
+   * Creates an in-memory RegisteredClientRepository containing a single OAuth2 client
+   * configured for the client credentials grant.
+   *
+   * <p>The registered client uses the configured {@code clientId} and an encoded
+   * {@code clientSecret}, authenticates with CLIENT_SECRET_BASIC, is granted the
+   * scopes "api.read" and "api.write", and issues access tokens with a TTL of
+   * 3600 seconds.
+   *
+   * <p>The provided PasswordEncoder is used to encode the client secret.
+   *
+   * @return a RegisteredClientRepository backed by an InMemoryRegisteredClientRepository
+   */
   @Bean
   RegisteredClientRepository registeredClientRepository(PasswordEncoder encoder) {
     var grpcMachineClient = RegisteredClient.withId(UUID.randomUUID().toString())

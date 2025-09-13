@@ -33,6 +33,15 @@ public class SecurityConfig {
     @Value("${application.url.google-auth")
     private String googleAuthUrl;
 
+  /**
+   * Configures a SecurityFilterChain for the OAuth2 authorization server endpoints and enables JWT-based resource server support.
+   *
+   * The configuration restricts HttpSecurity to the authorization server endpoints provided by
+   * OAuth2AuthorizationServerConfigurer, applies the authorization server defaults, and configures
+   * the OAuth2 Resource Server to use JWT authentication for those endpoints.
+   *
+   * @return the built SecurityFilterChain that secures the authorization server endpoints and enables JWT processing
+   */
   @Bean
   @Order(1)
   public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -46,6 +55,18 @@ public class SecurityConfig {
     return http.build();
   }
 
+  /**
+   * Configures and returns the resource-server SecurityFilterChain used for application endpoints.
+   *
+   * <p>Sets a permissive request authorization policy (all requests permitted), enforces stateless
+   * sessions, disables CSRF and HTTP Basic, and enables JWT-based OAuth2 resource-server support
+   * using the injected custom JWT authentication converter. Also wires CORS using the provided
+   * CorsConfigurationSource, configures OAuth2 login endpoints (authorization base URI comes from
+   * {@code googleAuthUrl} and the redirection endpoint is {@code /api/v1/auth/login/oauth2/code/*}),
+   * and attaches custom handlers for access-denied and authentication-entry-point events.</p>
+   *
+   * @return the configured SecurityFilterChain for the resource server
+   */
   @Bean
   @Order(2)
   public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -83,6 +104,14 @@ public class SecurityConfig {
 
 
 
+    /**
+     * Creates a PasswordEncoder bean that uses BCrypt for hashing passwords.
+     *
+     * <p>Provides a BCryptPasswordEncoder instance suitable for encoding and
+     * verifying user credentials stored in the application.</p>
+     *
+     * @return a BCrypt-based PasswordEncoder
+     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

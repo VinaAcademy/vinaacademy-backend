@@ -129,11 +129,26 @@ public class User extends BaseEntity implements UserDetails {
   @BatchSize(size = 20)
   private List<UserProgress> progressList;
 
+  /**
+   * Returns a concise string representation of the User containing only its id.
+   *
+   * This representation is intentionally minimal (format: {@code User{id=<id>}})
+   * to avoid exposing sensitive fields such as password or personal details.
+   *
+   * @return a string in the form {@code User{id=<id>}}
+   */
   @Override
   public String toString() {
     return "User{" + "id=" + id + '}';
   }
 
+  /**
+   * Returns the granted authorities for this user by aggregating authorities from all assigned roles.
+   *
+   * <p>If the user has no roles, an empty immutable collection is returned.</p>
+   *
+   * @return an immutable collection of GrantedAuthority derived from the user's roles
+   */
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     if (roles == null || roles.isEmpty()) {
@@ -142,16 +157,40 @@ public class User extends BaseEntity implements UserDetails {
     return roles.stream().map(Role::getAuthorities).flatMap(Collection::stream).toList();
   }
 
+  /**
+   * Indicates whether the user's account has not expired.
+   *
+   * <p>Delegates to the default {@link org.springframework.security.core.userdetails.UserDetails}
+   * implementation.</p>
+   *
+   * @return {@code true} if the account is non-expired, {@code false} otherwise
+   */
   @Override
   public boolean isAccountNonExpired() {
     return UserDetails.super.isAccountNonExpired();
   }
 
+  /**
+   * Indicates whether the user account is not locked.
+   *
+   * <p>Returns true only if the account is enabled and there is no active lock in place
+   * (i.e., {@code lockTime} is null or is before the current time).</p>
+   *
+   * @return {@code true} when the account is enabled and not currently locked; {@code false} otherwise
+   */
   @Override
   public boolean isAccountNonLocked() {
     return enabled && (lockTime == null || lockTime.isBefore(LocalDateTime.now()));
   }
 
+  /**
+   * Returns whether the user's credentials (e.g., password) are non-expired.
+   *
+   * <p>This implementation delegates to the {@link org.springframework.security.core.userdetails.UserDetails}
+   * default.</p>
+   *
+   * @return true if the user's credentials are valid (not expired), otherwise false
+   */
   @Override
   public boolean isCredentialsNonExpired() {
     return UserDetails.super.isCredentialsNonExpired();

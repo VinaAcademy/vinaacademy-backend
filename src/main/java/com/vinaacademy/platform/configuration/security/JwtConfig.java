@@ -22,6 +22,14 @@ public class JwtConfig {
         return new NimbusJwtEncoder(jwkSource);
     }
 
+    /**
+     * Creates a JwtDecoder backed by the RSA public key from the provided KeyPair.
+     *
+     * <p>Returns a NimbusJwtDecoder configured to validate JWTs using the KeyPair's RSA public key.
+     *
+     * @param keyPair the KeyPair whose public key (must be an RSAPublicKey) will be used to verify JWT signatures
+     * @return a JwtDecoder that verifies JWT signatures with the provided RSA public key
+     */
     @Bean
     JwtDecoder jwtDecoder(KeyPair keyPair) {
         return NimbusJwtDecoder
@@ -29,11 +37,26 @@ public class JwtConfig {
                 .build();
     }
 
+    /**
+     * Loads an existing RSA KeyPair from persistent storage or generates and persists a new one.
+     *
+     * @return the KeyPair used for JWT signing and verification
+     * @throws Exception if the key pair cannot be loaded or created (I/O or generation failure)
+     */
     @Bean
     KeyPair keyPair() throws Exception {
         return KeyUtils.loadOrCreateKeyPair();
     }
 
+    /**
+     * Creates a Nimbus RSA JWK (RSAKey) from the provided KeyPair for JWT encoding/decoding.
+     *
+     * The returned RSAKey contains the public key, the corresponding private key (for signing),
+     * and a fixed key ID of "rsa-key".
+     *
+     * @param keyPair the KeyPair whose public and private RSA keys are used to build the JWK
+     * @return an RSAKey containing the public and private RSA key material and key ID
+     */
     @Bean
     RSAKey rsaKey(KeyPair keyPair) {
         return new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())

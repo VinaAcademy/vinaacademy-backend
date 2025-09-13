@@ -58,11 +58,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     /**
-     * Registers a new user in the system.
+     * Register a new user account and send an email verification token.
      *
-     * @param registerRequest The registration request containing user details including email, password, retyped password and full name
-     * @throws BadRequestException if passwords don't match or if email already exists in the system.
-     *                             The user account is initially disabled and requires email verification to be activated.
+     * Creates a disabled user with an auto-generated username and the STUDENT role, persists it,
+     * issues a VERIFY_ACCOUNT action token, and sends a verification email containing the token.
+     *
+     * @param registerRequest registration data (email, full name, password, retyped password)
+     * @throws BadRequestException if the provided passwords do not match or if the email is already registered
      */
     @Transactional
     public void register(RegisterRequest registerRequest) {
@@ -95,6 +97,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailService.sendVerificationEmail(user.getEmail(), actionToken.getToken());
     }
 
+    /**
+     * Generates a candidate username from a user's full name.
+     *
+     * The returned username is the lowercase full name with all whitespace removed,
+     * truncated to at most 10 characters, then appended with 5 random characters
+     * (resulting in up to 15 characters). If the generated username already exists
+     * in the user repository, a RetryableException is thrown to allow the caller's
+     * retry mechanism to attempt a new generation.
+     *
+     * @param fullName the user's full name (may contain spaces and mixed case)
+     * @return a lowercase, whitespace-free username with 5 random characters appended
+     * @throws RetryableException if the generated username already exists
+     */
     @Retryable(retryFor = {RetryableException.class}, maxAttempts = RetryConstants.DEFAULT_MAX_ATTEMPTS)
     private String generateUsername(String fullName) {
         String username = fullName.toLowerCase().replaceAll("\\s+", "");
@@ -145,6 +160,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationResponse(accessToken, refreshToken);
     }
 
+    /**
+     * Authenticates a user by email and password and stores the resulting Authentication in the SecurityContext.
+     *
+     * On authentication failure this method throws a BadRequestException with a user-facing message.
+     * If the account is disabled, it invokes the disabled-account handler before throwing.
+     *
+     * @param email    the user's email (used as the principal)
+     * @param password the user's plain-text password
+     * @throws BadRequestException if authentication fails for any reason (bad credentials, locked/expired/disabled account, etc.)
+     */
     private void authenticateUser(String email, String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -328,10 +353,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Resets the user's password using a valid token and signature.
+     * Resets a user's password using a reset token and its URL signature.
      *
-     * @param request The reset password request containing the new password, token, and signature.
-     * @throws BadRequestException if the signature is invalid, or the token is invalid or expired.
+     * <p>Validates the provided signature, ensures the reset token exists and is not expired,
+     * verifies the new password matches its confirmation, updates the user's stored password,
+     * deletes the used action token, and records the action in the audit log.</p>
+     *
+     * @param request contains the reset token, URL signature, new password, and retyped password
+     * @throws BadRequestException if the signature is invalid, the token is not found, the token is expired,
+     *                             or the provided passwords do not match
      */
     @Override
     public void resetPassword(ResetPasswordRequest request) {
@@ -359,6 +389,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         logService.log(LogConstants.AUTH_KEY, LogConstants.RESET_PASSWORD_ACTION, null, Map.of("email", user.getEmail()));
     }
 
+    /**
+     * Change the currently authenticated user's password.
+     *
+     * Validates that the provided new password matches the re-typed confirmation and that the
+     * supplied current password is correct, then updates the persisted password and logs the change.
+     *
+     * @param request contains the current password, the new password, and the re-typed new password
+     * @return true if the password was successfully changed
+     * @throws BadRequestException if the new password and confirmation do not match or if the current password is incorrect
+     */
     @Override
     @Transactional
     public boolean changePassword(ChangePasswordRequest request) {
