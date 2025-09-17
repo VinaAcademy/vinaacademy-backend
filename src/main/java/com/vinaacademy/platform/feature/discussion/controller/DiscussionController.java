@@ -37,8 +37,8 @@ public class DiscussionController {
     
     @PostMapping
     @Operation(summary = "Tạo bình luận thảo luận")
-    public ApiResponse<DiscussionDto> createDiscussion(@RequestBody @Valid DiscussionRequest request) {
-        return ApiResponse.success(discussionService.createDiscussion(request));
+    public ApiResponse<DiscussionDto> createDiscussion(@Valid @RequestBody  DiscussionRequest request) {
+    	return ApiResponse.success(discussionService.createDiscussion(request));
     }
     
     @GetMapping("/{lessonId}")
@@ -47,7 +47,7 @@ public class DiscussionController {
             @PathVariable UUID lessonId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction) {
 
         Sort sort = direction.equalsIgnoreCase("DESC") ?
@@ -63,15 +63,18 @@ public class DiscussionController {
     @Operation(summary = "Lấy danh sách các phản hồi của thảo luận")
     public ApiResponse<Page<DiscussionDto>> getReplies(
             @PathVariable UUID parentId,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 10,
+            sort = "createdDate",
+            direction = Sort.Direction.ASC)
+            Pageable pageable) {
 
         return ApiResponse.success(discussionService.getRepliesWithReplyCount(parentId, pageable));
     }
     
     @PostMapping("/delete/{discussionId}")
     @Operation(summary = "Xóa bình luận thảo luận")
-    public ApiResponse<String> deleteDiscussion(@PathVariable UUID lessonId) {
-    	discussionService.deleteDiscussion(lessonId);
-        return ApiResponse.success("Xóa thành công thảo luận " + lessonId);
+    public ApiResponse<String> deleteDiscussion(@PathVariable UUID discussionId) {
+    	discussionService.deleteDiscussion(discussionId);
+        return ApiResponse.success("Xóa thành công thảo luận " + discussionId);
     }
 }

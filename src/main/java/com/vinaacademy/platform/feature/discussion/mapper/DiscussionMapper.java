@@ -15,6 +15,10 @@ public interface DiscussionMapper {
 	@Mapping(target = "lessonId", source = "lesson.id" )
 	@Mapping(target = "userId", source = "user.id" )
 	@Mapping(target = "replyCount", ignore = true )
-    DiscussionDto toDto(Discussion entity);   
+	@Mapping(target = "favoriteCount", ignore = true )
+	@Mapping(target = "avatarUrl", source = "user.fullName" )
+	@Mapping(target = "userFullName", source = "user.avatarUrl" )
+	@Mapping(target = "likedByCurrentUser", ignore = true )
+    DiscussionDto toDto(Discussion entity);    
 	 
 }
