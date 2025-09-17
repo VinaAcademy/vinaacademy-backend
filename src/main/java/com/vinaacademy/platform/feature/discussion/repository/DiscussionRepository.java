@@ -19,13 +19,16 @@ public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
 			       d.lesson.id,
 			       d.user.id,
 			       COUNT(DISTINCT r.id) AS replyCount,
-			       COUNT(DISTINCT f.id) AS favoriteCount
+			       COUNT(DISTINCT f.id) AS favoriteCount,
+			       d.user.fullName,
+			       d.user.avatarUrl,
+			       d.createdDate
 			FROM Discussion d
 			    LEFT JOIN Discussion r ON r.parentComment.id = d.id
 			    LEFT JOIN Favorite   f ON f.comment.id     = d.id
 			WHERE d.lesson.id = :lessonId
 			  AND d.parentComment IS NULL
-			GROUP BY d.id, d.comment, d.lesson.id, d.user.id
+			GROUP BY d.id, d.comment, d.lesson.id, d.user.id, d.user.fullName, d.user.avatarUrl, d.createdDate
 			""")
 	Page<Object[]> findRootCommentsWithCounts(@Param("lessonId") UUID lessonId, Pageable pageable);
 
@@ -36,12 +39,15 @@ public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
 			       d.lesson.id,
 			       d.user.id,
 			       COUNT(DISTINCT r.id) AS replyCount,
-			       COUNT(DISTINCT f.id) AS favoriteCount
+			       COUNT(DISTINCT f.id) AS favoriteCount,
+			       d.user.fullName,
+			       d.user.avatarUrl,
+			       d.createdDate
 			FROM Discussion d
 			    LEFT JOIN Discussion r ON r.parentComment.id = d.id
 			    LEFT JOIN Favorite   f ON f.comment.id     = d.id
 			WHERE d.parentComment.id = :parentId
-			GROUP BY d.id, d.comment, d.lesson.id, d.user.id
+			GROUP BY d.id, d.comment, d.lesson.id, d.user.id, d.user.fullName, d.user.avatarUrl, d.createdDate
 			""")
 	Page<Object[]> findRepliesWithCounts(@Param("parentId") UUID parentId, Pageable pageable);
 

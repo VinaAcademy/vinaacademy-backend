@@ -1,12 +1,14 @@
 // DiscussionServiceImpl.java
 package com.vinaacademy.platform.feature.discussion.service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.exception.NotFoundException;
 import com.vinaacademy.platform.feature.discussion.dto.DiscussionDto;
 import com.vinaacademy.platform.feature.discussion.dto.request.DiscussionRequest;
@@ -42,7 +44,10 @@ public class DiscussionServiceImpl implements DiscussionService {
 
 		Discussion discussion = Discussion.builder().lesson(lesson).user(user).comment(request.getComment())
 				.parentComment(parentComment).build();
-		DiscussionDto discussionDto = DiscussionMapper.INSTANCE.toDto(discussion);
+		Discussion saveDiscussion = discussionRepository.save(discussion);
+		DiscussionDto discussionDto = DiscussionMapper.INSTANCE.toDto(saveDiscussion);
+		discussionDto.setAvatarUrl(user.getAvatarUrl());
+		discussionDto.setUserFullName(user.getFullName());
 		return discussionDto;
 	}
 
@@ -63,6 +68,9 @@ public class DiscussionServiceImpl implements DiscussionService {
             		.userId((UUID) record[3])
             		.replyCount((Long) record[4])
             		.favoriteCount((Long) record[5])
+            		.userFullName((String) record[6])
+	            	.avatarUrl((String) record[7])
+            		.createdDate((LocalDateTime) record[8])
             		.likedByCurrentUser(likedByCurrentUser)
             		.build();
         });
@@ -84,6 +92,9 @@ public class DiscussionServiceImpl implements DiscussionService {
 	            	.userId((UUID) record[3])
 	            	.replyCount((Long) record[4])
 	            	.favoriteCount((Long) record[5])
+	            	.userFullName((String) record[6])
+	            	.avatarUrl((String) record[7])
+	            	.createdDate((LocalDateTime) record[8])
 	            	.likedByCurrentUser(likedByCurrentUser)
 	            	.build();
         });
@@ -91,6 +102,11 @@ public class DiscussionServiceImpl implements DiscussionService {
 
 	@Override
 	public void deleteDiscussion(UUID id) {
+		User user = securityHelper.getCurrentUser();
+		Discussion discussion = discussionRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException("Thảo luận này không tồn tại"));
+		if (!discussion.getUser().equals(user))
+			throw BadRequestException.message("Bạn không có quyền xóa thảo luận này");
 		discussionRepository.deleteById(id);
 	}
 }
