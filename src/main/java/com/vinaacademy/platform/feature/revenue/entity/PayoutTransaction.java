@@ -22,11 +22,7 @@ import jakarta.persistence.Table;
  * Lịch sử thanh toán đã hoàn thành
  */
 @Entity
-@Table(name = "payout_transactions", indexes = {
-    @jakarta.persistence.Index(name = "idx_payout_txn_instructor", columnList = "instructor_id"),
-    @jakarta.persistence.Index(name = "idx_payout_txn_request", columnList = "payout_request_id"),
-    @jakarta.persistence.Index(name = "idx_payout_txn_created", columnList = "created_date")
-})
+@Table(name = "payout_transactions")
 @Data
 @Builder
 @NoArgsConstructor

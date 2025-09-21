@@ -13,7 +13,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,16 +21,7 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "revenue_records", indexes = {
-    @Index(name = "idx_revenue_instructor", columnList = "instructor_id"),
-    @Index(name = "idx_revenue_course", columnList = "course_id"),
-    @Index(name = "idx_revenue_created", columnList = "created_date"),
-    @Index(name = "idx_revenue_status", columnList = "status")
-},
-	uniqueConstraints = {
-	        @UniqueConstraint(name = "uk_revenue_payment_instructor_course", 
-	                        columnNames = {"payment_id", "instructor_id", "course_id"})
-	    })
+@Table(name = "revenue_records")
 @Data
 @Builder
 @NoArgsConstructor

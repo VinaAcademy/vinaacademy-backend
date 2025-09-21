@@ -20,11 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "wallet_transactions", indexes = {
-	@jakarta.persistence.Index(name = "idx_instructor_id", columnList = "instructor_id"),
-	@jakarta.persistence.Index(name = "idx_type", columnList = "type"),
-	@jakarta.persistence.Index(name = "idx_reference_id", columnList = "reference_id")
-})
+@Table(name = "wallet_transactions")
 @Data
 @Builder
 @NoArgsConstructor
