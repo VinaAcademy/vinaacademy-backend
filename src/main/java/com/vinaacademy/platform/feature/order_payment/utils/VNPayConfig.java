@@ -29,7 +29,7 @@ public class VNPayConfig {
     public String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     @Value("${vnpay.url-return}") 
     public String urlReturn;
-    @Value("${vnpay.ipn-url}") 
+    @Value("${vnpay.ipn-url:}") 
     public String ipnUrl;
     
 

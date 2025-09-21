@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.revenue.service;
 
 import com.vinaacademy.platform.feature.instructor.repository.CourseInstructorRepository;
+import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
 import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentRepository;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -232,7 +234,7 @@ public class RevenueDistributionServiceImpl implements RevenueDistributionServic
      * @see #updateInstructorWallet(UUID, BigDecimal, RevenueRecord)
      */
     private void processOrderItemRevenue(OrderItem orderItem, Payment payment, Map<String, String> vnpayResponse) {
-        UUID instructorId = getInstructorIdFromCourseInstructor(orderItem.getCourse().getInstructors().get(0).getInstructor().getId());
+    	UUID instructorId = getInstructorIdFromCourseInstructor(orderItem.getCourse());
 		
 		 // Nếu không tìm thấy giảng viên, ghi log và bỏ qua
         if (instructorId == null) {
@@ -313,12 +315,10 @@ public class RevenueDistributionServiceImpl implements RevenueDistributionServic
      * @see CourseInstructor
      * @see CourseInstructorRepository#findAllByCourseId(UUID)
      */
-    private UUID getInstructorIdFromCourseInstructor(UUID courseId) {
+    private UUID getInstructorIdFromCourseInstructor(Course course) {
         // Tìm Instructor đầu tiên trong danh sách CourseInstructor
-        CourseInstructor courseInstructor = courseInstructorRepository.findAllByCourseId(courseId)
-                .stream().findFirst().orElse(null);
-        
-        return courseInstructor != null ? courseInstructor.getInstructor().getId() : null;
+    	Optional<CourseInstructor> courseInstructor = courseInstructorRepository.findByCourseAndIsOwnerTrue(course);        
+        return courseInstructor.map(ci -> ci.getInstructor().getId()).orElse(null);
     }
 
     /**
