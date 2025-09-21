@@ -29,6 +29,9 @@ public class VNPayConfig {
     public String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     @Value("${vnpay.url-return}") 
     public String urlReturn;
+    @Value("${vnpay.ipn-url:}") 
+    public String ipnUrl;
+    
 
     public String md5(String message) { 
         String digest = null;
@@ -157,7 +160,7 @@ public class VNPayConfig {
 		vnp_Params.put("vnp_Locale", locate);
 
 		vnp_Params.put("vnp_ReturnUrl", urlReturn);
-		//vnp_Params.put("vnp_IpnUrl", "http://localhost/api/v1/paymenttest/ipn");
+		vnp_Params.put("vnp_IpnUrl", ipnUrl);
 		vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
 		Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

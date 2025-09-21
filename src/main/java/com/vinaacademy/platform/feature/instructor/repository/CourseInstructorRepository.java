@@ -89,4 +89,6 @@ public interface CourseInstructorRepository extends JpaRepository<CourseInstruct
     Long countByInstructorAndIsOwnerTrue(User instructor);
 
     List<InstructorInfo> findByCourseId(UUID courseId);
+    
+    List<CourseInstructor> findAllByCourseId(UUID courseId);
 }
