@@ -94,7 +94,7 @@ application:
   url:
     frontend: ${APPLICATION_URL_FRONTEND:http://localhost:3000}
     backend: ${APPLICATION_URL_BACKEND:http://localhost:8080}
-    google-auth: ${APPLICATION_URL_GOOGLE_AUTH:${APPLICATION_URL_FRONTEND}/login/google}
+    google-auth: ${APPLICATION_URL_GOOGLE_AUTH:http://localhost:3000/login/google}
   notifications:
     email:
       enabled: ${APPLICATION_NOTIFICATIONS_EMAIL_ENABLED:true}

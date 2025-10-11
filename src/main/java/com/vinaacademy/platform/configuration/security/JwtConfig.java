@@ -50,7 +50,7 @@ public class JwtConfig {
 
     /**
      * Creates a Nimbus RSA JWK (RSAKey) from the provided KeyPair for JWT encoding/decoding.
-     *
+     * <p>
      * The returned RSAKey contains the public key, the corresponding private key (for signing),
      * and a fixed key ID of "rsa-key".
      *
