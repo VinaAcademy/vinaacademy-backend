@@ -1,16 +1,22 @@
-# Build stage
-FROM maven:3.8.3-openjdk-17-slim AS build
+# Stage 1: Build stage
+FROM openjdk:17-jdk-alpine AS builder
 
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
+# Copy Maven wrapper và pom.xml
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Cấp quyền thực thi cho Maven wrapper
 RUN chmod +x ./mvnw
+
+# Download dependencies
 RUN ./mvnw dependency:go-offline -B
 
-COPY ./src ./src
+# Copy source code và build
+COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Run stage
@@ -27,7 +33,7 @@ RUN apk add --no-cache ffmpeg ffmpeg-libs curl \
 
 # Set the working directory in the container
 WORKDIR /app
-COPY --from=build /app/target/VinaAcademy-*.jar app.jar
+COPY --from=builder /app/target/VinaAcademy-*.jar app.jar
 RUN chown vinaacademy:vinaacademy app.jar
 
 USER vinaacademy
