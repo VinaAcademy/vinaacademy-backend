@@ -12,8 +12,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 /**
  * Utility class for security-related operations.
  * Focuses on current user information retrieval from security context.
@@ -39,19 +37,19 @@ public class SecurityHelper {
             throw new UnauthorizedException("User is not authenticated");
         }
 
-        String email;
+        String username;
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof UserDetails userDetails) {
-            email = userDetails.getUsername();
+            username = userDetails.getUsername();
         } else if (principal instanceof Jwt jwt) {
-            email = jwt.getClaimAsString("sub");
+            username = jwt.getClaimAsString("sub");
         } else {
-            email = principal.toString();
+            username = principal.toString();
         }
 
-        // Based on CustomUserDetailService, we're using email as the username
-        return userRepository.findByEmailWithRoles(email)
+        // Based on CustomUserDetailService, we're using username as the username
+        return userRepository.findByUsernameWithRoles(username)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
     }
 
@@ -81,27 +79,6 @@ public class SecurityHelper {
             }
         }
         return false;
-    }
-
-    /**
-     * Get the email of the current user
-     *
-     * @return The email of the current user or empty optional if no user is authenticated
-     */
-    public Optional<String> getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return Optional.empty();
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetails) {
-            return Optional.of(((UserDetails) principal).getUsername());
-        } else {
-            return Optional.of(principal.toString());
-        }
     }
 
     /**
