@@ -34,5 +34,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS="-Xmx2048m -Xms512m -XX:+UseG1GC -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom"
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

@@ -15,15 +15,16 @@ import com.vinaacademy.platform.feature.user.dto.ViewMappingDto;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.user.role.entity.Role;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -116,7 +117,18 @@ public class UserServiceImpl implements UserService {
 				: 0;
 		ViewMappingDto viewDto = ViewMappingDto.builder().countCourseCreate(create).countCourseEnroll(enroll)
 				.countCourseEnrollComplete(erollComplete).build();
-		UserViewDto userViewDto = UserMapper.INSTANCE.toViewDto(user, viewDto);
-		return userViewDto;
+    return UserMapper.INSTANCE.toViewDto(user, viewDto);
+	}
+
+	@Override
+	public Page<UserDto> searchUsers(String keyword, int page, int size) {
+		if (StringUtils.isBlank(keyword) || keyword.length() < 3) {
+			throw BadRequestException.message("Keyword must be at least 3 characters long");
+		}
+
+		Pageable pageable = Pageable.ofSize(size).withPage(page);
+		Page<User> users = userRepository.searchUsersByKeyword(keyword, pageable);
+
+		return users.map(UserMapper.INSTANCE::toDto);
 	}
 }
