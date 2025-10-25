@@ -3,14 +3,14 @@ package com.vinaacademy.platform.feature.course.event.listener;
 import com.vinaacademy.platform.configuration.AppConfig;
 import com.vinaacademy.platform.feature.course.event.CourseStatusChangedEvent;
 import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
-import com.vinaacademy.platform.feature.notification.dto.NotificationCreateDTO;
-import com.vinaacademy.platform.feature.notification.enums.NotificationType;
-import com.vinaacademy.platform.feature.notification.service.NotificationService;
+import com.vinaacademy.platform.kafka.NotificationProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
 
 /**
  * Event listener for course-related domain events.
@@ -20,8 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class CourseEventListener {
-
-    private final NotificationService notificationService;
+    private final NotificationProducer notificationProducer;
 
     /**
      * Handle course status changed events by sending notifications to instructors
@@ -71,7 +70,7 @@ public class CourseEventListener {
                 AppConfig.INSTANCE.getFrontendUrl(),
                 event.getCourseId());
 
-        NotificationCreateDTO notification = NotificationCreateDTO.builder()
+        NotificationCreateEvent notification = NotificationCreateEvent.builder()
                 .title(title)
                 .content(content)
                 .targetUrl(url)
@@ -79,7 +78,7 @@ public class CourseEventListener {
                 .type(NotificationType.COURSE_APPROVAL)
                 .build();
 
-        notificationService.createNotification(notification);
+        notificationProducer.sendNotification(notification);
         log.debug("Status change notification sent to instructor: {} for course: {}",
                 event.getOwner(), event.getCourseId());
     }

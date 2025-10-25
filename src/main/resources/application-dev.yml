@@ -22,6 +22,12 @@ spring:
       minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
   data:
     redis:
       enabled: ${SPRING_DATA_REDIS_ENABLED:true}
@@ -95,9 +101,6 @@ application:
     frontend: ${APPLICATION_URL_FRONTEND:http://localhost:3000}
     backend: ${APPLICATION_URL_BACKEND:http://localhost:8080}
     google-auth: ${APPLICATION_URL_GOOGLE_AUTH:http://localhost:3000/login/google}
-  notifications:
-    email:
-      enabled: ${APPLICATION_NOTIFICATIONS_EMAIL_ENABLED:true}
 
 logging:
   level:

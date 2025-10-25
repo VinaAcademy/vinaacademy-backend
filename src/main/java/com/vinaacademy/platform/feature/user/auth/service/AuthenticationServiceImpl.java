@@ -4,8 +4,6 @@ import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.exception.RetryableException;
 import com.vinaacademy.platform.feature.common.constant.RetryConstants;
 import com.vinaacademy.platform.feature.common.utils.RandomUtils;
-import com.vinaacademy.platform.feature.email.config.UrlBuilder;
-import com.vinaacademy.platform.feature.email.service.EmailService;
 import com.vinaacademy.platform.feature.log.constant.LogConstants;
 import com.vinaacademy.platform.feature.log.service.LogService;
 import com.vinaacademy.platform.feature.user.UserMapper;
@@ -21,6 +19,7 @@ import com.vinaacademy.platform.feature.user.auth.utils.JwtUtils;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
+import com.vinaacademy.platform.kafka.EmailProducer;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -37,6 +36,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vinaacademy.common.config.UrlBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -44,17 +44,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
   private final JwtService jwtService;
-  private final EmailService emailService;
   private final RefreshTokenRepository refreshTokenRepository;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final ActionTokenRepository actionTokenRepository;
 
-  private final UrlBuilder urlBuilder;
   private final LogService logService;
   private final HttpServletRequest httpServletRequest;
   private final RoleRepository roleRepository;
   private final SecurityHelper securityHelper;
+  
+  private final EmailProducer emailProducer;
+  private final UrlBuilder urlBuilder;
 
   /**
    * Register a new user account and send an email verification token.
@@ -95,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     actionTokenRepository.save(actionToken);
 
     logService.log(LogConstants.AUTH_KEY, LogConstants.REGISTER_ACTION, null, user);
-    emailService.sendVerificationEmail(user.getEmail(), actionToken.getToken());
+    emailProducer.sendVerificationEmail(user.getEmail(), actionToken.getToken());
   }
 
   /**
@@ -208,7 +209,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     if (token.getExpiredAt().isBefore(now)) {
       token.setExpiredAt(now.plusHours(AuthConstants.ACTION_TOKEN_EXPIRED_HOURS));
       actionTokenRepository.save(token);
-      emailService.sendVerificationEmail(email, token.getToken());
+      emailProducer.sendVerificationEmail(email, token.getToken());
     }
   }
 
@@ -253,7 +254,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     logService.log(
         LogConstants.AUTH_KEY, LogConstants.RESEND_VERIFY_EMAIL_ACTION, null, actionToken);
 
-    emailService.sendVerificationEmail(user.getEmail(), actionToken.getToken());
+    emailProducer.sendVerificationEmail(user.getEmail(), actionToken.getToken());
   }
 
   /**
@@ -323,7 +324,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     actionTokenRepository.delete(actionToken);
 
-    emailService.sendWelcomeEmail(user);
+    emailProducer.sendWelcomeEmail(user.getEmail(), user.getFullName());
 
     logService.log(
         LogConstants.AUTH_KEY,
@@ -357,7 +358,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .build();
     actionTokenRepository.save(actionToken);
 
-    emailService.sendPasswordResetEmail(user, actionToken.getToken());
+    emailProducer.sendPasswordResetEmail(user.getEmail(), actionToken.getToken());
 
     logService.log(
         LogConstants.AUTH_KEY, LogConstants.FORGOT_PASSWORD_ACTION, null, Map.of("email", email));
