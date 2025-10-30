@@ -1,7 +1,6 @@
 package com.vinaacademy.platform.feature.quiz.entity;
 
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
-import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

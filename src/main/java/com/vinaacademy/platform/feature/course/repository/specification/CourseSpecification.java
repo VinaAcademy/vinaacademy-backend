@@ -34,7 +34,7 @@ public class CourseSpecification {
             return criteriaBuilder.equal(root.get("status"), status);
         };
     }
-    
+
     public static Specification<Course> dontHasStatus(CourseStatus status) {
         return (root, query, criteriaBuilder) -> {
             if (status == null) {
@@ -105,7 +105,6 @@ public class CourseSpecification {
         return "%" + searchTerm.toLowerCase() + "%";
     }
 
-    // Thêm phương thức để lọc theo instructor
     public static Specification<Course> hasInstructor(UUID instructorId) {
         if (instructorId == null) {
             return null;

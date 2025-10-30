@@ -29,5 +29,5 @@ public class OrderDto {
     private LocalDateTime createdDate;
     private PaymentDto paymentDto;
     
-    private List<OrderItemDto> orderItemsDto = new ArrayList<>();;
+    private List<OrderItemDto> orderItemsDto = new ArrayList<>();
 }

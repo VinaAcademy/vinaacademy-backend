@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.quiz.service.impl;
 
 import com.vinaacademy.platform.feature.quiz.dto.UserAnswerRequest;
+import com.vinaacademy.platform.feature.quiz.enums.QuestionType;
 import com.vinaacademy.platform.feature.quiz.service.QuizCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,8 +59,19 @@ public class QuizCacheServiceImpl implements QuizCacheService {
 
         UserAnswerRequest existing = cachedAnswer.get(request.getQuestionId().toString());
         if (existing != null && existing.getSelectedAnswerIds() != null) {
+            // unique ids
             Set<UUID> merged = Collections.synchronizedSet(new HashSet<>(existing.getSelectedAnswerIds()));
-            merged.addAll(request.getSelectedAnswerIds());
+
+            QuestionType type = request.getQuestionType();
+            if (type == QuestionType.SINGLE_CHOICE || type == QuestionType.TRUE_FALSE) {
+                // for single choice
+                merged = request.getSelectedAnswerIds().stream()
+                        .limit(1)
+                        .collect(Collectors.toCollection(HashSet::new));
+            } else {
+                merged.addAll(request.getSelectedAnswerIds());
+            }
+
             request.setSelectedAnswerIds(new ArrayList<>(merged));
         }
 

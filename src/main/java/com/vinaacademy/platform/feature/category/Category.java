@@ -3,9 +3,8 @@ package com.vinaacademy.platform.feature.category;
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Data
 @Getter
@@ -36,8 +35,10 @@ public class Category extends BaseEntity {
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
+    @ToString.Exclude
     private List<Category> children;
 
     @OneToMany(mappedBy = "category")
+    @ToString.Exclude
     private List<Course> courses;
 }

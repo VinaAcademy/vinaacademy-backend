@@ -3,20 +3,13 @@ package com.vinaacademy.platform.feature.user.service;
 import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.entity.User;
-import com.vinaacademy.platform.feature.user.role.entity.Permission;
-import com.vinaacademy.platform.feature.user.role.entity.Role;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +17,17 @@ public class CustomUserDetailService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
-    private static final long LOCK_TIME_DURATION = 15; // 15 minutes
+    private static final long LOCK_TIME_DURATION = 15; /**
+     * Loads a UserDetails by username (email), unlocking the account if a prior lock has expired.
+     *
+     * Retrieves the user identified by the given username (email) and returns it as a UserDetails instance.
+     * If the user is currently disabled due to a lock and the lock time has expired, the account is unlocked
+     * (enabled, failed attempts reset, lock time cleared) before returning.
+     *
+     * @param username the user's email used as the username
+     * @return the found User as a UserDetails instance
+     * @throws BadRequestException if no user with the given email is found
+     */
 
     @Override
     @Transactional(readOnly = true)
@@ -34,19 +37,18 @@ public class CustomUserDetailService implements UserDetailsService {
             unlockAccount(user);
         }
 
-        String[] roles = user.getRoles().stream().map(Role::getCode).toArray(String[]::new);
-
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .disabled(!user.isEnabled())
-                .accountExpired(false)
-                .credentialsExpired(false)
-                .accountLocked(user.isLocked()).roles(roles)
-                .authorities(getAuthorities(user.getRoles()))
-                .build();
+        return user;
     }
 
+    /**
+     * Increments the stored failed-login counter for the user identified by the given email.
+     *
+     * If the user is not found this method returns silently. When the counter reaches or
+     * exceeds the configured maximum failed attempts the account is locked (disabled and
+     * lock time set); otherwise the updated counter is persisted.
+     *
+     * @param username the user's email (used as username) whose failed-attempt counter will be incremented
+     */
     @Transactional
     public void increaseFailedAttempts(String username) {
         User user = userRepository.findByEmailWithRoles(username).orElse(null);
@@ -84,43 +86,18 @@ public class CustomUserDetailService implements UserDetailsService {
         return lockTime != null && lockTime.isBefore(LocalDateTime.now());
     }
 
+    /**
+     * Re-enables a locked user account and clears its lock state.
+     *
+     * This resets the user's failed-attempt counter to 0, clears the lock timestamp,
+     * marks the account enabled, and persists the updated user.
+     *
+     * @param user the User entity to unlock and persist
+     */
     private void unlockAccount(User user) {
         user.setEnabled(true);
         user.setFailedAttempts(0);
         user.setLockTime(null);
         userRepository.save(user);
-    }
-
-
-    private Collection<? extends GrantedAuthority> getAuthorities(final Set<Role> roles) {
-//        return roles.stream().map(s -> new GrantedAuthority() {
-//            @Override
-//            public String getAuthority() {
-//                return "ROLE_" + s.getName();
-//            }
-//        }).collect(Collectors.toList());
-        return getGrantedAuthorities(getPermissions(roles));
-    }
-
-    private Set<String> getPermissions(final Set<Role> role) {
-        final Set<String> permissions = new HashSet<>();
-        final List<Permission> collection = new ArrayList<>();
-        for (final Role item : role) {
-            permissions.add("ROLE_" + item.getName());
-            collection.addAll(item.getPermissions());
-        }
-        for (final Permission item : collection) {
-            permissions.add(item.getName());
-        }
-        return permissions;
-    }
-
-    private List<GrantedAuthority> getGrantedAuthorities(final Set<String> privileges) {
-        return privileges.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-//         List<GrantedAuthority> authorities = new ArrayList<>();
-//        for (final String privilege : privileges) {
-//            authorities.add(new SimpleGrantedAuthority(privilege));
-//        }
-//        return authorities;
     }
 }

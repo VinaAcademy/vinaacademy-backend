@@ -1,9 +1,8 @@
 package com.vinaacademy.platform.feature.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-
 import java.time.Instant;
+import lombok.*;
 
 @Data
 @Setter
@@ -15,12 +14,21 @@ import java.time.Instant;
 public class ApiResponse<T> {
     private String status;
     private String message;
+    private Integer code;
     private T data;
     private Instant timestamp;
 
     public ApiResponse(String status, String message, T data) {
         this.status = status;
         this.message = message;
+        this.data = data;
+        this.timestamp = Instant.now();
+    }
+
+    public ApiResponse(String status, String message, Integer code, T data) {
+        this.status = status;
+        this.message = message;
+        this.code = code;
         this.data = data;
         this.timestamp = Instant.now();
     }
@@ -41,4 +49,11 @@ public class ApiResponse<T> {
         return new ApiResponse<>("ERROR", message, null);
     }
 
+    public static <T> ApiResponse<T> error(Integer code, String message) {
+        return new ApiResponse<>("ERROR", message, code, null);
+    }
+
+    public static <T> ApiResponse<T> error(Integer code, String message, T data) {
+        return new ApiResponse<>("ERROR", message, code, data);
+    }
 }

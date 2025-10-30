@@ -5,6 +5,8 @@ import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Data
 @Getter
@@ -23,6 +25,7 @@ public class CourseInstructor extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @Fetch(FetchMode.JOIN)
     private User instructor;
 
     @ManyToOne

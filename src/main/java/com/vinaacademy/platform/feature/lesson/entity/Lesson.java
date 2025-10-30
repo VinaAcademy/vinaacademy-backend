@@ -6,11 +6,10 @@ import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.storage.entity.MediaFile;
 import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Getter
@@ -18,7 +17,6 @@ import java.util.UUID;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "lesson_type", discriminatorType = DiscriminatorType.STRING)
@@ -31,6 +29,7 @@ public abstract class Lesson extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "section_id", nullable = false)
+    @ToString.Exclude
     protected Section section;
 
     @Column(name = "title")
@@ -51,6 +50,7 @@ public abstract class Lesson extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
     protected User author;
 
     @Version
@@ -58,6 +58,7 @@ public abstract class Lesson extends BaseEntity {
     private Long version;
 
     @OneToMany(mappedBy = "lesson", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @ToString.Exclude
     protected List<UserProgress> progressList;
 
     @ManyToMany
@@ -66,6 +67,23 @@ public abstract class Lesson extends BaseEntity {
             joinColumns = @JoinColumn(name = "lesson_id"),
             inverseJoinColumns = @JoinColumn(name = "media_file_id")
     )
+    @ToString.Exclude
     protected List<MediaFile> mediaFiles;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null
+            || org.hibernate.Hibernate.getClass(this) != org.hibernate.Hibernate.getClass(o))
+            return false;
+        Lesson that = (Lesson) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return (id != null)
+            ? id.hashCode()
+            : org.hibernate.Hibernate.getClass(this).hashCode();
+    }
 }

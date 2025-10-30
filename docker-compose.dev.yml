@@ -7,8 +7,8 @@ services:
     container_name: vinaacademy-postgres
     environment:
       POSTGRES_DB: vinaacademy
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
@@ -39,8 +39,8 @@ services:
       - "9000:9000"   # API
       - "9001:9001"   # Web UI
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: admin123456
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"

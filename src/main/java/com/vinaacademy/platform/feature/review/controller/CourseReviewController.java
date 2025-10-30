@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -113,7 +114,7 @@ public class CourseReviewController {
 
         log.info("User {} retrieved their review for course {}: {}", userId, courseId, review);
 
-        if (review == null) {
+        if (Objects.isNull(review)) {
             return ResponseEntity.ok(new ApiResponse<>("success", "Bạn chưa đánh giá khóa học này", null));
         }
 
@@ -128,12 +129,7 @@ public class CourseReviewController {
 
         User currentUser = securityHelper.getCurrentUser();
         UUID userId = currentUser.getId();
-
-        //Kiểm tra quyền
-        if (!courseReviewService.isReviewOwnedByUser(reviewId, userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse<>("error", "Bạn không có quyền xóa đánh giá này", null));
-        }
+        
         courseReviewService.deleteReview(userId, reviewId);
 
         return ResponseEntity.ok(new ApiResponse<>("success", "Xóa đánh giá thành công", null));

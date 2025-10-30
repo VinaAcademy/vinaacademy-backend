@@ -5,7 +5,6 @@ import com.vinaacademy.platform.feature.quiz.dto.UserAnswerRequest;
 import com.vinaacademy.platform.feature.quiz.entity.QuizSession;
 import com.vinaacademy.platform.feature.quiz.repository.QuizSessionRepository;
 import com.vinaacademy.platform.feature.quiz.service.QuizCacheService;
-import com.vinaacademy.platform.feature.quiz.service.QuizService;
 import com.vinaacademy.platform.feature.quiz.service.QuizSessionService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;

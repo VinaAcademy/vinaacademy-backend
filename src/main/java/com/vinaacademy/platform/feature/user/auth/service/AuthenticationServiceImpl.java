@@ -2,6 +2,7 @@ package com.vinaacademy.platform.feature.user.auth.service;
 
 import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.exception.RetryableException;
+import com.vinaacademy.platform.feature.common.constant.RetryConstants;
 import com.vinaacademy.platform.feature.common.utils.RandomUtils;
 import com.vinaacademy.platform.feature.email.config.UrlBuilder;
 import com.vinaacademy.platform.feature.email.service.EmailService;
@@ -21,8 +22,11 @@ import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -33,10 +37,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -58,15 +58,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     /**
-     * Registers a new user in the system.
+     * Register a new user account and send an email verification token.
      *
-     * @param registerRequest The registration request containing user details including email, password, retyped password and full name
-     * @throws BadRequestException if passwords don't match or if email already exists in the system.
-     *                             The user account is initially disabled and requires email verification to be activated.
+     * Creates a disabled user with an auto-generated username and the STUDENT role, persists it,
+     * issues a VERIFY_ACCOUNT action token, and sends a verification email containing the token.
+     *
+     * @param registerRequest registration data (email, full name, password, retyped password)
+     * @throws BadRequestException if the provided passwords do not match or if the email is already registered
      */
     @Transactional
     public void register(RegisterRequest registerRequest) {
-        if (!StringUtils.equals(registerRequest.getPassword(), registerRequest.getRetypedPassword())) {
+        if (!Strings.CI.equals(registerRequest.getPassword(), registerRequest.getRetypedPassword())) {
             throw BadRequestException.message("Mật khẩu không khớp");
         }
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -95,7 +97,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailService.sendVerificationEmail(user.getEmail(), actionToken.getToken());
     }
 
-    @Retryable(retryFor = {RetryableException.class}, maxAttempts = 3)
+    /**
+     * Generates a candidate username from a user's full name.
+     *
+     * The returned username is the lowercase full name with all whitespace removed,
+     * truncated to at most 10 characters, then appended with 5 random characters
+     * (resulting in up to 15 characters). If the generated username already exists
+     * in the user repository, a RetryableException is thrown to allow the caller's
+     * retry mechanism to attempt a new generation.
+     *
+     * @param fullName the user's full name (may contain spaces and mixed case)
+     * @return a lowercase, whitespace-free username with 5 random characters appended
+     * @throws RetryableException if the generated username already exists
+     */
+    @Retryable(retryFor = {RetryableException.class}, maxAttempts = RetryConstants.DEFAULT_MAX_ATTEMPTS)
     private String generateUsername(String fullName) {
         String username = fullName.toLowerCase().replaceAll("\\s+", "");
         username = username.substring(0, Math.min(username.length(), 10))
@@ -114,9 +129,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * @throws BadRequestException if the user is not found, not enabled, or locked.
      */
     public AuthenticationResponse login(AuthenticationRequest loginRequest) {
-        Authentication authentication = authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+      authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
+      UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
         if (userDetails == null) {
             throw BadRequestException.message("Không tìm thấy người dùng: " + loginRequest.getEmail());
         }
@@ -145,13 +160,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationResponse(accessToken, refreshToken);
     }
 
-    private Authentication authenticateUser(String email, String password) {
+    /**
+     * Authenticates a user by email and password and stores the resulting Authentication in the SecurityContext.
+     *
+     * On authentication failure this method throws a BadRequestException with a user-facing message.
+     * If the account is disabled, it invokes the disabled-account handler before throwing.
+     *
+     * @param email    the user's email (used as the principal)
+     * @param password the user's plain-text password
+     * @throws BadRequestException if authentication fails for any reason (bad credentials, locked/expired/disabled account, etc.)
+     */
+    private void authenticateUser(String email, String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return authentication;
 
         } catch (AuthenticationException ex) {
             String message = authenticationExceptionMessage(ex);
@@ -329,10 +353,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Resets the user's password using a valid token and signature.
+     * Resets a user's password using a reset token and its URL signature.
      *
-     * @param request The reset password request containing the new password, token, and signature.
-     * @throws BadRequestException if the signature is invalid, or the token is invalid or expired.
+     * <p>Validates the provided signature, ensures the reset token exists and is not expired,
+     * verifies the new password matches its confirmation, updates the user's stored password,
+     * deletes the used action token, and records the action in the audit log.</p>
+     *
+     * @param request contains the reset token, URL signature, new password, and retyped password
+     * @throws BadRequestException if the signature is invalid, the token is not found, the token is expired,
+     *                             or the provided passwords do not match
      */
     @Override
     public void resetPassword(ResetPasswordRequest request) {
@@ -347,7 +376,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw BadRequestException.message("Token đã hết hạn");
         }
 
-        if (!StringUtils.equals(request.getPassword(), request.getRetypedPassword())) {
+        if (!Strings.CI.equals(request.getPassword(), request.getRetypedPassword())) {
             throw BadRequestException.message("Mật khẩu không khớp");
         }
 
@@ -360,11 +389,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         logService.log(LogConstants.AUTH_KEY, LogConstants.RESET_PASSWORD_ACTION, null, Map.of("email", user.getEmail()));
     }
 
+    /**
+     * Change the currently authenticated user's password.
+     *
+     * Validates that the provided new password matches the re-typed confirmation and that the
+     * supplied current password is correct, then updates the persisted password and logs the change.
+     *
+     * @param request contains the current password, the new password, and the re-typed new password
+     * @return true if the password was successfully changed
+     * @throws BadRequestException if the new password and confirmation do not match or if the current password is incorrect
+     */
     @Override
     @Transactional
     public boolean changePassword(ChangePasswordRequest request) {
         User user = securityHelper.getCurrentUser();
-        if (!StringUtils.equals(request.getNewPassword(), request.getRetypedPassword())) {
+        if (!Strings.CI.equals(request.getNewPassword(), request.getRetypedPassword())) {
             throw BadRequestException.message("Mật khẩu mới không khớp");
         }
 

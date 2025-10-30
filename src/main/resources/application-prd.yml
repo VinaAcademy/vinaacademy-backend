@@ -89,7 +89,12 @@ mail:
         mail.smtp.starttls.enable: true
 
 springdoc:
-  swagger-ui:
+  swagger-ui: 
     enabled: false
   api-docs:
     enabled: false
+
+vnpay:
+  tmn-code: 4V0UG95A
+  hash-secret: 9UUN29DW7VXYOZEYV9F670QUJPDY3I5E
+  url-return: https://vinaacademy.huuloc.id.vn/transaction

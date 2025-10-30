@@ -1,17 +1,18 @@
 package com.vinaacademy.platform.feature.order_payment.repository;
 
-import com.vinaacademy.platform.feature.order_payment.entity.Payment;
-import com.vinaacademy.platform.feature.order_payment.enums.PaymentStatus;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.vinaacademy.platform.feature.order_payment.entity.Payment;
+import com.vinaacademy.platform.feature.order_payment.enums.PaymentStatus;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
@@ -29,9 +30,17 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 	
 	Optional<Payment> findByOrderId(UUID uuid);
 	
-	@Query("SELECT p FROM Payment p WHERE p.paymentStatus = :status AND p.createdAt <= :cutoff")
-    List<Payment> findPendingPaymentsCreatedBefore(
-        @Param("status") PaymentStatus status,
-        @Param("cutoff") LocalDateTime cutoff
-    );
+	//Kiểm tra nếu payment = status pending và ngày tạo <= ngày hạn(ngày hạn = ngày hiện tại - thgian hạn)
+	// ví dụ hạn là 1 ngày và bây giờ là 16/6 thì cutoff sẽ là 16-1 = 15/6 thì nếu ngày tạo <= 15/6 thì hết hạn
+	@Modifying
+	@Query("""
+	    UPDATE Payment p
+	    SET p.paymentStatus = :cancelled
+	    WHERE p.paymentStatus = :pending
+	      AND p.createdAt <= :cutoff
+	""")
+	int cancelExpiredPendingPayments(@Param("cancelled") PaymentStatus cancelled,
+	                                 @Param("pending")   PaymentStatus pending,
+	                                 @Param("cutoff")    LocalDateTime cutoff);
+
 }

@@ -3,7 +3,10 @@ package com.vinaacademy.platform.feature.order_payment.utils;
 import com.vinaacademy.platform.feature.order_payment.entity.Coupon;
 import com.vinaacademy.platform.feature.order_payment.enums.PaymentStatus;
 
+import lombok.RequiredArgsConstructor;
+
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -11,7 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.stereotype.Component;
+
+@RequiredArgsConstructor
+@Component
 public class Utils {
+	
+	private final VNPayConfig vnPayConfig;
 	
 	public static boolean isCouponValid(Coupon coupon) {
         LocalDateTime now = LocalDateTime.now(); 
@@ -27,7 +36,11 @@ public class Utils {
         return true;
     }
 	
-	public static PaymentStatus orderReturn(Map<String, String> requestParams) {
+	public boolean isCouponValid(Coupon coupon, BigDecimal totalPrice) {
+		return totalPrice.compareTo(coupon.getMinOrderValue()) >= 0 && isCouponValid(coupon);
+    }
+	
+	public PaymentStatus orderReturn(Map<String, String> requestParams) {
 		Map<String, String> fields = new HashMap<>();
 		
 		for (Entry<String, String> entry : requestParams.entrySet()) {
@@ -51,7 +64,7 @@ public class Utils {
 		if (fields.containsKey("vnp_SecureHash")) {
 			fields.remove("vnp_SecureHash");
 		}
-		String signValue = VNPayConfig.hashAllFields(fields);
+		String signValue = vnPayConfig.hashAllFields(fields);
 		if (signValue.equals(vnp_SecureHash)) {
 			if ("00".equals(requestParams.get("vnp_TransactionStatus"))) {
 				return PaymentStatus.COMPLETED;

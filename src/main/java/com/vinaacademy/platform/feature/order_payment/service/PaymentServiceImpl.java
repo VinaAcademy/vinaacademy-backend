@@ -17,6 +17,7 @@ import com.vinaacademy.platform.feature.order_payment.repository.OrderRepository
 import com.vinaacademy.platform.feature.order_payment.repository.PaymentRepository;
 import com.vinaacademy.platform.feature.order_payment.utils.Utils;
 import com.vinaacademy.platform.feature.order_payment.utils.VNPayConfig;
+import com.vinaacademy.platform.feature.revenue.service.RevenueDistributionService;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.entity.User;
 
@@ -50,6 +51,12 @@ public class PaymentServiceImpl implements PaymentService {
 	private final SecurityHelper securityHelper;
 
 	private final EnrollmentService enrollmentService;
+	
+	private final VNPayConfig vnPayConfig;
+	
+	private final Utils utils;
+
+	private final RevenueDistributionService revenueDistributionService;
 
 	@Override
 	public PaymentDto createPayment(UUID orderId, HttpServletRequest request) {
@@ -57,12 +64,15 @@ public class PaymentServiceImpl implements PaymentService {
 				.orElseThrow(() -> BadRequestException.message("Không tìm thấy order id này"));
 //		if (StringUtil.isNullOrEmpty(urlChecking))
 //			throw BadRequestException.message("Url checking trống!");
-
+		
 		User user = securityHelper.getCurrentUser();
 		if (user.getId() != order.getUser().getId())
 			throw BadRequestException.message("Bạn không phải người sở hữu order này");
-
-		String url = VNPayConfig.createPaymentRedirect(order.getTotalAmount().longValue(),
+		
+		if (order.getCoupon() != null && !utils.isCouponValid(order.getCoupon(), order.getTotalAmount()))
+			throw BadRequestException.message("Coupon không hợp lệ, vui lòng thử lại");
+		
+		String url = vnPayConfig.createPaymentRedirect(order.getTotalAmount().longValue(),
 				"Đơn thanh toán cho mã đơn: " + orderId, order.getId().toString(), request);
 		ObjectNode data = objectMapper.createObjectNode();
 		data.put("urlTransaction", url);
@@ -116,6 +126,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
+	@Transactional
 	public PaymentStatus validPayment(Map<String, String> requestParams) {
 		Optional<Payment> payment = null;
 
@@ -130,7 +141,7 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		Payment pay = payment.get();
 
-		PaymentStatus result = Utils.orderReturn(requestParams);
+		PaymentStatus result = utils.orderReturn(requestParams);
 		pay.setPaymentStatus(result);
 		String transactionId = requestParams.get("vnp_TransactionNo");
 		pay.setTransactionId(result == PaymentStatus.COMPLETED ? transactionId : pay.getTransactionId());
@@ -151,12 +162,24 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		paymentRepository.save(pay);
 		if (updateEnroll) {
+			// 1. Tự động ghi danh khóa học
 			pay.getOrder().getOrderItems().forEach(oi -> {
 				EnrollmentRequest enrollrequest = EnrollmentRequest.builder().courseId(oi.getCourse().getId()).build();
 				UUID userId = pay.getOrder().getUser().getId();
 				if (!enrollmentService.isEnrolled(userId, enrollrequest.getCourseId()))
 					enrollmentService.enrollCourse(enrollrequest, pay.getOrder().getUser().getId());
 			});
+			
+			// 2. Phân chia doanh thu - Tạo lịch sử giao dịch và cộng tiền vào ví
+			try {
+				revenueDistributionService.distributeRevenue(pay, requestParams);
+				log.info("Successfully distributed revenue for payment {} - Order {}", 
+						pay.getId(), pay.getOrder().getId());
+			} catch (Exception e) {
+				log.error("Failed to distribute revenue for payment {} - Order {}: {}", 
+						pay.getId(), pay.getOrder().getId(), e.getMessage(), e);
+				// Không throw exception để không ảnh hưởng đến flow thanh toán chính
+			}
 		}
 		log.debug("update payment {} with status {} ", pay.getId(), result);
 
@@ -165,12 +188,12 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public String testApi() {
-		return VNPayConfig.createPaymentRedirect(Long.parseLong("10000"), "test order", "abcdeg12345678", null);
+		return vnPayConfig.createPaymentRedirect(Long.parseLong("10000"), "test order", "abcdeg12345678", null);
 	}
 
 	@Override
 	public PaymentStatus validUrlReturn(Map<String, String> requestParams) {
-		return Utils.orderReturn(requestParams);
+		return utils.orderReturn(requestParams);
 	}
 
 }
