@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package com.vinaacademy.grpc;
+
+option java_package = "com.vinaacademy.grpc";
+option java_outer_classname = "UserServiceProto";
+option java_multiple_files = true;
+
+// User Service for microservices communication
+service UserService {
+    rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+    rpc GetUserByIds(GetUserByIdsRequest) returns (GetUserByIdsResponse);
+}
+
+// Request message for getting user by ID
+message GetUserByIdRequest {
+    string user_id = 1;
+}
+
+// Request message for getting multiple users by IDs
+message GetUserByIdsRequest {
+    repeated string user_ids = 1;
+}
+
+// Response message containing user information
+message GetUserByIdResponse {
+    bool success = 1;
+    string message = 2;
+    UserInfo user = 3;
+}
+
+// Response message containing multiple users information
+message GetUserByIdsResponse {
+    bool success = 1;
+    string message = 2;
+    repeated UserInfo users = 3;
+    repeated string not_found_ids = 4;
+}
+
+// User information message
+message UserInfo {
+    string id = 1;
+    string email = 2;
+    string username = 3;
+    string phone = 4;
+    string avatar_url = 5;
+    string full_name = 6;
+    string description = 7;
+    bool is_collaborator = 8;
+    string birthday = 9;
+    repeated string roles = 10;
+    bool enabled = 11;
+    bool is_using_2fa = 12;
+}

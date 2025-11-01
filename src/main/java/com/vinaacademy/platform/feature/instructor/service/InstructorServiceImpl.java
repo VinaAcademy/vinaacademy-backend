@@ -3,21 +3,20 @@ package com.vinaacademy.platform.feature.instructor.service;
 import com.vinaacademy.platform.configuration.AppConfig;
 import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.feature.instructor.dto.InstructorInfoDto;
-import com.vinaacademy.platform.feature.notification.dto.NotificationCreateDTO;
-import com.vinaacademy.platform.feature.notification.enums.NotificationType;
-import com.vinaacademy.platform.feature.notification.service.NotificationService;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.user.role.entity.Role;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
+import com.vinaacademy.platform.kafka.NotificationProducer;
+import java.util.Set;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Set;
-import java.util.UUID;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
 
 @Service
 public class InstructorServiceImpl implements InstructorService {
@@ -28,7 +27,7 @@ public class InstructorServiceImpl implements InstructorService {
     @Autowired
     private SecurityHelper securityHelper;
     @Autowired
-    private NotificationService notificationService;
+    private NotificationProducer notificationProducer;
 
     @Override
     @Transactional(readOnly = true)
@@ -64,8 +63,8 @@ public class InstructorServiceImpl implements InstructorService {
 
         // Kiểm tra xem người dùng hiện tại có đúng một role là STUDENT không
         Set<Role> userRoles = currentUser.getRoles();
-        if (userRoles.size() != 1 || !userRoles.stream()
-                .anyMatch(role -> role.getCode().equalsIgnoreCase(AuthConstants.STUDENT_ROLE))) {
+        if (userRoles.size() != 1 || userRoles.stream()
+                .noneMatch(role -> role.getCode().equalsIgnoreCase(AuthConstants.STUDENT_ROLE))) {
             throw BadRequestException.message("Chỉ học viên mới có thể đăng ký làm giảng viên");
         }
 
@@ -106,7 +105,7 @@ public class InstructorServiceImpl implements InstructorService {
         String title = "Chào mừng bạn đến cộng đồng giảng viên VinaAcademy";
         String message = "Chúng tôi rất vui khi bạn trở thành một phần của cộng đồng giảng viên tại VinaAcademy.";
         String targetUrl = AppConfig.INSTANCE.getFrontendUrl() + "/instructor/dashboard";
-        NotificationCreateDTO request = NotificationCreateDTO.builder()
+        NotificationCreateEvent request = NotificationCreateEvent.builder()
                 .userId(userId)
                 .title(title)
                 .content(message)
@@ -114,7 +113,7 @@ public class InstructorServiceImpl implements InstructorService {
                 .type(NotificationType.SYSTEM)
                 .build();
 
-        notificationService.createNotification(request);
+        notificationProducer.sendNotification(request);
     }
 
 //    @Override

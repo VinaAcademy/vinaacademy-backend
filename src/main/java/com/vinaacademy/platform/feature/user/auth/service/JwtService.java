@@ -37,7 +37,7 @@ public class JwtService {
 
   /**
    * Generates a signed JWT access token for the given user containing standard and application-specific claims.
-   *
+   * <p>
    * The token is built from the user's details (subject, userId, email, roles, avatarUrl, fullName, etc.)
    * and is issued with the service's configured access-token expiration.
    *
@@ -54,7 +54,7 @@ public class JwtService {
 
   /**
    * Generates a signed refresh JWT for the given user.
-   *
+   * <p>
    * The token contains the service's standard claims (issuer, subject, userId, email, roles, etc.)
    * and is issued with the configured refresh token lifetime.
    *
@@ -112,7 +112,7 @@ public class JwtService {
 
   /**
    * Extracts the roles claim from a JWT and returns them as a single comma-separated string.
-   *
+   * <p>
    * Decodes the token's claims, converts the "roles" claim to a List<String>, and joins the entries
    * with commas (e.g. "ROLE_USER,ROLE_ADMIN"). The input should be a valid JWT string containing a
    * "roles" claim that is convertible to a list of strings.
@@ -138,7 +138,7 @@ public class JwtService {
 
   /**
    * Builds a JwtClaimsSet for the given user with standard and custom claims used by access/refresh tokens.
-   *
+   * <p>
    * The returned claims include issuer, subject, issuedAt, expiresAt, and custom claims:
    * - "sub": user's email (also used as subject)
    * - "userId": user's id as a string
@@ -172,10 +172,9 @@ public class JwtService {
     JwtClaimsSet.Builder claimsSet =
         JwtClaimsSet.builder()
             .issuer(issuer)
-            .subject(user.getEmail())
+            .subject(user.getUsername())
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plusSeconds(expiredTime))
-            .claim("sub", user.getEmail())
             .claim("userId", String.valueOf(user.getId()))
             .claim("email", user.getEmail())
             .claim("avatarUrl", user.getAvatarUrl() == null ? "" : user.getAvatarUrl())
@@ -188,7 +187,7 @@ public class JwtService {
 
   /**
    * Checks whether a JWT string is decodable by the configured JwtDecoder.
-   *
+   * <p>
    * Returns true when the provided token is non-blank and can be successfully decoded; returns false for blank tokens or when decoding fails for any reason.
    *
    * @param token the JWT string to validate

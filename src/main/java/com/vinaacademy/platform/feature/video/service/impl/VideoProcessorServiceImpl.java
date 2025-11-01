@@ -1,8 +1,6 @@
 package com.vinaacademy.platform.feature.video.service.impl;
 
 import com.vinaacademy.platform.exception.BadRequestException;
-import com.vinaacademy.platform.feature.notification.dto.NotificationCreateDTO;
-import com.vinaacademy.platform.feature.notification.service.NotificationService;
 import com.vinaacademy.platform.feature.request.ProcessVideoRequest;
 import com.vinaacademy.platform.feature.storage.entity.MediaFile;
 import com.vinaacademy.platform.feature.storage.properties.StorageProperties;
@@ -13,6 +11,7 @@ import com.vinaacademy.platform.feature.video.enums.VideoStatus;
 import com.vinaacademy.platform.feature.video.repository.VideoRepository;
 import com.vinaacademy.platform.feature.video.service.VideoProcessorService;
 import com.vinaacademy.platform.feature.video.utils.FFmpegUtils;
+import com.vinaacademy.platform.kafka.NotificationProducer;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +27,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent;
 
 @Slf4j
 @Service
@@ -36,7 +36,6 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
 
     private final VideoRepository videoRepository;
     private final MediaFileRepository mediaFileRepository;
-    private final NotificationService notificationService;
     private final StorageProperties storageProperties;
     private final S3Service s3Service;
 
@@ -46,6 +45,8 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
     @Autowired
     @Lazy
     private VideoProcessorService self;
+    @Autowired
+    private NotificationProducer notificationProducer;
 
     /**
      * Asynchronously converts a local video file to adaptive HLS, uploads the result to S3, updates the
@@ -96,7 +97,7 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
 
     /**
      * Apply successful processing results to a Video entity.
-     *
+     * <p>
      * Sets the video's status to READY, stores the S3 HLS key prefix, updates duration
      * from the provided input file, and, if missing, assigns a generated thumbnail S3 key
      * in the form "videos/thumbnails/{videoId}.jpg".
@@ -126,7 +127,7 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
 
     private void notifySuccess(Video video) {
         String courseId = video.getSection().getCourse().getId().toString();
-        notificationService.createNotification(NotificationCreateDTO.builder()
+        notificationProducer.sendNotification(NotificationCreateEvent.builder()
                 .title("Video " + video.getTitle() + " đã được xử lý thành công")
                 .content("Bạn có thể xem tại đây.")
                 .targetUrl(frontendUrl + "/instructor/courses/" + courseId + "/lectures/" + video.getId())
@@ -136,7 +137,7 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
 
     private void notifyFailure(Video video, String errorMessage) {
         String courseId = video.getSection().getCourse().getId().toString();
-        notificationService.createNotification(NotificationCreateDTO.builder()
+        notificationProducer.sendNotification(NotificationCreateEvent.builder()
                 .title("Lỗi xử lý video " + video.getTitle())
                 .content("Có lỗi xảy ra: " + errorMessage)
                 .targetUrl(frontendUrl + "/instructor/courses/" + courseId + "/lectures/" + video.getId())

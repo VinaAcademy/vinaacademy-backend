@@ -30,12 +30,12 @@ public class SecurityConfig {
     private final UrlBasedCorsConfigurationSource corsConfigurationSource;
     private final CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
     
-    @Value("${application.url.google-auth")
+    @Value("${application.url.google-auth:/oauth2/authorize/google}")
     private String googleAuthUrl;
 
   /**
    * Configures a SecurityFilterChain for the OAuth2 authorization server endpoints and enables JWT-based resource server support.
-   *
+   * <p>
    * The configuration restricts HttpSecurity to the authorization server endpoints provided by
    * OAuth2AuthorizationServerConfigurer, applies the authorization server defaults, and configures
    * the OAuth2 Resource Server to use JWT authentication for those endpoints.

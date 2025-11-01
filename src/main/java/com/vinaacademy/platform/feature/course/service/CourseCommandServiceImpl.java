@@ -3,7 +3,6 @@ package com.vinaacademy.platform.feature.course.service;
 import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.feature.category.Category;
 import com.vinaacademy.platform.feature.category.repository.CategoryRepository;
-import com.vinaacademy.platform.feature.common.helpers.SlugGeneratorHelper;
 import com.vinaacademy.platform.feature.common.utils.SlugUtils;
 import com.vinaacademy.platform.feature.course.dto.CourseDto;
 import com.vinaacademy.platform.feature.course.dto.CourseRequest;
@@ -18,6 +17,8 @@ import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,9 +26,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
+import vn.vinaacademy.common.helpers.SlugGeneratorHelper;
 
 /**
  * Implementation of course command service.
