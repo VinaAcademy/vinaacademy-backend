@@ -12,7 +12,7 @@ RUN mvn clean package -DskipTests
 
 # Run stage
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17-jdk-alpine
 
 LABEL maintainer="VinaAcademy"
 LABEL description="VinaAcademy Platform"
