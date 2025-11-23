@@ -1,5 +1,6 @@
 package com.vinaacademy.platform.feature.quiz.service.impl;
 
+import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.exception.NotFoundException;
 import com.vinaacademy.platform.exception.ValidationException;
 import com.vinaacademy.platform.feature.quiz.dto.AnswerDto;
@@ -10,11 +11,10 @@ import com.vinaacademy.platform.feature.quiz.mapper.QuizMapper;
 import com.vinaacademy.platform.feature.quiz.repository.AnswerRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuestionRepository;
 import com.vinaacademy.platform.feature.quiz.service.AnswerService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +90,9 @@ public class AnswerServiceImpl implements AnswerService {
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new NotFoundException("Answer not found with id: " + answerId));
 
+        if (answerRepository.existsByIdAndUserAnswersIsNotEmpty(answerId)) {
+            throw BadRequestException.message("Không thể xóa đáp án đã có người chọn");
+        }
         answerRepository.delete(answer);
     }
 }

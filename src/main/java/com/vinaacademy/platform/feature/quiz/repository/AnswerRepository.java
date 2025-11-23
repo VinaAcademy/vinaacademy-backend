@@ -35,4 +35,6 @@ public interface AnswerRepository extends JpaRepository<Answer, UUID> {
       WHERE a.question.id = :questionId
   """)
   boolean existsByQuestionIdInUserAnswers(UUID questionId);
+
+  boolean existsByIdAndUserAnswersIsNotEmpty(UUID answerId);
 }
