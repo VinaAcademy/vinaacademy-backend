@@ -1,8 +1,8 @@
 package com.vinaacademy.platform.feature.quiz.service;
 
 import com.vinaacademy.platform.feature.quiz.dto.QuizDto;
+import com.vinaacademy.platform.feature.quiz.dto.QuizStudentAttemptsDto;
 import com.vinaacademy.platform.feature.quiz.dto.QuizSubmissionResultDto;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -15,4 +15,5 @@ public interface QuizInstructorService {
 
     List<QuizSubmissionResultDto> getQuizSubmissions(UUID quizId);
 
+    List<QuizStudentAttemptsDto> getStudentAttempts(UUID quizId);
 }

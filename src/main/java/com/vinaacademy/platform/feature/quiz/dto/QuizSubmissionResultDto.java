@@ -1,14 +1,14 @@
 package com.vinaacademy.platform.feature.quiz.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -22,6 +22,7 @@ public class QuizSubmissionResultDto {
     private LocalDateTime endTime;
     private Double score;
     private Double totalPoints;
-    private Boolean isPassed;
+    @JsonProperty("isPassed")
+    private boolean isPassed;
     private List<UserAnswerResultDto> answers = new ArrayList<>();
 }
