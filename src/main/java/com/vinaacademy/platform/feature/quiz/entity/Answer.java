@@ -1,12 +1,12 @@
 package com.vinaacademy.platform.feature.quiz.entity;
 
-import com.vinaacademy.platform.feature.common.entity.SoftDeleteEntity;
+import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 @Data
 @Getter
@@ -17,9 +17,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "answers")
-@SQLDelete(sql = "UPDATE answers SET deleted = true, deleted_at = now() WHERE id = ?")
-@Where(clause = "deleted = false")
-public class Answer extends SoftDeleteEntity {
+public class Answer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,4 +32,8 @@ public class Answer extends SoftDeleteEntity {
 
     @Column(name = "is_correct")
     private Boolean isCorrect = false;
+
+  @ManyToMany(mappedBy = "selectedAnswers")
+  @BatchSize(size = 50)
+  private List<UserAnswer> userAnswers = new ArrayList<>();
 }

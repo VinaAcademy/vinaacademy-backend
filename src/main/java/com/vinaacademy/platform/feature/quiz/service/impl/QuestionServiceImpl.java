@@ -1,5 +1,6 @@
 package com.vinaacademy.platform.feature.quiz.service.impl;
 
+import com.vinaacademy.platform.exception.BadRequestException;
 import com.vinaacademy.platform.exception.NotFoundException;
 import com.vinaacademy.platform.exception.ValidationException;
 import com.vinaacademy.platform.feature.quiz.dto.QuestionDto;
@@ -8,12 +9,14 @@ import com.vinaacademy.platform.feature.quiz.entity.Question;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
 import com.vinaacademy.platform.feature.quiz.enums.QuestionType;
 import com.vinaacademy.platform.feature.quiz.mapper.QuizMapper;
+import com.vinaacademy.platform.feature.quiz.repository.AnswerRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuestionRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuizRepository;
 import com.vinaacademy.platform.feature.quiz.service.AnswerService;
 import com.vinaacademy.platform.feature.quiz.service.QuestionService;
 import com.vinaacademy.platform.feature.user.auth.annotation.RequiresResourcePermission;
 import com.vinaacademy.platform.feature.user.constant.ResourceConstants;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,8 @@ public class QuestionServiceImpl implements QuestionService {
   private final QuizRepository quizRepository;
 
   private final AnswerService answerService;
+  private final AnswerRepository answerRepository;
+  private final EntityManager entityManager;
 
   @Override
   @Transactional
@@ -131,10 +136,21 @@ public class QuestionServiceImpl implements QuestionService {
   public void deleteQuestion(UUID questionId) {
     Question question =
         questionRepository
-            .findById(questionId)
+            .findByIdWithAnswer(questionId)
             .orElseThrow(() -> new NotFoundException("Question not found with id: " + questionId));
+    if (answerRepository.existsByQuestionIdInUserAnswers(questionId)) {
+      throw BadRequestException.message("Không thể xóa câu hỏi đã có người trả lời");
+    }
 
     Quiz quiz = question.getQuiz();
+    
+    // Delete all answers first
+    answerRepository.deleteByQuestionId(questionId);
+    
+    // Force flush to ensure answers are deleted before deleting question
+    entityManager.flush();
+    
+    // Now delete the question
     questionRepository.delete(question);
 
     // Update quiz total points

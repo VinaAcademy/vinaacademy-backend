@@ -3,11 +3,11 @@ package com.vinaacademy.platform.feature.quiz.entity;
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.quiz.enums.QuestionType;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 @Data
 @Getter
@@ -42,6 +42,7 @@ public class Question extends BaseEntity {
     private QuestionType questionType = QuestionType.SINGLE_CHOICE;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 50)
     private List<Answer> answers = new ArrayList<>();
 
     public void addAnswer(Answer answer) {
