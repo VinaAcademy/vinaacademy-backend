@@ -1,7 +1,7 @@
 package com.vinaacademy.platform.feature.quiz.enums;
 
 public enum QuestionType {
-    SINGLE_CHOICE, MULTIPLE_CHOICE, TRUE_FALSE, TEXT;
+    SINGLE_CHOICE, MULTIPLE_CHOICE, TRUE_FALSE;
 
     public boolean isSingleChoice() {
         return this == SINGLE_CHOICE;
@@ -13,9 +13,5 @@ public enum QuestionType {
 
     public boolean isTrueFalse() {
         return this == TRUE_FALSE;
-    }
-
-    public boolean isText() {
-        return this == TEXT;
     }
 }

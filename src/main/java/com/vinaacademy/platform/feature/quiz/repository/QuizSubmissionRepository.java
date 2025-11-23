@@ -1,13 +1,12 @@
 package com.vinaacademy.platform.feature.quiz.repository;
 
 import com.vinaacademy.platform.feature.quiz.entity.QuizSubmission;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QuizSubmissionRepository extends JpaRepository<QuizSubmission, UUID> {
@@ -29,4 +28,14 @@ public interface QuizSubmissionRepository extends JpaRepository<QuizSubmission, 
             "ORDER BY submission.createdDate DESC " +
             "LIMIT 1")
     Optional<QuizSubmission> findFirstByQuizIdAndUserIdOrderByCreatedDateDesc(UUID quizId, UUID userId);
+
+  @Query(
+      """
+    SELECT s FROM QuizSubmission s
+        JOIN FETCH s.quizSession qs
+        JOIN FETCH qs.user u
+    WHERE qs.quiz.id = :quizId
+    ORDER BY s.createdDate DESC
+    """)
+  List<QuizSubmission> findByQuizIdOrderByCreatedDateDesc(UUID quizId);
 }

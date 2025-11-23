@@ -9,6 +9,8 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.checksums.RequestChecksumCalculation;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.http.Protocol;
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -36,7 +38,7 @@ public class S3Config {
 
   /**
    * Create an S3Configuration with path-style addressing set from the configured flag.
-   *
+   * <p>
    * This configures S3 clients to use path-style access when the injected `pathStyle` property
    * is true (required for many MinIO deployments).
    *
@@ -48,7 +50,7 @@ public class S3Config {
 
   /**
    * Creates a StaticCredentialsProvider from the configured access and secret keys.
-   *
+   * <p>
    * The provider wraps AwsBasicCredentials constructed from this class's
    * accessKey and secretKey fields.
    *
@@ -79,8 +81,8 @@ public class S3Config {
         .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
         .overrideConfiguration(
             ClientOverrideConfiguration.builder()
-                .apiCallTimeout(Duration.ofMinutes(2))
-                .apiCallAttemptTimeout(Duration.ofSeconds(30))
+                .apiCallTimeout(Duration.ofMinutes(10))
+                .apiCallAttemptTimeout(Duration.ofMinutes(5))
                 .build())
         .build();
   }
@@ -88,7 +90,7 @@ public class S3Config {
   /**
    * Creates and configures a non-blocking S3AsyncClient for high-throughput and
    * asynchronous S3 operations (required by the Transfer Manager).
-   *
+   * <p>
    * The client is configured to target the configured endpoint and region, use
    * the shared S3 service configuration (including path-style addressing), and
    * the static credentials provider. Request checksum calculation is enabled
@@ -106,17 +108,22 @@ public class S3Config {
         .serviceConfiguration(s3Cfg())
         .credentialsProvider(creds())
         .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
+        .httpClientBuilder(NettyNioAsyncHttpClient.builder()
+            .writeTimeout(Duration.ofMinutes(5))
+            .readTimeout(Duration.ofMinutes(5))
+            .connectionTimeout(Duration.ofSeconds(60))
+            .protocol(Protocol.HTTP1_1))
         .overrideConfiguration(
             ClientOverrideConfiguration.builder()
-                .apiCallTimeout(Duration.ofMinutes(5))
-                .apiCallAttemptTimeout(Duration.ofSeconds(30))
+                .apiCallTimeout(Duration.ofMinutes(10))
+                .apiCallAttemptTimeout(Duration.ofMinutes(5))
                 .build())
         .build();
   }
 
   /**
    * Creates an S3TransferManager for high-throughput, parallel S3 transfers using the provided async client.
-   *
+   * <p>
    * The returned manager performs multipart and parallel uploads/downloads and should be closed when no longer needed.
    *
    * @return a configured S3TransferManager backed by the provided S3AsyncClient
