@@ -4,12 +4,11 @@ import com.vinaacademy.platform.feature.quiz.dto.AnswerResultDto;
 import com.vinaacademy.platform.feature.quiz.dto.QuizSubmissionResultDto;
 import com.vinaacademy.platform.feature.quiz.dto.UserAnswerResultDto;
 import com.vinaacademy.platform.feature.quiz.entity.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface QuizSubmissionMapper {
@@ -18,6 +17,7 @@ public interface QuizSubmissionMapper {
     @Mapping(target = "quizId", source = "quizSession.quiz.id")
     @Mapping(target = "quizTitle", source = "quizSession.quiz.title")
     @Mapping(target = "answers", expression = "java(mapUserAnswers(submission))")
+    @Mapping(target = "isPassed", source = "passed")
     QuizSubmissionResultDto toSubmissionResultDto(QuizSubmission submission);
 
     default List<UserAnswerResultDto> mapUserAnswers(QuizSubmission submission) {
