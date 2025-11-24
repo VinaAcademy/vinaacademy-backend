@@ -1,7 +1,5 @@
 package com.vinaacademy.platform.feature.revenue.controller;
 
-import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -64,11 +62,10 @@ public class AdminRevenueController {
      * <ul>
      *   <li>Nhận PUT request với thông tin adminId (header) và dữ liệu duyệt/từ chối (body).</li>
      *   <li>Ghi log thao tác duyệt/từ chối.</li>
-     *   <li>Gọi {@link PayoutService#approvePayoutRequest(PayoutApprovalRequest, UUID)} để xử lý duyệt hoặc từ chối.</li>
+     *   <li>Gọi  để xử lý duyệt hoặc từ chối.</li>
      *   <li>Trả về thông tin yêu cầu rút tiền đã được cập nhật trạng thái.</li>
      * </ul>
      *
-     * @param adminId UUID của admin thực hiện thao tác (lấy từ header X-Admin-ID)
      * @param approvalRequest thông tin duyệt/từ chối yêu cầu rút tiền
      * @return ResponseEntity chứa ApiResponse<PayoutRequest> đã được xử lý
      */
