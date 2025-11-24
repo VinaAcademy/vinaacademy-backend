@@ -48,7 +48,7 @@ public class InstructorRevenueController {
      *   <li>Gọi service để lấy số dư ví</li>
      *   <li>Trả về thông tin số dư ví</li>
      * </ul>
-     * @param instructorId ID giảng viên (lấy từ header X-Instructor-ID)
+     * @param instructorId ID giảng viên
      * @return ResponseEntity chứa ApiResponse<WalletBalanceDto> với thông tin số dư ví
      */
 	@HasAnyRole({AuthConstants.INSTRUCTOR_ROLE, AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
@@ -109,17 +109,15 @@ public class InstructorRevenueController {
      *   <li>Gọi service để tạo yêu cầu rút tiền</li>
      *   <li>Trả về thông tin yêu cầu rút tiền vừa tạo</li>
      * </ul>
-     * @param instructorId ID giảng viên
      * @param request      Thông tin yêu cầu rút tiền
      * @return ResponseEntity chứa ApiResponse<PayoutRequest> với yêu cầu rút tiền vừa tạo
      */
     @PostMapping("/payout/request")
-    public ResponseEntity<ApiResponse<PayoutRequest>> createPayoutRequest(UUID instructorId,
-            @Valid @RequestBody PayoutRequestDto request) {
+    public ResponseEntity<ApiResponse<PayoutRequest>> createPayoutRequest(@Valid @RequestBody PayoutRequestDto request) {
         
-        log.info("Instructor {} requesting payout: {}", instructorId, request.getAmount());
+        log.info("Instructor {} requesting payout: {}", request.getAmount());
         
-        PayoutRequest payoutRequest = payoutService.createPayoutRequest(instructorId, request);
+        PayoutRequest payoutRequest = payoutService.createPayoutRequest(request);
         return ResponseEntity.ok(ApiResponse.success("Tạo yêu cầu rút tiền thành công", payoutRequest));
     }
     
@@ -137,10 +135,9 @@ public class InstructorRevenueController {
      * @return ResponseEntity chứa ApiResponse<Page<PayoutRequest>> với danh sách yêu cầu rút tiền
      */
     @GetMapping("/payout/requests")
-    public ResponseEntity<ApiResponse<Page<PayoutRequest>>> getPayoutRequests(UUID instructorId,
-            @PageableDefault(size = 20) Pageable pageable) {
+    public ResponseEntity<ApiResponse<Page<PayoutRequest>>> getPayoutRequests(@PageableDefault(size = 20) Pageable pageable) {
         
-        Page<PayoutRequest> requests = payoutService.getInstructorPayoutRequests(instructorId, pageable);
+        Page<PayoutRequest> requests = payoutService.getInstructorPayoutRequests(pageable);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách yêu cầu rút tiền thành công", requests));
     }
     
@@ -158,10 +155,9 @@ public class InstructorRevenueController {
      * @return ResponseEntity chứa ApiResponse<PayoutRequest> với yêu cầu rút tiền đã hủy
      */
     @PutMapping("/payout/requests/{requestId}/cancel")
-    public ResponseEntity<ApiResponse<PayoutRequest>> cancelPayoutRequest(UUID instructorId,
-            @PathVariable Long requestId) {
+    public ResponseEntity<ApiResponse<PayoutRequest>> cancelPayoutRequest(@PathVariable Long requestId) {
         
-        PayoutRequest cancelledRequest = payoutService.cancelPayoutRequest(requestId, instructorId);
+        PayoutRequest cancelledRequest = payoutService.cancelPayoutRequest(requestId);
         return ResponseEntity.ok(ApiResponse.success("Hủy yêu cầu rút tiền thành công", cancelledRequest));
     }
     

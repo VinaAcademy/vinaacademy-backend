@@ -49,6 +49,13 @@ public class PayoutServiceImpl implements PayoutService {
     private static final BigDecimal MIN_PAYOUT_AMOUNT = new BigDecimal("50000"); // 50k VND
 
     /**
+     * Helper method to get current instructor ID
+     */
+    private UUID getCurrentInstructorId() {
+        return securityHelper.getCurrentUser().getId();
+    }
+
+    /**
      * Tạo yêu cầu rút tiền cho giảng viên.
      * <p>
      * <b>Luồng hoạt động:</b>
@@ -59,7 +66,6 @@ public class PayoutServiceImpl implements PayoutService {
      *   <li>Cộng số tiền rút vào trường pendingWithdraw của ví (đánh dấu số tiền đang chờ rút, tránh double spending).</li>
      *   <li>Tạo bản ghi yêu cầu rút tiền ở trạng thái PENDING.</li>
      * </ol>
-     * @param instructorId ID giảng viên yêu cầu rút tiền
      * @param request      DTO chứa thông tin rút tiền (số tiền, ngân hàng, số tài khoản, ...)
      * @return PayoutRequest đã tạo
      * @throws IllegalArgumentException nếu số tiền nhỏ hơn mức tối thiểu
@@ -67,9 +73,9 @@ public class PayoutServiceImpl implements PayoutService {
      * @throws RuntimeException nếu đã có yêu cầu rút tiền đang chờ hoặc không tìm thấy ví
      */
 	@Override
-	public PayoutRequest createPayoutRequest(UUID instructorId, PayoutRequestDto request) {
+	public PayoutRequest createPayoutRequest(PayoutRequestDto request) {
 
-		log.info("Creating payout request for instructor: {}, amount: {}", instructorId, request.getAmount());
+		log.info("Creating payout request for instructor: {}, amount: {}", request.getAmount());
         
         // 1. Kiểm tra số tiền rút tối thiểu
         if (request.getAmount().compareTo(MIN_PAYOUT_AMOUNT) < 0) {
@@ -77,13 +83,13 @@ public class PayoutServiceImpl implements PayoutService {
         }
         
         // 2. Kiểm tra giảng viên có yêu cầu rút tiền đang chờ xử lý không
-        long pendingCount = payoutRequestRepository.countPendingRequestsByInstructor(instructorId);
+        long pendingCount = payoutRequestRepository.countPendingRequestsByInstructor(getCurrentInstructorId());
         if (pendingCount > 0) {
             throw new RuntimeException("Instructor already has pending payout requests");
         }
         
         // 3. Kiểm tra số dư ví đủ để rút
-        InstructorWallet wallet = walletRepository.findByInstructorId(instructorId)
+        InstructorWallet wallet = walletRepository.findByInstructorId(getCurrentInstructorId())
             .orElseThrow(() -> new RuntimeException("Instructor wallet not found"));
             
         if (!wallet.hasSufficientBalance(request.getAmount())) {
@@ -96,7 +102,7 @@ public class PayoutServiceImpl implements PayoutService {
         
         // 5. Tạo bản ghi yêu cầu rút tiền ở trạng thái PENDING
         PayoutRequest payoutRequest = PayoutRequest.builder()
-            .instructorId(instructorId)
+            .instructorId(getCurrentInstructorId())
             .amount(request.getAmount())
             .bankName(request.getBankName())
             .bankAccount(request.getBankAccount())
@@ -135,7 +141,6 @@ public class PayoutServiceImpl implements PayoutService {
      *   <li>Lưu lại trạng thái mới của yêu cầu rút tiền.</li>
      * </ol>
      * @param approvalRequest Thông tin duyệt yêu cầu rút tiền (ID, approved, lý do từ chối)
-     * @param adminId        ID admin/staff thực hiện duyệt
      * @return PayoutRequest đã cập nhật trạng thái
      * @throws PayoutRequestNotFoundException nếu không tìm thấy yêu cầu
      * @throws InvalidPayoutStatusException nếu trạng thái không hợp lệ
@@ -204,7 +209,6 @@ public class PayoutServiceImpl implements PayoutService {
      *   <li>Cập nhật trạng thái yêu cầu rút tiền thành PAID.</li>
      * </ol>
      * @param payoutRequest Yêu cầu rút tiền đã được duyệt
-     * @param adminId      ID admin xử lý
      * @throws RuntimeException nếu không tìm thấy ví giảng viên
      */
 	@Override
@@ -274,23 +278,22 @@ public class PayoutServiceImpl implements PayoutService {
      *   <li>Cập nhật trạng thái yêu cầu thành CANCELLED, lưu thời gian xử lý.</li>
      * </ol>
      * @param requestId    ID yêu cầu rút tiền
-     * @param instructorId ID giảng viên thực hiện hủy
      * @return PayoutRequest đã hủy
      * @throws PayoutRequestNotFoundException nếu không tìm thấy yêu cầu
      * @throws InvalidPayoutStatusException nếu trạng thái không hợp lệ
      * @throws RuntimeException nếu không đúng quyền sở hữu
      */
 	@Override
-	public PayoutRequest cancelPayoutRequest(Long requestId, UUID instructorId) {
-		checkAccess(instructorId);
-		log.info("Cancelling payout request: {} by instructor: {}", requestId, instructorId);
+	public PayoutRequest cancelPayoutRequest(Long requestId) {
+		checkAccess(getCurrentInstructorId());
+		log.info("Cancelling payout request: {} by instructor: {}", requestId, getCurrentInstructorId());
         
         // 1. Tìm kiếm yêu cầu rút tiền
         PayoutRequest payoutRequest = payoutRequestRepository.findById(requestId)
             .orElseThrow(() -> new PayoutRequestNotFoundException("Payout request not found"));
             
         // 2. Kiểm tra quyền sở hữu
-        if (!payoutRequest.getInstructorId().equals(instructorId)) {
+        if (!payoutRequest.getInstructorId().equals(getCurrentInstructorId())) {
             throw new RuntimeException("Unauthorized to cancel this payout request");
         }
         
@@ -300,7 +303,7 @@ public class PayoutServiceImpl implements PayoutService {
         }
         
         // 4. Giải phóng số tiền pending trong ví
-        InstructorWallet wallet = walletRepository.findByInstructorId(instructorId)
+        InstructorWallet wallet = walletRepository.findByInstructorId(getCurrentInstructorId())
             .orElseThrow(() -> new RuntimeException("Instructor wallet not found"));
             
         wallet.setPendingWithdraw(wallet.getPendingWithdraw().subtract(payoutRequest.getAmount()));
@@ -345,7 +348,6 @@ public class PayoutServiceImpl implements PayoutService {
      *   <li>Lấy ví theo instructorId, nếu chưa có thì trả về số dư 0.</li>
      *   <li>Trả về WalletBalanceDto với các trường số dư, tổng thu nhập, tổng đã rút, số tiền pending, số dư khả dụng.</li>
      * </ol>
-     * @param instructorId ID giảng viên
      * @return WalletBalanceDto thông tin số dư
      */
 	@Override
@@ -377,14 +379,14 @@ public class PayoutServiceImpl implements PayoutService {
      *   <li>Kiểm tra quyền truy cập.</li>
      *   <li>Lấy danh sách yêu cầu rút tiền theo instructorId, sắp xếp mới nhất trước.</li>
      * </ol>
-     * @param instructorId ID giảng viên
      * @param pageable     Thông tin phân trang
      * @return Page<PayoutRequest> danh sách yêu cầu
      */
 	@Override
-	public Page<PayoutRequest> getInstructorPayoutRequests(UUID instructorId, Pageable pageable) {
-		checkAccess(instructorId);
-        return payoutRequestRepository.findByInstructorIdOrderByCreatedDateDesc(instructorId, pageable);
+	public Page<PayoutRequest> getInstructorPayoutRequests(Pageable pageable) {
+        var user = securityHelper.getCurrentUser();
+        checkAccess(user.getId());
+        return payoutRequestRepository.findByInstructorIdOrderByCreatedDateDesc(user.getId(), pageable);
 	}
 
 	/**
@@ -438,7 +440,6 @@ public class PayoutServiceImpl implements PayoutService {
 	public Page<PayoutTransaction> getPayoutTransactions(UUID instructorId, Pageable pageable) {
 		checkAccess(instructorId);
         return payoutTransactionRepository.findByInstructorIdOrderByCreatedDateDesc(instructorId, pageable);
-
 	}
 
 }
