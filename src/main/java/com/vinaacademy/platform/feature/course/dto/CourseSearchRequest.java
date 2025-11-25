@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class CourseSearchRequest {
     private String keyword;
     private String categorySlug;
+    private List<String> categorieSlugs;
     private UUID instructorId;
     private CourseLevel level;
     private String language;
