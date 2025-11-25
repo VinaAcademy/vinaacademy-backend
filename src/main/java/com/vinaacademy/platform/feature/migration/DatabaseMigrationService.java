@@ -1,11 +1,11 @@
 package com.vinaacademy.platform.feature.migration;
 
 import jakarta.annotation.PostConstruct;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,6 +49,7 @@ public class DatabaseMigrationService {
 
     } catch (SQLException ex) {
       log.error("Failed to ensure PostgreSQL 'unaccent' extension", ex);
+      throw new RuntimeException("Unaccent extension initialization failed", ex);
     }
   }
 }

@@ -62,6 +62,9 @@ public class CourseSpecification {
     }
 
     public static Specification<Course> hasCategories(List<String> categorySlugs) {
+        if (categorySlugs != null && categorySlugs.size() > 50) {
+            throw new IllegalArgumentException("Too many categories");
+        }
         return (root, query, criteriaBuilder) -> {
             if (categorySlugs == null || categorySlugs.isEmpty()) {
                 return criteriaBuilder.conjunction();
