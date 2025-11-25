@@ -4,12 +4,14 @@ import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.domain.Specification;
 
 public class CourseSpecification {
 
@@ -18,11 +20,17 @@ public class CourseSpecification {
             if (keyword == null || keyword.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            String containsLikePattern = getContainsLikePattern(keyword);
-            return criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), containsLikePattern),
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), containsLikePattern)
-            );
+        String containsLikePattern = getContainsLikePattern(keyword);
+
+        Expression<String> unaccentName =
+            criteriaBuilder.function("unaccent", String.class, criteriaBuilder.lower(root.get("name")));
+        Expression<String> unaccentDescription =
+            criteriaBuilder.function("unaccent", String.class, criteriaBuilder.lower(root.get("description")));
+
+        return criteriaBuilder.or(
+            criteriaBuilder.like(unaccentName, containsLikePattern),
+            criteriaBuilder.like(unaccentDescription, containsLikePattern)
+        );
         };
     }
 
@@ -50,6 +58,24 @@ public class CourseSpecification {
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.equal(root.get("category").get("slug"), categorySlug);
+        };
+    }
+
+    public static Specification<Course> hasCategories(List<String> categorySlugs) {
+        if (categorySlugs != null && categorySlugs.size() > 50) {
+            throw new IllegalArgumentException("Too many categories");
+        }
+        return (root, query, criteriaBuilder) -> {
+            if (categorySlugs == null || categorySlugs.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            CriteriaBuilder.In<String> inClause =
+                criteriaBuilder.in(root.get("category").get("slug"));
+            for (String slug : categorySlugs) {
+                inClause.value(slug);
+            }
+            return inClause;
         };
     }
 
