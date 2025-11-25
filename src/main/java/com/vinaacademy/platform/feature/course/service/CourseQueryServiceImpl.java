@@ -61,6 +61,31 @@ public class CourseQueryServiceImpl implements CourseQueryService {
             .findBySlugWithDetails(slug)
             .orElseThrow(() -> BadRequestException.messageKey("course.not_found"));
 
+    // Only allow PUBLISHED courses for public users, unless user has permission
+    if (course.getStatus() != CourseStatus.PUBLISHED) {
+      try {
+        User currentUser = securityHelper.getCurrentUser();
+        
+        // Check if user is admin/staff
+        boolean isAdminOrStaff = securityHelper.hasAnyRole(AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE);
+        
+        // Check if user is course instructor
+        boolean isInstructor = course.getInstructors().stream()
+            .anyMatch(ci -> ci.getInstructor().getId().equals(currentUser.getId()));
+        
+        if (!isAdminOrStaff && !isInstructor) {
+          log.warn("User {} attempted to access non-published course: {} (status: {})", 
+              currentUser.getId(), slug, course.getStatus());
+          throw BadRequestException.messageKey("course.not_published");
+        }
+      } catch (Exception e) {
+        // No authenticated user or other error - only allow PUBLISHED
+        log.warn("Unauthenticated user attempted to access non-published course: {} (status: {})", 
+            slug, course.getStatus());
+        throw BadRequestException.messageKey("course.not_published");
+      }
+    }
+
     return courseAssembler.assembleCourseDetailsResponse(course);
   }
 
@@ -74,6 +99,31 @@ public class CourseQueryServiceImpl implements CourseQueryService {
             .findByIdWithDetails(id)
             .orElseThrow(() -> BadRequestException.messageKey("course.not_found"));
 
+    // Only allow PUBLISHED courses for public users, unless user has permission
+    if (course.getStatus() != CourseStatus.PUBLISHED) {
+      try {
+        User currentUser = securityHelper.getCurrentUser();
+        
+        // Check if user is admin/staff
+        boolean isAdminOrStaff = securityHelper.hasAnyRole(AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE);
+        
+        // Check if user is course instructor
+        boolean isInstructor = course.getInstructors().stream()
+            .anyMatch(ci -> ci.getInstructor().getId().equals(currentUser.getId()));
+        
+        if (!isAdminOrStaff && !isInstructor) {
+          log.warn("User {} attempted to access non-published course: {} (status: {})", 
+              currentUser.getId(), id, course.getStatus());
+          throw BadRequestException.messageKey("course.not_published");
+        }
+      } catch (Exception e) {
+        // No authenticated user or other error - only allow PUBLISHED
+        log.warn("Unauthenticated user attempted to access non-published course: {} (status: {})", 
+            id, course.getStatus());
+        throw BadRequestException.messageKey("course.not_published");
+      }
+    }
+
     return courseAssembler.assembleCourseDetailsResponse(course);
   }
 
@@ -86,6 +136,32 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         courseRepository
             .findById(id)
             .orElseThrow(() -> BadRequestException.messageKey("course.not_found"));
+    
+    // Only allow PUBLISHED courses for public users, unless user has permission
+    if (course.getStatus() != CourseStatus.PUBLISHED) {
+      try {
+        User currentUser = securityHelper.getCurrentUser();
+        
+        // Check if user is admin/staff
+        boolean isAdminOrStaff = securityHelper.hasAnyRole(AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE);
+        
+        // Check if user is course instructor
+        boolean isInstructor = course.getInstructors().stream()
+            .anyMatch(ci -> ci.getInstructor().getId().equals(currentUser.getId()));
+        
+        if (!isAdminOrStaff && !isInstructor) {
+          log.warn("User {} attempted to access non-published course: {} (status: {})", 
+              currentUser.getId(), id, course.getStatus());
+          throw BadRequestException.messageKey("course.not_published");
+        }
+      } catch (Exception e) {
+        // No authenticated user or other error - only allow PUBLISHED
+        log.warn("Unauthenticated user attempted to access non-published course: {} (status: {})", 
+            id, course.getStatus());
+        throw BadRequestException.messageKey("course.not_published");
+      }
+    }
+    
     return courseMapper.toDTO(course);
   }
 
