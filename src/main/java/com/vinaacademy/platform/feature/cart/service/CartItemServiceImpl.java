@@ -9,10 +9,12 @@ import com.vinaacademy.platform.feature.cart.mapper.CartMapper;
 import com.vinaacademy.platform.feature.cart.repository.CartItemRepository;
 import com.vinaacademy.platform.feature.cart.repository.CartRepository;
 import com.vinaacademy.platform.feature.course.entity.Course;
+import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.entity.User;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class CartItemServiceImpl implements CartItemService{
 	@Autowired
 	private CartRepository cartRepository;
@@ -46,6 +49,13 @@ public class CartItemServiceImpl implements CartItemService{
 		if (cart.getUser().getId() != userId ) {
     		throw BadRequestException.message("Bạn không có quyền sở hữu với cart này");
     	}
+		
+		// Only allow adding PUBLISHED courses to cart
+		if (course.getStatus() != CourseStatus.PUBLISHED) {
+			log.warn("User {} attempted to add non-published course {} (status: {}) to cart", 
+					userId, course.getId(), course.getStatus());
+			throw BadRequestException.message("Chỉ có thể thêm khóa học đã được xuất bản vào giỏ hàng");
+		}
 		
 		if (cartItemRepository.existsByCourseIdAndCart(course.getId(), cart))
 			throw BadRequestException.message("Duplicate course: Course id này đã tồn tại trong giỏ hàng");
@@ -79,6 +89,13 @@ public class CartItemServiceImpl implements CartItemService{
 		if (cart.getUser().getId() != userId ) {
     		throw BadRequestException.message("Bạn không có quyền sở hữu với cart này");
     	}
+		
+		// Only allow updating to PUBLISHED courses
+		if (course.getStatus() != CourseStatus.PUBLISHED) {
+			log.warn("User {} attempted to update cart item with non-published course {} (status: {})", 
+					userId, course.getId(), course.getStatus());
+			throw BadRequestException.message("Chỉ có thể cập nhật với khóa học đã được xuất bản");
+		}
 		
 		cartItem.setCourse(course);
 		cartItem.setCart(cart);
