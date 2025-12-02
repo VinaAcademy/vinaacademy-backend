@@ -5,9 +5,15 @@ import com.vinaacademy.platform.feature.lesson.dto.LessonDto;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
 import com.vinaacademy.platform.feature.reading.Reading;
+import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
+import com.vinaacademy.platform.feature.storage.entity.MediaFile;
+import com.vinaacademy.platform.feature.storage.mapper.MediaFileMapper;
 import com.vinaacademy.platform.feature.video.entity.Video;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -29,6 +35,7 @@ public interface LessonMapper {
     @Mapping(target = "passPoint", ignore = true)
     @Mapping(target = "totalPoint", ignore = true)
     @Mapping(target = "duration", ignore = true)
+    @Mapping(target = "attachments", ignore = true)
     LessonDto lessonToLessonDto(Lesson lesson);
 
     @AfterMapping
@@ -43,6 +50,14 @@ public interface LessonMapper {
             builder.passPoint(quiz.getPassingScore());
             builder.totalPoint(quiz.getTotalPoints());
             builder.duration(quiz.getDuration());
+        }
+        
+        // Map attachments (mediaFiles) to DTOs
+        if (lesson.getMediaFiles() != null && !lesson.getMediaFiles().isEmpty()) {
+            List<MediaFileDto> attachments = lesson.getMediaFiles().stream()
+                    .map(MediaFileMapper.INSTANCE::toDto)
+                    .collect(Collectors.toList());
+            builder.attachments(attachments);
         }
     }
 

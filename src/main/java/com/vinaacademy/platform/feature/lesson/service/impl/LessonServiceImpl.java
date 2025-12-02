@@ -24,6 +24,12 @@ import com.vinaacademy.platform.feature.lesson.service.LessonService;
 import com.vinaacademy.platform.feature.log.service.LogService;
 import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.section.repository.SectionRepository;
+import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
+import com.vinaacademy.platform.feature.storage.entity.MediaFile;
+import com.vinaacademy.platform.feature.storage.enums.FileType;
+import com.vinaacademy.platform.feature.storage.mapper.MediaFileMapper;
+import com.vinaacademy.platform.feature.storage.repository.MediaFileRepository;
+import com.vinaacademy.platform.feature.storage.service.S3Service;
 import com.vinaacademy.platform.feature.user.auth.annotation.RequiresResourcePermission;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.auth.service.AuthorizationService;
@@ -36,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,6 +61,8 @@ public class LessonServiceImpl implements LessonService {
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final EnrollmentService enrollmentService;
+    private final MediaFileRepository mediaFileRepository;
+    private final S3Service s3Service;
 
     @Autowired
     private LessonMapper lessonMapper;
@@ -147,6 +156,11 @@ public class LessonServiceImpl implements LessonService {
         // Use the factory method to create the lesson
         Lesson lesson = creator.createLesson(request, section, author);
 
+        // Attach documents if provided
+        if (request.getAttachmentIds() != null && !request.getAttachmentIds().isEmpty()) {
+            attachDocumentsToLesson(lesson, request.getAttachmentIds());
+        }
+
         // Log the creation
         logService.log("Lesson", "CREATE",
                 String.format("Created new %s lesson in section: %s",
@@ -192,6 +206,21 @@ public class LessonServiceImpl implements LessonService {
         }
 
         updateLessonByType(existingLesson, request);
+
+        // Update attachments if provided in the request
+        if (request.getAttachmentIds() != null) {
+            // Clear existing attachments and add new ones
+            if (existingLesson.getMediaFiles() == null) {
+                existingLesson.setMediaFiles(new ArrayList<>());
+            } else {
+                existingLesson.getMediaFiles().clear();
+            }
+            
+            // Add new attachments
+            if (!request.getAttachmentIds().isEmpty()) {
+                attachDocumentsToLesson(existingLesson, request.getAttachmentIds());
+            }
+        }
 
         // Cập nhật trạng thái khóa học sau khi cập nhật bài học
         boolean isQuizWithSettings = LessonType.QUIZ.equals(request.getType())
@@ -447,5 +476,138 @@ public class LessonServiceImpl implements LessonService {
 
         // Use the creator to update the lesson
         creator.updateLesson(lesson, request);
+    }
+
+    /**
+     * Helper method to attach documents to a lesson
+     * Validates file types and adds them to the lesson's media files
+     */
+    private void attachDocumentsToLesson(Lesson lesson, List<UUID> fileIds) {
+        if (fileIds == null || fileIds.isEmpty()) {
+            return;
+        }
+        
+        // Validate all files exist and are of correct type
+        List<MediaFile> mediaFiles = new ArrayList<>();
+        for (UUID fileId : fileIds) {
+            MediaFile mediaFile = mediaFileRepository.findById(fileId)
+                    .orElseThrow(() -> new NotFoundException("Media file not found with id: " + fileId));
+            
+            // Validate file type is DOCUMENT or OTHER
+            if (mediaFile.getFileType() != FileType.DOCUMENT && mediaFile.getFileType() != FileType.OTHER) {
+                throw new ValidationException("Only DOCUMENT or OTHER file types can be attached. File " + 
+                        mediaFile.getFileName() + " is of type " + mediaFile.getFileType());
+            }
+            
+            mediaFiles.add(mediaFile);
+        }
+        
+        // Initialize list if null
+        if (lesson.getMediaFiles() == null) {
+            lesson.setMediaFiles(new ArrayList<>());
+        }
+        
+        // Add new files (avoid duplicates)
+        for (MediaFile mediaFile : mediaFiles) {
+            if (!lesson.getMediaFiles().contains(mediaFile)) {
+                lesson.getMediaFiles().add(mediaFile);
+            }
+        }
+        
+        lessonRepository.save(lesson);
+    }
+
+    @Override
+    @Transactional
+    @RequiresResourcePermission(
+            resourceType = ResourceConstants.LESSON,
+            permission = ResourceConstants.EDIT,
+            idParam = "lessonId"
+    )
+    public void attachDocuments(UUID lessonId, List<UUID> fileIds) {
+        log.info("Attaching {} documents to lesson {}", fileIds.size(), lessonId);
+        
+        if (fileIds == null || fileIds.isEmpty()) {
+            throw new ValidationException("File IDs list cannot be empty");
+        }
+        
+        Lesson lesson = findLessonById(lessonId);
+        
+        // Use the helper method to attach documents
+        attachDocumentsToLesson(lesson, fileIds);
+        
+        log.info("Successfully attached {} documents to lesson {}", fileIds.size(), lessonId);
+    }
+
+    @Override
+    @Transactional
+    @RequiresResourcePermission(
+            resourceType = ResourceConstants.LESSON,
+            permission = ResourceConstants.EDIT,
+            idParam = "lessonId"
+    )
+    public void removeAttachment(UUID lessonId, UUID fileId) {
+        log.info("Removing attachment {} from lesson {}", fileId, lessonId);
+        
+        Lesson lesson = findLessonById(lessonId);
+        
+        if (lesson.getMediaFiles() == null || lesson.getMediaFiles().isEmpty()) {
+            throw new NotFoundException("No attachments found for this lesson");
+        }
+        
+        MediaFile mediaFile = mediaFileRepository.findById(fileId)
+                .orElseThrow(() -> new NotFoundException("Media file not found with id: " + fileId));
+        
+        boolean removed = lesson.getMediaFiles().remove(mediaFile);
+        
+        if (!removed) {
+            throw new NotFoundException("Attachment not found in this lesson");
+        }
+        
+        lessonRepository.save(lesson);
+        
+        log.info("Successfully removed attachment {} from lesson {}", fileId, lessonId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MediaFileDto> getAttachments(UUID lessonId) {
+        log.debug("Getting attachments for lesson {}", lessonId);
+        
+        Lesson lesson = findLessonById(lessonId);
+        
+        if (lesson.getMediaFiles() == null || lesson.getMediaFiles().isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        return lesson.getMediaFiles().stream()
+                .map(MediaFileMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String generateAttachmentDownloadUrl(UUID lessonId, UUID attachmentId) {
+        log.debug("Generating presigned download URL for attachment {} in lesson {}", attachmentId, lessonId);
+        
+        // Verify lesson exists
+        Lesson lesson = findLessonById(lessonId);
+        
+        // Check if attachment exists in lesson
+        MediaFile attachment = lesson.getMediaFiles().stream()
+                .filter(file -> file.getId().equals(attachmentId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Attachment not found in lesson"));
+        
+        // Validate attachment has a file path
+        if (attachment.getFilePath() == null || attachment.getFilePath().isEmpty()) {
+            throw BadRequestException.message("Attachment file path is not available");
+        }
+        
+        // Generate presigned URL valid for 1 hour (3600 seconds)
+        String presignedUrl = s3Service.generatePresignedUrl(attachment.getFilePath(), 3600);
+        
+        log.info("Generated presigned URL for attachment {} in lesson {}", attachmentId, lessonId);
+        return presignedUrl;
     }
 }

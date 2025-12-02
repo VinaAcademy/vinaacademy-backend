@@ -76,41 +76,57 @@ public class OrderServiceImpl implements OrderService {
 	private final Utils utils;
 
 	@Override
+	@Transactional
 	public OrderDto createOrder() {
 		User user = securityHelper.getCurrentUser();
 
 		Cart cart = cartRepository.findByUserId(user.getId())
 				.orElseThrow(() -> BadRequestException.message("Không tìm thấy Cart của user id này"));
 		List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
-		if (cartItems.size() == 0)
+		if (cartItems.isEmpty())
 			throw BadRequestException.message("Cart không có gì cả");
 		
-		Order order = Order.builder().status(OrderStatus.PENDING).coupon(cart.getCoupon()).payment(null)
-				.orderItems(new ArrayList<>()).user(user).build();
-		order = orderRepository.save(order);
-		List<OrderItem> orderItems = orderItemMapper.toOrderItemList(cartItems, order);
+		// Filter courses PUBLISHED TRƯỚC khi tạo Order
+		List<CartItem> validCartItems = cartItems.stream()
+				.filter(cartItem -> cartItem.getCourse().getStatus() == CourseStatus.PUBLISHED)
+				.toList();
 		
-		orderItems = orderItems.stream()
-				.filter(orderItem -> orderItem.getCourse().getStatus() == CourseStatus.PUBLISHED).toList();
-		log.debug(orderItems.size() + " size order");
+		if (validCartItems.isEmpty()) {
+			log.warn("User {} có {} items trong cart nhưng không có course nào PUBLISHED", 
+					user.getId(), cartItems.size());
+			throw BadRequestException.message("Không có khóa học khả dụng để đặt hàng. Vui lòng kiểm tra lại giỏ hàng.");
+		}
 		
-		if (orderItems.size() == 0)
-			throw BadRequestException.message("Không có order item nào cả");
+		// Tạo Order object (chưa lưu DB)
+		Order order = Order.builder()
+				.status(OrderStatus.PENDING)
+				.coupon(cart.getCoupon())
+				.payment(null)
+				.orderItems(new ArrayList<>())
+				.user(user)
+				.build();
+		
+		// Convert valid CartItems sang OrderItems
+		List<OrderItem> orderItems = orderItemMapper.toOrderItemList(validCartItems, order);
+		
+		// Add items vào order và tính toán
 		orderItems.forEach(order::addOrderItem);
 		order.calculateAmounts();
-		order = orderRepository.save(order);
-
-//		xoa all item trong cart
 		
-		for (CartItem cartitem: cartItems) {
-			log.debug("Xóa "+cartitem.getId());
-			cartItemService.deleteCartItem(cartitem.getId());
+		// Lưu Order (với OrderItems cascade)
+		order = orderRepository.save(order);
+		log.debug("Created order {} with {} items, total amount: {}", 
+				order.getId(), orderItems.size(), order.getTotalAmount());
+
+		// Xóa tất cả items trong cart
+		for (CartItem cartItem : cartItems) {
+			log.debug("Deleting cart item {}", cartItem.getId());
+			cartItemService.deleteCartItem(cartItem.getId());
 		}
 
 		OrderDto orderDto = orderMapper.toOrderDto(order);
 		orderDto.setOrderItemsDto(orderItemMapper.toOrderItemDtoList(orderItems));
 		return orderDto;
-
 	}
 
 	@Override

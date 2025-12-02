@@ -3,6 +3,7 @@ package com.vinaacademy.platform.feature.lesson.service;
 import com.vinaacademy.platform.feature.lesson.dto.LessonDto;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
+import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
 import com.vinaacademy.platform.feature.user.entity.User;
 
 import java.util.List;
@@ -24,4 +25,13 @@ public interface LessonService {
     void completeLesson(UUID lessonId);
 
     void markLessonCompleted(Lesson lesson, User user);
+    
+    // Attachment operations
+    void attachDocuments(UUID lessonId, List<UUID> fileIds);
+    
+    void removeAttachment(UUID lessonId, UUID fileId);
+    
+    List<MediaFileDto> getAttachments(UUID lessonId);
+    
+    String generateAttachmentDownloadUrl(UUID lessonId, UUID attachmentId);
 }

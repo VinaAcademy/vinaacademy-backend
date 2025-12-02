@@ -141,7 +141,14 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		Payment pay = payment.get();
 
+		// Validate payment và lấy status từ VNPay response
 		PaymentStatus result = utils.orderReturn(requestParams);
+		
+		// Log thông tin quan trọng để audit
+		log.info("Processing payment validation for orderId={}, paymentId={}, vnp_ResponseCode={}, status={}", 
+				pay.getOrder().getId(), pay.getId(), 
+				requestParams.get("vnp_ResponseCode"), result);
+		
 		pay.setPaymentStatus(result);
 		String transactionId = requestParams.get("vnp_TransactionNo");
 		pay.setTransactionId(result == PaymentStatus.COMPLETED ? transactionId : pay.getTransactionId());
@@ -150,6 +157,8 @@ public class PaymentServiceImpl implements PaymentService {
 			requestParams.forEach(objectNode::put);
 			pay.setPaymentData(objectNode);
 		}
+		
+		// CHỈ cho phép ghi danh và chia doanh thu nếu thanh toán COMPLETED
 		Boolean updateEnroll = false;
 		if (result == PaymentStatus.COMPLETED) {
 			updateEnroll = true;		
@@ -161,6 +170,8 @@ public class PaymentServiceImpl implements PaymentService {
 
 		}
 		paymentRepository.save(pay);
+		
+		// Chỉ xử lý enrollment và revenue nếu thanh toán thành công
 		if (updateEnroll) {
 			// 1. Tự động ghi danh khóa học
 			pay.getOrder().getOrderItems().forEach(oi -> {
@@ -180,6 +191,9 @@ public class PaymentServiceImpl implements PaymentService {
 						pay.getId(), pay.getOrder().getId(), e.getMessage(), e);
 				// Không throw exception để không ảnh hưởng đến flow thanh toán chính
 			}
+		} else {
+			log.warn("Payment NOT completed for orderId={}, paymentId={}, status={}. Skipping enrollment and revenue distribution.", 
+					pay.getOrder().getId(), pay.getId(), result);
 		}
 		log.debug("update payment {} with status {} ", pay.getId(), result);
 
