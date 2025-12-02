@@ -4,6 +4,7 @@ import com.vinaacademy.platform.feature.order_payment.entity.Coupon;
 import com.vinaacademy.platform.feature.order_payment.enums.PaymentStatus;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ import java.util.Map.Entry;
 
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class Utils {
@@ -66,9 +68,15 @@ public class Utils {
 		}
 		String signValue = vnPayConfig.hashAllFields(fields);
 		if (signValue.equals(vnp_SecureHash)) {
-			if ("00".equals(requestParams.get("vnp_TransactionStatus"))) {
+			// Kiểm tra vnp_ResponseCode thay vì vnp_TransactionStatus
+			// vnp_ResponseCode = "00" nghĩa là giao dịch thành công
+			// Các mã khác nghĩa là giao dịch thất bại hoặc bị hủy
+			String responseCode = requestParams.get("vnp_ResponseCode");
+			if ("00".equals(responseCode)) {
 				return PaymentStatus.COMPLETED;
 			} else {
+				// Log mã lỗi để debug
+				log.warn("VNPay payment failed with ResponseCode: {}", responseCode);
 				return PaymentStatus.CANCELLED;
 			}
 		} else {

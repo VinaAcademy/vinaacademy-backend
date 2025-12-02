@@ -5,6 +5,7 @@ import com.vinaacademy.platform.feature.lesson.dto.LessonDto;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
 import com.vinaacademy.platform.feature.lesson.service.LessonReorderService;
 import com.vinaacademy.platform.feature.lesson.service.LessonService;
+import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
 import com.vinaacademy.platform.feature.user.auth.annotation.HasAnyRole;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -187,4 +188,108 @@ public class LessonController {
         lessonReorderService.reorderLessons(sectionId, lessonIds);
         return ApiResponse.success("Lessons reordered successfully");
     }
+
+    // ==================== ATTACHMENT ENDPOINTS ====================
+    
+    @Operation(summary = "Attach documents to lesson", 
+               description = "Attach one or more document files to a lesson. Only DOCUMENT and OTHER file types are allowed.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully attached documents to lesson"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid file IDs or file types"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Unauthorized access"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Lesson or file not found"
+            )
+    })
+    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE})
+    @PostMapping("/{lessonId}/attachments")
+    public ApiResponse<Void> attachDocuments(
+            @PathVariable UUID lessonId, 
+            @RequestBody List<UUID> fileIds) {
+        log.info("Attaching documents to lesson {}: {}", lessonId, fileIds);
+        lessonService.attachDocuments(lessonId, fileIds);
+        return ApiResponse.success("Documents attached successfully");
+    }
+
+    @Operation(summary = "Remove attachment from lesson",
+               description = "Remove a specific document attachment from a lesson")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully removed attachment"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Unauthorized access"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Lesson or attachment not found"
+            )
+    })
+    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE})
+    @DeleteMapping("/{lessonId}/attachments/{fileId}")
+    public ApiResponse<Void> removeAttachment(
+            @PathVariable UUID lessonId,
+            @PathVariable UUID fileId) {
+        log.info("Removing attachment {} from lesson {}", fileId, lessonId);
+        lessonService.removeAttachment(lessonId, fileId);
+        return ApiResponse.success("Attachment removed successfully");
+    }
+
+    @Operation(summary = "Get all attachments of a lesson",
+               description = "Retrieve all document attachments associated with a lesson")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved attachments",
+                    content = @Content(schema = @Schema(implementation = MediaFileDto.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Lesson not found"
+            )
+    })
+    @GetMapping("/{lessonId}/attachments")
+    public ApiResponse<List<MediaFileDto>> getAttachments(@PathVariable UUID lessonId) {
+        log.debug("Getting attachments for lesson {}", lessonId);
+        return ApiResponse.success(lessonService.getAttachments(lessonId));
+    }
+
+    @Operation(summary = "Get presigned download URL for attachment",
+               description = "Generate a temporary presigned URL to download a specific lesson attachment. URL expires after 1 hour.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully generated presigned URL",
+                    content = @Content(schema = @Schema(implementation = String.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Unauthorized access - user must be enrolled in the course or be the instructor"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Attachment or lesson not found"
+            )
+    })
+    @GetMapping("/{lessonId}/attachments/{attachmentId}/download-url")
+    public ApiResponse<String> getAttachmentDownloadUrl(
+            @PathVariable UUID lessonId,
+            @PathVariable UUID attachmentId) {
+        log.info("Generating presigned download URL for attachment {} in lesson {}", attachmentId, lessonId);
+        String presignedUrl = lessonService.generateAttachmentDownloadUrl(lessonId, attachmentId);
+        return ApiResponse.success(presignedUrl);
+    }
 }
+

@@ -3,6 +3,7 @@ package com.vinaacademy.platform.feature.lesson.dto;
 import com.vinaacademy.platform.feature.common.dto.BaseDto;
 import com.vinaacademy.platform.feature.course.enums.LessonType;
 import com.vinaacademy.platform.feature.lesson.entity.UserProgress;
+import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
 import com.vinaacademy.platform.feature.video.enums.VideoStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = false, of = {"id"})
@@ -48,4 +50,7 @@ public class LessonDto extends BaseDto {
     private Double passPoint;
     private Double totalPoint;
     private Integer duration;
+
+    // Attachments (documents)
+    private List<MediaFileDto> attachments;
 }

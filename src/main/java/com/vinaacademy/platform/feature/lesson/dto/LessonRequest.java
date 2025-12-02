@@ -66,4 +66,7 @@ public class LessonRequest {
     
     // List of questions for batch creation with quiz
     private List<QuestionDto> questions = new ArrayList<>();
+    
+    // List of attachment (media file) IDs to attach to this lesson
+    private List<UUID> attachmentIds = new ArrayList<>();
 }
