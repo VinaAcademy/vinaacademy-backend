@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -15,24 +16,32 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class CourseSpecification {
 
-    public static Specification<Course> hasKeyword(String keyword) {
-        return (root, query, criteriaBuilder) -> {
-            if (keyword == null || keyword.isEmpty()) {
-                return criteriaBuilder.conjunction();
-            }
-        String containsLikePattern = getContainsLikePattern(keyword);
+  public static Specification<Course> hasKeyword(String keyword) {
+    return (root, query, criteriaBuilder) -> {
+      if (keyword == null || keyword.isEmpty()) {
+        return criteriaBuilder.conjunction();
+      }
+      String containsLikePattern = getContainsLikePattern(keyword);
 
-        Expression<String> unaccentName =
-            criteriaBuilder.function("unaccent", String.class, criteriaBuilder.lower(root.get("name")));
-        Expression<String> unaccentDescription =
-            criteriaBuilder.function("unaccent", String.class, criteriaBuilder.lower(root.get("description")));
+      Expression<String> unaccentName =
+          criteriaBuilder.function(
+              "unaccent", String.class, criteriaBuilder.lower(root.get("name")));
+      Expression<String> unaccentDescription =
+          criteriaBuilder.function(
+              "unaccent", String.class, criteriaBuilder.lower(root.get("description")));
+      Predicate nameUnaccentPredicate = criteriaBuilder.like(unaccentName, containsLikePattern);
+      Predicate descriptionUnaccentPredicate =
+          criteriaBuilder.like(unaccentDescription, containsLikePattern);
 
-        return criteriaBuilder.or(
-            criteriaBuilder.like(unaccentName, containsLikePattern),
-            criteriaBuilder.like(unaccentDescription, containsLikePattern)
-        );
-        };
-    }
+      Predicate namePredicate =
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), containsLikePattern);
+      Predicate descriptionPredicate =
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), containsLikePattern);
+
+      return criteriaBuilder.or(
+          namePredicate, descriptionPredicate, nameUnaccentPredicate, descriptionUnaccentPredicate);
+    };
+  }
 
     public static Specification<Course> hasStatus(CourseStatus status) {
         return (root, query, criteriaBuilder) -> {
