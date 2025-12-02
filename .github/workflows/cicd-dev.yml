@@ -107,24 +107,24 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
             # Navigate to deployment directory
-            cd /home/${{ secrets.VPS_USER }}/ms-ci-cd
+            cd /root/ms-ci-cd
             
             # Pull latest changes from repository
             git pull origin develop
             
             # Pull latest Docker images
-            sudo docker compose -f docker-compose.dev.yml pull vinaacademy-platform
+            sudo docker compose -f services/docker-compose.yml pull vinaacademy-platform
             
             # Restart vinaacademy-platform with new image
-            sudo docker compose  -f docker-compose.dev.yml up -d vinaacademy-platform
+            sudo docker compose  -f services/docker-compose.yml --env-file .env.services up -d vinaacademy-platform
             
             # Clean up old images
             sudo docker image prune -f
             
             # Check if service is running
             sleep 10
-            sudo docker compose  -f docker-compose.dev.yml ps vinaacademy-platform
+            sudo docker compose  -f services/docker-compose.yml ps vinaacademy-platform
