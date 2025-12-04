@@ -202,7 +202,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public String testApi() {
-		return vnPayConfig.createPaymentRedirect(Long.parseLong("10000"), "test order", "abcdeg12345678", null);
+		return vnPayConfig.createPaymentRedirect(Long.parseLong("10000"), "test order", "abcdeg987653421", null);
 	}
 
 	@Override
