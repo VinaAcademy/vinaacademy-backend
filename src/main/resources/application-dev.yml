@@ -34,6 +34,7 @@ spring:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
       default-ttl: ${SPRING_DATA_REDIS_DEFAULT_TTL:3600}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
 
   jpa:
     properties:

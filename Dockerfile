@@ -24,6 +24,10 @@ RUN apk add --no-cache ffmpeg ffmpeg-libs curl \
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Create directory for temporary file storage (e.g., video processing, MinIO uploads)
+RUN mkdir -p /vinaacademy/temp && chown -R vinaacademy:vinaacademy /vinaacademy
+
 COPY --from=build /app/target/VinaAcademy-*.jar app.jar
 RUN chown vinaacademy:vinaacademy app.jar
 
