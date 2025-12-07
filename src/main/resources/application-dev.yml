@@ -35,6 +35,11 @@ spring:
       port: ${SPRING_DATA_REDIS_PORT:6379}
       default-ttl: ${SPRING_DATA_REDIS_DEFAULT_TTL:3600}
 
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+
   jpa:
     properties:
       hibernate:
@@ -118,8 +123,8 @@ logging:
         SQL: ${LOGGING_LEVEL_HIBERNATE_SQL:DEBUG}
 
 vnpay:
-  tmn-code: ${VNPAY_TMN_CODE:4V0UG95A}
-  hash-secret: ${VNPAY_HASH_SECRET:9UUN29DW7VXYOZEYV9F670QUJPDY3I5E}
+  tmn-code: ${VNPAY_TMN_CODE:DOLK8HOP}
+  hash-secret: ${VNPAY_HASH_SECRET:W1P016W8U8M8MDOPP8MLC8SLUQHXTF24}
   url-return: ${VNPAY_URL_RETURN:http://localhost:3000/transaction}
 
 minio:
@@ -129,3 +134,15 @@ minio:
   bucket: ${MINIO_BUCKET:vinaacademy}
   region: ${MINIO_REGION:ap-southeast-1}
   path-style: ${MINIO_PATH_STYLE:true}
+
+# Text-to-Speech Service Configuration
+tts:
+  service:
+    # Service URL using Eureka service discovery with load balancing
+    # Format: lb://SERVICE-NAME for Eureka discovery
+    # Or direct URL: http://localhost:8084 for local testing
+    url: ${TTS_SERVICE_URL:http://localhost:8084}
+  # Maximum text length for TTS (characters)
+  max-text-length: ${TTS_MAX_TEXT_LENGTH:5000}
+  # Timeout for TTS service calls (milliseconds)
+  timeout: ${TTS_TIMEOUT:30000}
