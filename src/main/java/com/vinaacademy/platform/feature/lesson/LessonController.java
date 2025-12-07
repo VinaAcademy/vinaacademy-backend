@@ -3,8 +3,11 @@ package com.vinaacademy.platform.feature.lesson;
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
 import com.vinaacademy.platform.feature.lesson.dto.LessonDto;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
+import com.vinaacademy.platform.feature.lesson.dto.TTSRequestDto;
+import com.vinaacademy.platform.feature.lesson.dto.TTSResponseDto;
 import com.vinaacademy.platform.feature.lesson.service.LessonReorderService;
 import com.vinaacademy.platform.feature.lesson.service.LessonService;
+import com.vinaacademy.platform.feature.lesson.service.LessonTTSService;
 import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
 import com.vinaacademy.platform.feature.user.auth.annotation.HasAnyRole;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
@@ -19,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +39,8 @@ public class LessonController {
     private LessonService lessonService;
     @Autowired
     private LessonReorderService lessonReorderService;
+    @Autowired
+    private LessonTTSService lessonTTSService;
 
     @Operation(summary = "Get lesson by ID")
     @ApiResponses(value = {
@@ -291,5 +298,77 @@ public class LessonController {
         String presignedUrl = lessonService.generateAttachmentDownloadUrl(lessonId, attachmentId);
         return ApiResponse.success(presignedUrl);
     }
-}
 
+    // ==================== Text-to-Speech Endpoints ====================
+
+    @Operation(summary = "Generate Text-to-Speech audio for Reading lesson",
+               description = "Convert Reading lesson content to audio using Azure Text-to-Speech service. " +
+                             "Returns audio as base64 encoded string. Only works for Reading type lessons.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully generated audio",
+                    content = @Content(schema = @Schema(implementation = TTSResponseDto.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request - not a Reading lesson or content too long"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Unauthorized - user must be enrolled in the course or lesson must be free"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Lesson not found"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "503",
+                    description = "TTS service unavailable"
+            )
+    })
+    @PostMapping("/{lessonId}/tts")
+    public ApiResponse<TTSResponseDto> generateLessonAudio(
+            @PathVariable UUID lessonId,
+            @RequestBody @Valid TTSRequestDto request) {
+        log.info("Generating TTS audio for lesson: {} with voice: {}", lessonId, request.getVoice());
+        TTSResponseDto response = lessonTTSService.generateAudioForLesson(lessonId, request);
+        
+        if ("error".equals(response.getStatus())) {
+            return ApiResponse.error(response.getMessage());
+        }
+        
+        return ApiResponse.success("Audio generated successfully", response);
+    }
+
+    @Operation(summary = "Stream Text-to-Speech audio for Reading lesson",
+               description = "Stream audio directly instead of base64 encoding. " +
+                             "Useful for large content to reduce memory usage. " +
+                             "Returns audio/mpeg content type.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully streaming audio",
+                    content = @Content(mediaType = "audio/mpeg")
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Unauthorized access"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Lesson not found"
+            )
+    })
+    @GetMapping("/{lessonId}/tts/stream")
+    public ResponseEntity<StreamingResponseBody> streamLessonAudio(
+            @PathVariable UUID lessonId,
+            @RequestParam(defaultValue = "vi-VN-HoaiMyNeural") String voice) {
+        log.info("Streaming TTS audio for lesson: {} with voice: {}", lessonId, voice);
+        return lessonTTSService.streamAudioForLesson(lessonId, voice);
+    }
+}
