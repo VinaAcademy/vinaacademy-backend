@@ -56,4 +56,64 @@ public interface RevenueRecordRepository extends JpaRepository<RevenueRecord, Lo
      */
     Optional<RevenueRecord> findByPaymentIdAndInstructorIdAndCourseId(UUID paymentId, UUID instructorId, UUID courseId);
 
+    /**
+     * Tính tổng thu nhập của giảng viên trong khoảng thời gian với trạng thái ACTIVE.
+     *
+     * @param instructorId ID của giảng viên
+     * @param startDate    Ngày bắt đầu
+     * @param endDate      Ngày kết thúc
+     * @return Tổng thu nhập (BigDecimal)
+     */
+    @Query("SELECT COALESCE(SUM(r.instructorEarning), 0) FROM RevenueRecord r " +
+           "WHERE r.instructorId = :instructorId " +
+           "AND r.status = 'ACTIVE' " +
+           "AND r.createdDate >= :startDate " +
+           "AND r.createdDate <= :endDate")
+    BigDecimal getTotalEarningsByInstructorAndDateRange(
+            @Param("instructorId") UUID instructorId,
+            @Param("startDate") java.time.LocalDateTime startDate,
+            @Param("endDate") java.time.LocalDateTime endDate
+    );
+
+    /**
+     * Tính tổng thu nhập của giảng viên theo danh sách courseIds.
+     *
+     * @param courseIds Danh sách ID các khóa học
+     * @return Tổng thu nhập (BigDecimal)
+     */
+    @Query("SELECT COALESCE(SUM(r.instructorEarning), 0) FROM RevenueRecord r " +
+           "WHERE r.courseId IN :courseIds " +
+           "AND r.status = 'ACTIVE'")
+    BigDecimal getTotalEarningsByCourseIds(@Param("courseIds") List<UUID> courseIds);
+
+    /**
+     * Tính tổng thu nhập của một khóa học cụ thể.
+     *
+     * @param courseId ID của khóa học
+     * @return Tổng thu nhập (BigDecimal)
+     */
+    @Query("SELECT COALESCE(SUM(r.instructorEarning), 0) FROM RevenueRecord r " +
+           "WHERE r.courseId = :courseId " +
+           "AND r.status = 'ACTIVE'")
+    BigDecimal getTotalEarningsByCourseId(@Param("courseId") UUID courseId);
+
+    /**
+     * Lấy danh sách revenue records của giảng viên trong khoảng thời gian
+     *
+     * @param instructorId ID của giảng viên
+     * @param startDate    Ngày bắt đầu
+     * @param endDate      Ngày kết thúc
+     * @return Danh sách RevenueRecord
+     */
+    @Query("SELECT r FROM RevenueRecord r " +
+           "WHERE r.instructorId = :instructorId " +
+           "AND r.status = 'ACTIVE' " +
+           "AND r.createdDate >= :startDate " +
+           "AND r.createdDate <= :endDate " +
+           "ORDER BY r.createdDate ASC")
+    List<RevenueRecord> findByInstructorIdAndDateRange(
+            @Param("instructorId") UUID instructorId,
+            @Param("startDate") java.time.LocalDateTime startDate,
+            @Param("endDate") java.time.LocalDateTime endDate
+    );
 }
