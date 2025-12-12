@@ -10,6 +10,7 @@ import com.vinaacademy.platform.feature.review.dto.CourseReviewRequestDto;
 import com.vinaacademy.platform.feature.review.entity.CourseReview;
 import com.vinaacademy.platform.feature.review.mapper.CourseReviewMapper;
 import com.vinaacademy.platform.feature.review.repository.CourseReviewRepository;
+import com.vinaacademy.platform.feature.review.service.SentimentAnalysisService;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.entity.User;
 
@@ -38,6 +39,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final SentimentAnalysisService sentimentAnalysisService;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -83,6 +85,9 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
         // Cập nhật rating trung bình
         updateCourseAverageRating(course.getId());
+        
+        // Trigger async sentiment analysis
+        sentimentAnalysisService.analyzeReviewAsync(courseReview);
 
         return CourseReviewMapper.INSTANCE.toDto(courseReview);
     }
