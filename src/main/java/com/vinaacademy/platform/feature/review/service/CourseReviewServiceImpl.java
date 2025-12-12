@@ -206,13 +206,13 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
     private void updateCourseAverageRating(UUID courseId) {
         Double averageRating = courseReviewRepository.calculateAverageRatingByCourseId(courseId);
+        Long totalReviews = courseReviewRepository.countByCourseId(courseId);
 
-        if (averageRating != null) {
-            Course course = courseRepository.findById(courseId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học với ID: " + courseId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khóa học với ID: " + courseId));
 
-            course.setRating(averageRating);
-            courseRepository.save(course);
-        }
+        course.setRating(averageRating != null ? averageRating : 0.0);
+        course.setTotalRating(totalReviews);
+        courseRepository.save(course);
     }
 }

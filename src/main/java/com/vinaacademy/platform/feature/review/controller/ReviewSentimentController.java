@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.review.controller;
 
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
+import com.vinaacademy.platform.feature.course.service.CourseManagementService;
 import com.vinaacademy.platform.feature.review.dto.sentiment.*;
 import com.vinaacademy.platform.feature.review.entity.ReviewModerationFlag;
 import com.vinaacademy.platform.feature.review.enums.ModerationStatus;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +44,7 @@ public class ReviewSentimentController {
     private final ReviewSentimentQueryService queryService;
     private final ReviewModerationFlagRepository flagRepository;
     private final SecurityHelper securityHelper;
+    private final CourseManagementService courseManagementService;
     
     // ========== API CHO SINH VIÊN ==========
     
@@ -95,8 +98,12 @@ public class ReviewSentimentController {
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         log.debug("Lấy dashboard giảng viên cho khóa học: {}", courseId);
-        
-        // TODO: Xác thực giảng viên sở hữu khóa học này
+
+        // Thêm kiểm tra ownership trước khi trả về dữ liệu
+        UUID instructorId = securityHelper.getCurrentUser().getId();
+        if (!courseManagementService.isInstructorOfCourse(courseId, instructorId)) {
+            throw new AccessDeniedException("Bạn không có quyền truy cập dashboard của khóa học này");
+        }
         
         SentimentDashboardResponse dashboard = queryService.getInstructorDashboard(
             courseId,

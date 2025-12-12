@@ -25,6 +25,8 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
 
     Optional<CourseReview> findByIdAndUserId(Long id, UUID userId);
 
+    Long countByCourseId(UUID courseId);
+
     @Query("SELECT AVG(cr.rating) FROM CourseReview cr WHERE cr.course.id = :courseId")
     Double calculateAverageRatingByCourseId(@Param("courseId") UUID courseId);
 
@@ -41,5 +43,16 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
                     @Param("rating") Integer rating, 
                     @Param("review") String review, 
                     @Param("updatedDate") LocalDateTime updatedDate);
+
+    /**
+     * Lấy danh sách reviews gần đây cho các courses của giảng viên
+     */
+    @Query("SELECT cr FROM CourseReview cr " +
+           "WHERE cr.course.id IN :courseIds " +
+           "ORDER BY cr.createdDate DESC")
+    Page<CourseReview> findRecentReviewsByCourseIds(
+            @Param("courseIds") List<UUID> courseIds,
+            Pageable pageable
+    );
 
 }
