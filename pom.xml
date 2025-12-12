@@ -162,6 +162,12 @@
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Hypersistence Utils for JSON type support in Hibernate 6 -->
+    <dependency>
+      <groupId>io.hypersistence</groupId>
+      <artifactId>hypersistence-utils-hibernate-60</artifactId>
+      <version>3.7.3</version>
+    </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>

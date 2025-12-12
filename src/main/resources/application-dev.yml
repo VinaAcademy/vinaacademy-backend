@@ -147,3 +147,13 @@ tts:
   max-text-length: ${TTS_MAX_TEXT_LENGTH:5000}
   # Timeout for TTS service calls (milliseconds)
   timeout: ${TTS_TIMEOUT:30000}
+
+# Lang-AI Service Configuration for Sentiment Analysis
+langai:
+  service:
+    # Lang-AI Service endpoint
+    # For local dev: http://localhost:8085 (default)
+    # For Docker: set LANGAI_SERVICE_URL=http://lang-ai-service:8085
+    url: ${LANGAI_SERVICE_URL:http://localhost:8085}
+  # Timeout for Lang-AI service calls (milliseconds)
+  timeout: ${LANGAI_TIMEOUT:30000}

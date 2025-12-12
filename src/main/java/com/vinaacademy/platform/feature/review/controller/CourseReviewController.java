@@ -59,7 +59,7 @@ public class CourseReviewController {
 
         CourseReviewDto reviewDto = courseReviewService.createOrUpdateReview(userId, requestDto);
 
-        log.info("User {} created/updated review for course {}: {}", userId, requestDto.getCourseId(), reviewDto);
+        log.info("Người dùng {} đã tạo/cập nhật đánh giá cho khóa học {}: {}", userId, requestDto.getCourseId(), reviewDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>("success", "Đánh giá khóa học thành công", reviewDto));
@@ -73,7 +73,7 @@ public class CourseReviewController {
 
         Page<CourseReviewDto> reviews = courseReviewService.getCourseReviews(courseId, pageable);
 
-        log.info("Get {} reviews for course {}", reviews.getTotalElements(), courseId);
+        log.info("Lấy {} đánh giá cho khóa học {}", reviews.getTotalElements(), courseId);
 
         return ResponseEntity.ok(new ApiResponse<>("success", "Lấy danh sách đánh giá thành công", reviews));
     }
@@ -86,7 +86,7 @@ public class CourseReviewController {
         UUID userId = securityHelper.getCurrentUser().getId();
         List<CourseReviewDto> reviews = courseReviewService.getUserReviews(userId);
 
-        log.info("User {} retrieved their reviews: {}", userId, reviews);
+        log.info("Người dùng {} đã lấy danh sách đánh giá của họ: {}", userId, reviews);
 
         return ResponseEntity.ok(new ApiResponse<>("success", "Lấy danh sách đánh giá của bạn thành công", reviews));
     }
@@ -98,7 +98,7 @@ public class CourseReviewController {
 
         CourseReviewDto review = courseReviewService.getReviewById(reviewId);
 
-        log.info("Get review {}: {}", reviewId, review);
+        log.info("Lấy đánh giá {}: {}", reviewId, review);
 
         return ResponseEntity.ok(new ApiResponse<>("success", "Lấy thông tin đánh giá thành công", review));
     }
@@ -112,7 +112,7 @@ public class CourseReviewController {
         UUID userId = securityHelper.getCurrentUser().getId();
         CourseReviewDto review = courseReviewService.getUserReviewForCourse(userId, courseId);
 
-        log.info("User {} retrieved their review for course {}: {}", userId, courseId, review);
+        log.info("Người dùng {} đã lấy đánh giá của họ cho khóa học {}: {}", userId, courseId, review);
 
         if (Objects.isNull(review)) {
             return ResponseEntity.ok(new ApiResponse<>("success", "Bạn chưa đánh giá khóa học này", null));
