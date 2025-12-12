@@ -25,6 +25,8 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
 
     Optional<CourseReview> findByIdAndUserId(Long id, UUID userId);
 
+    Long countByCourseId(UUID courseId);
+
     @Query("SELECT AVG(cr.rating) FROM CourseReview cr WHERE cr.course.id = :courseId")
     Double calculateAverageRatingByCourseId(@Param("courseId") UUID courseId);
 
