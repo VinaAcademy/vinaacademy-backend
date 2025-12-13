@@ -17,7 +17,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "favorites")
+@Table(name = "favorites", indexes = {
+    @Index(name = "idx_favorite_user_comment", columnList = "user_id, comment_id", unique = true)
+})
 public class Favorite extends BaseEntity {
 
     @Id

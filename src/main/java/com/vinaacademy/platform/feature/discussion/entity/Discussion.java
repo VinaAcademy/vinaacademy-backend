@@ -35,13 +35,13 @@ public class Discussion extends BaseEntity {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
     private Discussion parentComment;
 
-    @OneToMany(mappedBy = "parentComment")
+    @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
     private List<Discussion> replies;
     
-    @OneToMany(mappedBy = "comment")
+    @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Favorite> favorites;
 }
