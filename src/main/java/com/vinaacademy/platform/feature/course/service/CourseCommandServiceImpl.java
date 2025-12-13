@@ -287,6 +287,8 @@ public class CourseCommandServiceImpl implements CourseCommandService {
                     .instructorName(instructor.getFullName())
                     .instructorId(instructor.getId())
                     .timestamp(LocalDateTime.now())
+                    .categoryName(course.getCategory().getName())
+                    .price(course.getPrice())
                     .build();
             
             eventPublisher.publishEvent(event);

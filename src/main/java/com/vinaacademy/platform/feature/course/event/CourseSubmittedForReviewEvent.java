@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -46,4 +47,8 @@ public class CourseSubmittedForReviewEvent {
     private final String instructorName;
     
     private final String description;
+    
+    private final String categoryName;
+    
+	private final BigDecimal price;
 }

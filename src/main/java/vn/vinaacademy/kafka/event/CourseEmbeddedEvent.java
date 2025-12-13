@@ -1,5 +1,6 @@
 package vn.vinaacademy.kafka.event;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -16,4 +17,6 @@ public class CourseEmbeddedEvent {
 	private String title;
 	private String description;
 	private String instructorName;
+	private String categoryName;
+	private BigDecimal price;
 }
