@@ -78,47 +78,54 @@ public class TestingDataService {
         Role instructorRole = roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE);
         Role studentRole = roleRepository.findByCode(AuthConstants.STUDENT_ROLE);
 
-        User admin = User.builder()
-                .username("admin")
-                .password("admin123")
-                .email("locn562836@gmail.com")
-                .enabled(true)
-                .roles(Set.of(adminRole, studentRole))
-                .build();
-        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+    User admin =
+        User.builder()
+            .fullName("Nguyen Huu Loc")
+            .username("admin")
+            .password("admin123")
+            .email("locn562836@gmail.com")
+            .enabled(true)
+            .roles(Set.of(adminRole, studentRole))
+            .build();
+    admin.setPassword(passwordEncoder.encode(admin.getPassword()));
 
-        User staff = User.builder()
-                .username("staff")
-                .password("staff123")
-                .email("huuloc2155@gmail.com")
-                .enabled(true)
-                .roles(Set.of(staffRole, studentRole))
-                .build();
-        staff.setPassword(passwordEncoder.encode(staff.getPassword()));
+    User staff =
+        User.builder()
+            .username("staff")
+            .password("staff123")
+            .fullName("Huu Loc")
+            .email("huuloc2155@gmail.com")
+            .enabled(true)
+            .roles(Set.of(staffRole, studentRole))
+            .build();
+    staff.setPassword(passwordEncoder.encode(staff.getPassword()));
 
-        User instructor = User.builder()
-                .username("instructor")
-                .password("instructor123")
-                .email("linhpht263@outlook.com.vn")
-                .enabled(true)
-                .roles(Set.of(instructorRole, studentRole))
-                .fullName("Linh Phan")
-                .description("ABCxyz")
-                .build();
-        instructor.setPassword(passwordEncoder.encode(instructor.getPassword()));
+    User instructor =
+        User.builder()
+            .username("instructor")
+            .password("instructor123")
+            .email("linhpht263@outlook.com.vn")
+            .enabled(true)
+            .roles(Set.of(instructorRole, studentRole))
+            .fullName("Linh Phan")
+            .description("ABCxyz")
+            .build();
+    instructor.setPassword(passwordEncoder.encode(instructor.getPassword()));
 
-        User student = User.builder()
-                .username("student")
-                .password("student123")
-                .email("trihung987@gmail.com")
-                .enabled(true)
-                .roles(Set.of(studentRole))
-                .build();
-        student.setPassword(passwordEncoder.encode(student.getPassword()));
+    User student =
+        User.builder()
+            .username("student")
+            .password("student123")
+            .email("trihung987@gmail.com")
+            .fullName("Vuong Tri Hung")
+            .enabled(true)
+            .roles(Set.of(studentRole))
+            .build();
+    student.setPassword(passwordEncoder.encode(student.getPassword()));
 
-        userRepository.save(admin);
-        userRepository.save(staff);
-        userRepository.save(instructor);
+    userRepository.save(admin);
+    userRepository.save(staff);
+    userRepository.save(instructor);
         userRepository.save(student);
     }
 
