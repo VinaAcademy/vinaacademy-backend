@@ -14,6 +14,7 @@ import com.vinaacademy.platform.feature.course.mapper.CourseMapper;
 import com.vinaacademy.platform.feature.course.permission.CoursePermissionService;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
+import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
@@ -44,6 +45,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
     private final SlugGeneratorHelper slugGeneratorHelper;
     private final CoursePermissionService coursePermissionService;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -109,10 +111,11 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         course.setLanguage(request.getLanguage());
         course.setLevel(request.getLevel());
         course.setPrice(request.getPrice());
-
+        
         Course savedCourse = courseRepository.save(course);
         log.info("Course updated successfully with ID: {} and slug: {}", savedCourse.getId(), savedCourse.getSlug());
-
+        
+        publishCourseSubmittedForReviewEvent(course, currentUser);
         return courseMapper.toDTO(savedCourse);
     }
 
@@ -199,12 +202,12 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         CourseStatus previousStatus = course.getStatus();
         course.setStatus(CourseStatus.PENDING);
         courseRepository.save(course);
-
+        
         // Publish domain event for course submission
         publishCourseSubmittedForReviewEvent(course, currentUser);
 
-        // Also publish status change event
-        publishCourseStatusChangedEvent(course, previousStatus, CourseStatus.PENDING);
+//        // Also publish status change event
+//        publishCourseStatusChangedEvent(course, previousStatus, CourseStatus.PENDING);
 
         log.info("Course submitted for review successfully with ID: {} by user: {}", courseId, currentUser.getId());
 

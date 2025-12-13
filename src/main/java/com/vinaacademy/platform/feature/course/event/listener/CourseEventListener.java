@@ -99,7 +99,7 @@ public class CourseEventListener {
 
 	private void sendUpdateVectorCourse(CourseEmbeddedEvent event) {
 		vectorUpdateProducer.sendNotification(event);
-		log.debug("Update vector for course {}", event.getId());
+		log.info("Update vector for course {}", event.getId());
 	}
 
 	private void sendSubmissionNotification(CourseSubmittedForReviewEvent event) {

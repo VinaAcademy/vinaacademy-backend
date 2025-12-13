@@ -52,4 +52,6 @@ public class DatabaseMigrationService {
       throw new RuntimeException("Unaccent extension initialization failed", ex);
     }
   }
+  
+  
 }
