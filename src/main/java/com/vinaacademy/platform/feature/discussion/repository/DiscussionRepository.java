@@ -12,43 +12,54 @@ import org.springframework.data.repository.query.Param;
 import com.vinaacademy.platform.feature.discussion.entity.Discussion;
 
 public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
-	// Lấy danh sách Root comment + tổng số reply + tổng số like
+	// Lấy danh sách Root comment tối ưu: chỉ chọn đúng cột cần thiết cho DTO
 	@Query("""
-			SELECT d.id,
-			       d.comment,
-			       d.lesson.id,
-			       d.user.id,
-			       COUNT(DISTINCT r.id) AS replyCount,
-			       COUNT(DISTINCT f.id) AS favoriteCount,
-			       d.user.fullName,
-			       d.user.avatarUrl,
-			       d.createdDate
+			SELECT 
+				d.id                 AS id,
+				d.comment            AS comment,
+				d.lesson.id          AS lessonId,
+				d.user.id            AS userId,
+				(SELECT COUNT(r2.id) FROM Discussion r2 WHERE r2.parentComment.id = d.id) AS replyCount,
+				(SELECT COUNT(f2.id) FROM Favorite   f2 WHERE f2.comment.id        = d.id) AS favoriteCount,
+				d.user.fullName      AS userFullName,
+				d.user.avatarUrl     AS avatarUrl,
+				d.createdDate        AS createdDate,
+				CASE WHEN (
+					(SELECT COUNT(f3.id) FROM Favorite f3 
+					 WHERE f3.user.id = :currentUserId AND f3.comment.id = d.id) > 0
+				) THEN true ELSE false END AS likedByCurrentUser
 			FROM Discussion d
-			    LEFT JOIN Discussion r ON r.parentComment.id = d.id
-			    LEFT JOIN Favorite   f ON f.comment.id     = d.id
-			WHERE d.lesson.id = :lessonId
-			  AND d.parentComment IS NULL
-			GROUP BY d.id, d.comment, d.lesson.id, d.user.id, d.user.fullName, d.user.avatarUrl, d.createdDate
+			WHERE d.lesson.id = :lessonId AND d.parentComment IS NULL
 			""")
-	Page<Object[]> findRootCommentsWithCounts(@Param("lessonId") UUID lessonId, Pageable pageable);
+	Page<com.vinaacademy.platform.feature.discussion.repository.projection.DiscussionSummary> findRootCommentSummaries(
+		@Param("lessonId") UUID lessonId,
+		@Param("currentUserId") UUID currentUserId,
+		Pageable pageable
+	);
 
-	// Lấy danh sách reply cho 1 comment + tổng số reply con + tổng số like
+	// Lấy danh sách reply tối ưu: chỉ chọn đúng cột cần thiết cho DTO
 	@Query("""
-			SELECT d.id,
-			       d.comment,
-			       d.lesson.id,
-			       d.user.id,
-			       COUNT(DISTINCT r.id) AS replyCount,
-			       COUNT(DISTINCT f.id) AS favoriteCount,
-			       d.user.fullName,
-			       d.user.avatarUrl,
-			       d.createdDate
+			SELECT 
+				d.id                 AS id,
+				d.comment            AS comment,
+				d.lesson.id          AS lessonId,
+				d.user.id            AS userId,
+				(SELECT COUNT(r2.id) FROM Discussion r2 WHERE r2.parentComment.id = d.id) AS replyCount,
+				(SELECT COUNT(f2.id) FROM Favorite   f2 WHERE f2.comment.id        = d.id) AS favoriteCount,
+				d.user.fullName      AS userFullName,
+				d.user.avatarUrl     AS avatarUrl,
+				d.createdDate        AS createdDate,
+				CASE WHEN (
+					(SELECT COUNT(f3.id) FROM Favorite f3 
+					 WHERE f3.user.id = :currentUserId AND f3.comment.id = d.id) > 0
+				) THEN true ELSE false END AS likedByCurrentUser
 			FROM Discussion d
-			    LEFT JOIN Discussion r ON r.parentComment.id = d.id
-			    LEFT JOIN Favorite   f ON f.comment.id     = d.id
 			WHERE d.parentComment.id = :parentId
-			GROUP BY d.id, d.comment, d.lesson.id, d.user.id, d.user.fullName, d.user.avatarUrl, d.createdDate
 			""")
-	Page<Object[]> findRepliesWithCounts(@Param("parentId") UUID parentId, Pageable pageable);
+	Page<com.vinaacademy.platform.feature.discussion.repository.projection.DiscussionSummary> findReplySummaries(
+		@Param("parentId") UUID parentId,
+		@Param("currentUserId") UUID currentUserId,
+		Pageable pageable
+	);
 
 }

@@ -17,6 +17,7 @@ import com.vinaacademy.platform.feature.discussion.entity.Discussion;
 import com.vinaacademy.platform.feature.discussion.mapper.DiscussionMapper;
 import com.vinaacademy.platform.feature.discussion.repository.DiscussionRepository;
 import com.vinaacademy.platform.feature.discussion.repository.FavoriteRepository;
+import com.vinaacademy.platform.feature.discussion.repository.projection.DiscussionSummary;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.lesson.repository.LessonRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
@@ -53,63 +54,44 @@ public class DiscussionServiceImpl implements DiscussionService {
 	}
 
 	@Override
-    public Page<DiscussionDto> getRepliesWithReplyCount(UUID parentId, Pageable pageable) {
-		Page<Object[]> pageResult = discussionRepository.findRepliesWithCounts(parentId, pageable);
-        UUID currentUserId = securityHelper.getCurrentUser().getId();
-        
-        // Batch query: Get all liked discussion IDs at once instead of N queries
-        List<UUID> discussionIds = pageResult.getContent().stream()
-            .map(record -> (UUID) record[0])
-            .toList();
-        List<UUID> likedDiscussionIds = favoriteRepository.findLikedCommentIdsByUserAndCommentIds(currentUserId, discussionIds);
-        
-        return pageResult.map(record -> {
-        	UUID discussionId = (UUID) record[0];
-            boolean likedByCurrentUser = likedDiscussionIds.contains(discussionId);
+	public Page<DiscussionDto> getRepliesWithReplyCount(UUID parentId, Pageable pageable) {
+		UUID currentUserId = securityHelper.getCurrentUser().getId();
+		Page<DiscussionSummary> pageResult = discussionRepository.findReplySummaries(parentId, currentUserId, pageable);
 
-            return DiscussionDto.builder()
-            		.id(discussionId)
-            		.comment((String) record[1])
-            		.lessonId((UUID) record[2])
-            		.userId((UUID) record[3])
-            		.replyCount((Long) record[4])
-            		.favoriteCount((Long) record[5])
-            		.userFullName((String) record[6])
-	            	.avatarUrl((String) record[7])
-            		.createdDate((LocalDateTime) record[8])
-            		.likedByCurrentUser(likedByCurrentUser)
-            		.build();
-        });
-    }
+		return pageResult.map(p -> DiscussionDto.builder()
+				.id(p.getId())
+				.comment(p.getComment())
+				.lessonId(p.getLessonId())
+				.userId(p.getUserId())
+				.replyCount(p.getReplyCount())
+				.favoriteCount(p.getFavoriteCount())
+				.userFullName(p.getUserFullName())
+				.avatarUrl(p.getAvatarUrl())
+				.createdDate(p.getCreatedDate())
+				.likedByCurrentUser(Boolean.TRUE.equals(p.getLikedByCurrentUser()))
+				.parentCommentId(parentId)
+				.build());
+	}
 
 	@Override
-    public Page<DiscussionDto> getRootCommentsWithReplyCount(UUID lessonId, Pageable pageable) {
-        Page<Object[]> pageResult = discussionRepository.findRootCommentsWithCounts(lessonId, pageable);
-        UUID currentUserId = securityHelper.getCurrentUser().getId();
-        
-        // Batch query: Get all liked discussion IDs at once instead of N queries
-        List<UUID> discussionIds = pageResult.getContent().stream()
-            .map(record -> (UUID) record[0])
-            .toList();
-        List<UUID> likedDiscussionIds = favoriteRepository.findLikedCommentIdsByUserAndCommentIds(currentUserId, discussionIds);
-        
-        return pageResult.map(record -> {
-            UUID discussionId = (UUID) record[0];
-            boolean likedByCurrentUser = likedDiscussionIds.contains(discussionId);
-            return DiscussionDto.builder()
-            		.id(discussionId)
-            		.comment((String) record[1])
-            		.lessonId((UUID) record[2])
-	            	.userId((UUID) record[3])
-	            	.replyCount((Long) record[4])
-	            	.favoriteCount((Long) record[5])
-	            	.userFullName((String) record[6])
-	            	.avatarUrl((String) record[7])
-	            	.createdDate((LocalDateTime) record[8])
-	            	.likedByCurrentUser(likedByCurrentUser)
-	            	.build();
-        });
-    }
+	public Page<DiscussionDto> getRootCommentsWithReplyCount(UUID lessonId, Pageable pageable) {
+		UUID currentUserId = securityHelper.getCurrentUser().getId();
+		Page<DiscussionSummary> pageResult = discussionRepository.findRootCommentSummaries(lessonId, currentUserId, pageable);
+
+		return pageResult.map(p -> DiscussionDto.builder()
+				.id(p.getId())
+				.comment(p.getComment())
+				.lessonId(p.getLessonId())
+				.userId(p.getUserId())
+				.replyCount(p.getReplyCount())
+				.favoriteCount(p.getFavoriteCount())
+				.userFullName(p.getUserFullName())
+				.avatarUrl(p.getAvatarUrl())
+				.createdDate(p.getCreatedDate())
+				.likedByCurrentUser(Boolean.TRUE.equals(p.getLikedByCurrentUser()))
+				.parentCommentId(null)
+				.build());
+	}
 
 	@Override
 	public void deleteDiscussion(UUID id) {
