@@ -71,4 +71,6 @@ public class CourseStatusChangedEvent {
      * The first instructor ID (for notifications)
      */
     private final UUID owner;
+    
+    private final String content;
 }

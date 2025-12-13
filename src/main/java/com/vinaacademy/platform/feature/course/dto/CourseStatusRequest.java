@@ -16,6 +16,8 @@ public class CourseStatusRequest {
     private String slug;
     
     private CourseStatus status;
+    
+    private String content;
 
    
 }
