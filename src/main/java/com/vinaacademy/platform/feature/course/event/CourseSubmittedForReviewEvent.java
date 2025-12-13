@@ -1,17 +1,21 @@
 package com.vinaacademy.platform.feature.course.event;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+
 /**
  * Domain event published when a course is submitted for review.
  * This event can be used for notifications to staff/admin for approval.
  */
-@Data
 @Builder
+@Data
+@AllArgsConstructor
 public class CourseSubmittedForReviewEvent {
     
     /**
@@ -38,4 +42,8 @@ public class CourseSubmittedForReviewEvent {
      * The timestamp when the submission occurred
      */
     private final LocalDateTime timestamp;
+    
+    private final String instructorName;
+    
+    private final String description;
 }
