@@ -64,6 +64,8 @@ public class CourseEventListener {
 					.title(event.getCourseName())
 					.description(event.getDescription())
 					.instructorName(event.getInstructorName())
+					.categoryName(event.getCategoryName())
+					.price(event.getPrice())
 					.build();
 			sendUpdateVectorCourse(courseEmbeddedEvent);
 
