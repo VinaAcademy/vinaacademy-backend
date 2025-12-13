@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.vinaacademy.platform.configuration.AppConfig;
+import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.event.CourseStatusChangedEvent;
 import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
 import com.vinaacademy.platform.kafka.NotificationProducer;
@@ -77,16 +78,20 @@ public class CourseEventListener {
 	}
 
 	private void sendStatusChangeNotification(CourseStatusChangedEvent event) {
-		String title = "course.notification.status_update.title";
-		String content = String.format("course.notification.status_update.content.%s",
-				event.getNewStatus().name().toLowerCase());
+		String title = "Khóa học của bạn ";
+		String content = "";
 
 		String url = String.format("%s/instructor/courses/%s/content", AppConfig.INSTANCE.getFrontendUrl(),
 				event.getCourseId());
-
+		if (event.getNewStatus() == CourseStatus.PUBLISHED) {
+			title += "đã được duyệt";
+		}else {
+			title += "đã bị từ chối";
+			content = "Lý do: "+ event.getContent();
+		}
 		NotificationCreateEvent notification = NotificationCreateEvent.builder().title(title).content(content)
 				.targetUrl(url).userId(event.getOwner()).type(NotificationType.COURSE_APPROVAL).build();
-
+		
 		notificationProducer.sendNotification(notification);
 		log.debug("Status change notification sent to instructor: {} for course: {}", event.getOwner(),
 				event.getCourseId());
