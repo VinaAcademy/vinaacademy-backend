@@ -283,10 +283,12 @@ public class CourseCommandServiceImpl implements CourseCommandService {
                     .courseId(course.getId())
                     .courseSlug(course.getSlug())
                     .courseName(course.getName())
+                    .description(course.getDescription())
+                    .instructorName(instructor.getFullName())
                     .instructorId(instructor.getId())
                     .timestamp(LocalDateTime.now())
                     .build();
-
+            
             eventPublisher.publishEvent(event);
             log.debug("Published course submitted for review event for course: {}", course.getId());
         } catch (Exception e) {
