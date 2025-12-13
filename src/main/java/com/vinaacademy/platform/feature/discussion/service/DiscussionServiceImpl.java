@@ -2,6 +2,7 @@
 package com.vinaacademy.platform.feature.discussion.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -56,10 +57,15 @@ public class DiscussionServiceImpl implements DiscussionService {
 		Page<Object[]> pageResult = discussionRepository.findRepliesWithCounts(parentId, pageable);
         UUID currentUserId = securityHelper.getCurrentUser().getId();
         
+        // Batch query: Get all liked discussion IDs at once instead of N queries
+        List<UUID> discussionIds = pageResult.getContent().stream()
+            .map(record -> (UUID) record[0])
+            .toList();
+        List<UUID> likedDiscussionIds = favoriteRepository.findLikedCommentIdsByUserAndCommentIds(currentUserId, discussionIds);
+        
         return pageResult.map(record -> {
         	UUID discussionId = (UUID) record[0];
-            boolean likedByCurrentUser =
-            		favoriteRepository.existsByUserIdAndCommentId(currentUserId, discussionId);
+            boolean likedByCurrentUser = likedDiscussionIds.contains(discussionId);
 
             return DiscussionDto.builder()
             		.id(discussionId)
@@ -81,10 +87,15 @@ public class DiscussionServiceImpl implements DiscussionService {
         Page<Object[]> pageResult = discussionRepository.findRootCommentsWithCounts(lessonId, pageable);
         UUID currentUserId = securityHelper.getCurrentUser().getId();
         
+        // Batch query: Get all liked discussion IDs at once instead of N queries
+        List<UUID> discussionIds = pageResult.getContent().stream()
+            .map(record -> (UUID) record[0])
+            .toList();
+        List<UUID> likedDiscussionIds = favoriteRepository.findLikedCommentIdsByUserAndCommentIds(currentUserId, discussionIds);
+        
         return pageResult.map(record -> {
             UUID discussionId = (UUID) record[0];
-            boolean likedByCurrentUser =
-                    favoriteRepository.existsByUserIdAndCommentId(currentUserId, discussionId);
+            boolean likedByCurrentUser = likedDiscussionIds.contains(discussionId);
             return DiscussionDto.builder()
             		.id(discussionId)
             		.comment((String) record[1])
