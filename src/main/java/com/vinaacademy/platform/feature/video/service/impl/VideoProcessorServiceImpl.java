@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.vinaacademy.kafka.event.NotificationCreateEvent;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
 
 @Slf4j
 @Service
@@ -132,6 +133,7 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
                 .content("Bạn có thể xem tại đây.")
                 .targetUrl(frontendUrl + "/instructor/courses/" + courseId + "/lectures/" + video.getId())
                 .userId(video.getAuthor().getId())
+                .type(NotificationType.COURSE_APPROVAL)
                 .build());
     }
 
@@ -142,6 +144,7 @@ public class VideoProcessorServiceImpl implements VideoProcessorService {
                 .content("Có lỗi xảy ra: " + errorMessage)
                 .targetUrl(frontendUrl + "/instructor/courses/" + courseId + "/lectures/" + video.getId())
                 .userId(video.getAuthor().getId())
+                .type(NotificationType.COURSE_APPROVAL)
                 .build());
     }
 
