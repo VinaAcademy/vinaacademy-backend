@@ -16,6 +16,7 @@ import com.vinaacademy.platform.feature.discussion.repository.DiscussionReposito
 import com.vinaacademy.platform.feature.discussion.repository.FavoriteRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.entity.User;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,21 +36,21 @@ public class FavoriteServiceImpl implements FavoriteService {
 		Discussion discussion = discussionRepository.findById(request.getCommentId()).orElseThrow(
 				() -> NotFoundException.message("Không tìm thấy thảo luận id " + request.getCommentId()));
 		
-		boolean isHasFavorite = favoriteRepository.existsByUserIdAndCommentId(user.getId(), request.getCommentId());
-		if (isHasFavorite)
+		// Rely on unique index to prevent duplicates; avoid extra exists query
+		try {
+			Favorite favoriteNew = Favorite.builder().user(user).comment(discussion).build();
+			return favoriteMapper.toDto(favoriteRepository.save(favoriteNew));
+		} catch (DataIntegrityViolationException ex) {
 			throw BadRequestException.message("Thảo luận này bạn đã thích rồi!!");
-		
-		Favorite favoriteNew = Favorite.builder().user(user).comment(discussion).build();
-		return favoriteMapper.toDto(favoriteRepository.save(favoriteNew));
+		}
 	}
 
 	@Override
 	public void deleteFavorite(FavoriteRequest favoriteRequest) {
 		User user = securityHelper.getCurrentUser();
-		
-		Favorite favorite = favoriteRepository.findByUserIdAndCommentId(user.getId(), favoriteRequest.getCommentId())
-				.orElseThrow(() -> NotFoundException.message("Không tìm thấy lượt yêu thích này"));
-		
-		favoriteRepository.delete(favorite);
+		int affected = favoriteRepository.deleteByUserIdAndCommentId(user.getId(), favoriteRequest.getCommentId());
+		if (affected == 0) {
+			throw NotFoundException.message("Không tìm thấy lượt yêu thích này");
+		}
 	}
 }

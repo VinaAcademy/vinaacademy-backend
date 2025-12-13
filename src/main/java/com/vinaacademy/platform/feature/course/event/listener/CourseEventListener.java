@@ -59,7 +59,7 @@ public class CourseEventListener {
 		try {
 			log.debug("Handling course submitted for review event for course: {}", event.getCourseId());
 
-			sendSubmissionNotification(event);
+			sendSubmissionNotification(event); //gui noti cho admin staff
 			CourseEmbeddedEvent courseEmbeddedEvent = CourseEmbeddedEvent.builder()
 					.id(event.getCourseId())
 					.title(event.getCourseName())
@@ -97,7 +97,7 @@ public class CourseEventListener {
 				event.getCourseId());
 	}
 
-	private void sendUpdateVectorCourse(CourseEmbeddedEvent event) {
+	public void sendUpdateVectorCourse(CourseEmbeddedEvent event) {
 		vectorUpdateProducer.sendNotification(event);
 		log.info("Update vector for course {}", event.getId());
 	}
