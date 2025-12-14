@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.vinaacademy.platform.feature.discussion.entity.Discussion;
 
-public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
+public interface DiscussionRepository extends JpaRepository<Discussion, UUID>, DiscussionRepositoryCustom {
 	// Lấy danh sách Root comment tối ưu: chỉ chọn đúng cột cần thiết cho DTO
 	@Query("""
 			SELECT 
@@ -30,6 +30,7 @@ public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
 				) THEN true ELSE false END AS likedByCurrentUser
 			FROM Discussion d
 			WHERE d.lesson.id = :lessonId AND d.parentComment IS NULL
+			ORDER BY CASE WHEN d.user.id = :currentUserId THEN 0 ELSE 1 END, d.createdDate DESC
 			""")
 	Page<com.vinaacademy.platform.feature.discussion.repository.projection.DiscussionSummary> findRootCommentSummaries(
 		@Param("lessonId") UUID lessonId,
@@ -55,6 +56,7 @@ public interface DiscussionRepository extends JpaRepository<Discussion, UUID> {
 				) THEN true ELSE false END AS likedByCurrentUser
 			FROM Discussion d
 			WHERE d.parentComment.id = :parentId
+			ORDER BY CASE WHEN d.user.id = :currentUserId THEN 0 ELSE 1 END, d.createdDate DESC
 			""")
 	Page<com.vinaacademy.platform.feature.discussion.repository.projection.DiscussionSummary> findReplySummaries(
 		@Param("parentId") UUID parentId,

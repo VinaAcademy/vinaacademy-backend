@@ -1,33 +1,49 @@
 package com.vinaacademy.platform.feature.review.controller;
 
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
 import com.vinaacademy.platform.feature.course.service.CourseManagementService;
-import com.vinaacademy.platform.feature.review.dto.sentiment.*;
+import com.vinaacademy.platform.feature.review.dto.sentiment.FlaggedReviewDto;
+import com.vinaacademy.platform.feature.review.dto.sentiment.ModerationActionRequest;
+import com.vinaacademy.platform.feature.review.dto.sentiment.ProsConsResponse;
+import com.vinaacademy.platform.feature.review.dto.sentiment.ReviewWithSentimentDto;
+import com.vinaacademy.platform.feature.review.dto.sentiment.SentimentDashboardResponse;
 import com.vinaacademy.platform.feature.review.entity.ReviewModerationFlag;
 import com.vinaacademy.platform.feature.review.enums.ModerationStatus;
 import com.vinaacademy.platform.feature.review.enums.SentimentType;
 import com.vinaacademy.platform.feature.review.repository.ReviewModerationFlagRepository;
+import com.vinaacademy.platform.feature.review.service.CourseReviewService;
 import com.vinaacademy.platform.feature.review.service.ReviewSentimentQueryService;
-import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.auth.annotation.HasAnyRole;
+import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
+import com.vinaacademy.platform.kafka.NotificationProducer;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.UUID;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
 
 /**
  * Controller cho các endpoint phân tích cảm xúc
@@ -45,6 +61,8 @@ public class ReviewSentimentController {
     private final ReviewModerationFlagRepository flagRepository;
     private final SecurityHelper securityHelper;
     private final CourseManagementService courseManagementService;
+    private final CourseReviewService courseReviewService;
+    private final NotificationProducer notificationProducer;
     
     // ========== API CHO SINH VIÊN ==========
     
@@ -162,6 +180,12 @@ public class ReviewSentimentController {
             }
         } else if ("reject".equalsIgnoreCase(request.getAction())) {
             flag.reject(moderatorId, request.getNotes());
+            courseReviewService.deleteReview(request.getUserId(), request.getReviewId());
+            NotificationCreateEvent notification = NotificationCreateEvent.builder().title("Đánh giá của bạn đã bị xóa").content("Lí do: "+request.getNotes())
+    				.targetUrl(null).userId(request.getUserId()).type(NotificationType.SYSTEM).build();
+    		
+    		notificationProducer.sendNotification(notification);
+    		log.info("Send notification reject review {}",request.getReviewId());
         } else {
             return ResponseEntity.badRequest().body(new ApiResponse<>(
                 "error",

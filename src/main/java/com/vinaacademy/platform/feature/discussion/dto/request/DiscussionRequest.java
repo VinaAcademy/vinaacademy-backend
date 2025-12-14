@@ -21,4 +21,6 @@ public class DiscussionRequest {
     private String comment;
 	
     private UUID parentCommentId;
+    
+    private UUID courseId;
 }

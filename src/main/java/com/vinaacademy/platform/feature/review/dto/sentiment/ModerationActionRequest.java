@@ -1,5 +1,7 @@
 package com.vinaacademy.platform.feature.review.dto.sentiment;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +22,6 @@ public class ModerationActionRequest {
     
     private String notes;
     private Boolean deleteReview; // If approve, should we also delete the review?
+    private UUID userId;
+    private Long reviewId;
 }
