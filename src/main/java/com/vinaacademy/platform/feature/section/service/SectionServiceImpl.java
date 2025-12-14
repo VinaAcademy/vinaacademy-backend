@@ -11,13 +11,12 @@ import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.section.mapper.SectionMapper;
 import com.vinaacademy.platform.feature.section.repository.SectionRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +82,10 @@ public class SectionServiceImpl implements SectionService {
         );
 
         section = sectionRepository.save(section);
+
+        course.setTotalSection(course.getTotalSection() + 1);
+        courseRepository.save(course);
+
         log.info("Section created with id: {}", section.getId());
 
         return sectionMapper.toDto(section);
@@ -144,12 +147,15 @@ public class SectionServiceImpl implements SectionService {
         // Update order index for sections after the deleted one
         List<Section> sectionsToUpdate = sectionRepository.findByCourseOrderByOrderIndex(course).stream()
                 .filter(s -> s.getOrderIndex() > deletedOrderIndex)
-                .collect(Collectors.toList());
+                .toList();
 
         for (Section sectionToUpdate : sectionsToUpdate) {
             sectionToUpdate.setOrderIndex(sectionToUpdate.getOrderIndex() - 1);
             sectionRepository.save(sectionToUpdate);
         }
+
+        course.setTotalSection(course.getTotalSection() - 1);
+        courseRepository.save(course);
 
         log.info("Section deleted with id: {}", id);
     }
