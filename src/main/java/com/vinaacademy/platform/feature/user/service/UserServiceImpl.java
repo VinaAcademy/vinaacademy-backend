@@ -20,10 +20,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -83,7 +85,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional
 	public UserDto updateUserInfo(UpdateUserInfoRequest request) {
 		User user = securityHelper.getCurrentUser();
 		updateIfPresent(user::setFullName, request.getFullName());
@@ -91,9 +92,15 @@ public class UserServiceImpl implements UserService {
 		updateIfPresent(user::setAvatarUrl, request.getAvatarUrl());
 		updateIfPresent(user::setBirthday, request.getBirthday());
 		updateIfPresent(user::setPhone, request.getPhone());
-
-		User savedUser = userRepository.save(user);
-		return UserMapper.INSTANCE.toDto(savedUser);
+		User savedUser = null;
+		try {
+			savedUser = userRepository.save(user);
+		} catch (Exception e) {
+			throw BadRequestException.message("Số điện thoại đã được sử dụng");
+		}
+		
+		UserDto userDto =  UserMapper.INSTANCE.toDto(savedUser);
+		return userDto;
 	}
 
 	private <T> void updateIfPresent(Consumer<T> setter, T value) {

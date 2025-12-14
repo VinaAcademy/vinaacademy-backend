@@ -34,6 +34,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, J
 
     //Lấy tất cả đăng ký khóa học của một khóa học
     List<Enrollment> findByCourseId(UUID courseId);
+    
+    @Query(nativeQuery = true, value = "SELECT user_id FROM enrollments WHERE course_id = :courseId")
+    List<UUID> findUserIdsByCourseId(@Param("courseId") UUID courseId);
 
     //Lấy tất cả đăng ký khóa học của nhiều khóa học
     List<Enrollment> findByCourseIdIn(List<UUID> courseIds);
@@ -81,7 +84,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, J
 
     //Lấy tất cả đăng ký khóa học của một khóa học (có phân trang)
     Page<Enrollment> findByCourseId(UUID courseId, Pageable pageable);
-
+    
     //Lấy tất cả đăng ký khóa học của một khóa học theo trạng thái (có phân trang)
     Page<Enrollment> findByCourseIdAndStatus(UUID courseId, ProgressStatus status, Pageable pageable);
     
