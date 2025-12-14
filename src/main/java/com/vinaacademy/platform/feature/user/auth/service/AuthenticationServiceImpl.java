@@ -80,7 +80,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     user.setUsername(username);
     user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
     user.setEnabled(false);
-    user.setRoles(Set.of(roleRepository.findByCode(AuthConstants.STUDENT_ROLE)));
+    user.setRoles(Set.of(roleRepository.findByCode(AuthConstants.STUDENT_ROLE).orElseThrow()));
     //        user.setRoles(List.of(roleRepository.findByCode(AuthConstants.STUDENT_ROLE)));
     user = userRepository.save(user);
 

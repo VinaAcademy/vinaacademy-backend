@@ -73,10 +73,10 @@ public class TestingDataService {
                     .code(role).build());
         }
 
-        Role adminRole = roleRepository.findByCode(AuthConstants.ADMIN_ROLE);
-        Role staffRole = roleRepository.findByCode(AuthConstants.STAFF_ROLE);
-        Role instructorRole = roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE);
-        Role studentRole = roleRepository.findByCode(AuthConstants.STUDENT_ROLE);
+        Role adminRole = roleRepository.findByCode(AuthConstants.ADMIN_ROLE).orElseThrow();
+        Role staffRole = roleRepository.findByCode(AuthConstants.STAFF_ROLE).orElseThrow();
+        Role instructorRole = roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE).orElseThrow();
+        Role studentRole = roleRepository.findByCode(AuthConstants.STUDENT_ROLE).orElseThrow();
 
         User admin = User.builder()
                 .username("admin")
@@ -297,7 +297,7 @@ public class TestingDataService {
                                 .password(passwordEncoder.encode("instructor123"))
                                 .email("instructor@example.com")
                                 .enabled(true)
-                                .roles(Set.of(roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE)))
+                                .roles(Set.of(roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE).orElseThrow()))
                                 .build();
                         return userRepository.save(newInstructor);
                     });

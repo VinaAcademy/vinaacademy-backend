@@ -1,9 +1,15 @@
 package com.vinaacademy.platform.feature.course.service;
 
+import com.vinaacademy.platform.feature.course.dto.CategoryDistributionDto;
+import com.vinaacademy.platform.feature.course.dto.CourseDashboardStatsDto;
 import com.vinaacademy.platform.feature.course.dto.CourseCountStatusDto;
 import com.vinaacademy.platform.feature.course.dto.CourseDetailsResponse;
 import com.vinaacademy.platform.feature.course.dto.CourseDto;
 import com.vinaacademy.platform.feature.course.dto.CourseSearchRequest;
+import com.vinaacademy.platform.feature.course.dto.CourseTrendDto;
+import com.vinaacademy.platform.feature.course.dto.TopCoursesDto;
+import com.vinaacademy.platform.feature.course.dto.TopInstructorsDto;
+import com.vinaacademy.platform.feature.course.dto.RecentCoursesDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -90,4 +96,57 @@ public interface CourseQueryService {
      * @return Course count statistics
      */
     CourseCountStatusDto getCountCourses();
+
+    /**
+     * Get dashboard statistics including counts, revenue, and growth rates
+     *
+     * @return Dashboard statistics
+     */
+    CourseDashboardStatsDto getDashboardStats();
+
+    /**
+     * Get category distribution statistics
+     *
+     * @return Category distribution with course counts and percentages
+     */
+    CategoryDistributionDto getCategoryDistribution();
+
+    /**
+     * Get course trend statistics over the last N months
+     *
+     * @param months Number of months to look back (default 6)
+     * @return Monthly trend data for created and published courses
+     */
+    CourseTrendDto getCourseTrend(int months);
+
+    /**
+     * Get top N courses by performance metrics
+     *
+     * @param limit Maximum number of courses to return (default 10)
+     * @return Top courses with ranking
+     */
+    TopCoursesDto getTopCourses(int limit);
+
+    /**
+     * Get top N instructors by performance metrics
+     *
+     * @param limit Maximum number of instructors to return (default 10)
+     * @return Top instructors with aggregated statistics
+     */
+    TopInstructorsDto getTopInstructors(int limit);
+
+    /**
+     * Get recently published courses
+     *
+     * @param limit Maximum number of courses to return (default 12)
+     * @return Recent published courses ordered by publish date
+     */
+    RecentCoursesDto getRecentCourses(int limit);
+
+    /**
+     * Get alerts and performance metrics for dashboard
+     *
+     * @return Alerts and metrics including approval rate, avg approval time, rejection rate, and dynamic alerts
+     */
+    com.vinaacademy.platform.feature.course.dto.AlertsAndMetricsDto getAlertsAndMetrics();
 }

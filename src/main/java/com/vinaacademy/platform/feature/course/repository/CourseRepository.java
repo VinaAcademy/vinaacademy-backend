@@ -121,6 +121,29 @@ public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecif
     List<Object[]> countCoursesByStatus();
 
     /**
+     * Get course count grouped by category
+     * Returns: [categoryId, categoryName, categorySlug, courseCount]
+     */
+    @Query("SELECT c.category.id, c.category.name, c.category.slug, COUNT(c) " +
+           "FROM Course c " +
+           "WHERE c.status = 'PUBLISHED' " +
+           "GROUP BY c.category.id, c.category.name, c.category.slug " +
+           "ORDER BY COUNT(c) DESC")
+    List<Object[]> countCoursesByCategory();
+
+    /**
+     * Count courses created in a specific date range
+     */
+    @Query("SELECT COUNT(c) FROM Course c WHERE c.createdDate >= :startDate AND c.createdDate < :endDate")
+    long countCoursesByDateRange(@Param("startDate") java.time.LocalDateTime startDate, @Param("endDate") java.time.LocalDateTime endDate);
+
+    /**
+     * Count courses by status in a specific date range
+     */
+    @Query("SELECT COUNT(c) FROM Course c WHERE c.status = :status AND c.createdDate >= :startDate AND c.createdDate < :endDate")
+    long countByStatusAndDateRange(@Param("status") CourseStatus status, @Param("startDate") java.time.LocalDateTime startDate, @Param("endDate") java.time.LocalDateTime endDate);
+
+    /**
      * Lightweight projection query for course pagination/search
      * Only selects essential fields for better performance
      */
@@ -186,5 +209,119 @@ public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecif
                      c.category.name, c.category.slug
             """)
     Page<CourseListProjection> findCourseProjectionsByInstructor(@Param("instructorId") UUID instructorId, Pageable pageable);
+
+    /**
+     * Get monthly trend data for courses created in the last N months
+     * Returns [year, month, count] for courses created
+     */
+    @Query("""
+            SELECT YEAR(c.createdDate) as year,
+                   MONTH(c.createdDate) as month,
+                   COUNT(c) as count
+            FROM Course c
+            WHERE c.createdDate >= :startDate
+            GROUP BY YEAR(c.createdDate), MONTH(c.createdDate)
+            ORDER BY YEAR(c.createdDate), MONTH(c.createdDate)
+            """)
+    List<Object[]> countCoursesCreatedByMonth(@Param("startDate") java.time.LocalDateTime startDate);
+
+    /**
+     * Get monthly trend data for courses published in the last N months
+     * Returns [year, month, count] for courses published
+     * Uses updatedDate as published date approximation since courses are updated when status changes to PUBLISHED
+     */
+    @Query("""
+            SELECT YEAR(c.updatedDate) as year,
+                   MONTH(c.updatedDate) as month,
+                   COUNT(c) as count
+            FROM Course c
+            WHERE c.updatedDate >= :startDate
+            AND c.status = :status
+            GROUP BY YEAR(c.updatedDate), MONTH(c.updatedDate)
+            ORDER BY YEAR(c.updatedDate), MONTH(c.updatedDate)
+            """)
+    List<Object[]> countCoursesPublishedByMonth(@Param("startDate") java.time.LocalDateTime startDate, @Param("status") CourseStatus status);
+
+    /**
+     * Get top N courses ordered by multiple performance metrics
+     * Returns courses with highest combination of students, revenue, and rating
+     */
+    @Query("""
+            SELECT c
+            FROM Course c
+            WHERE c.status = :status
+            ORDER BY c.totalStudent DESC, c.rating DESC
+            """)
+    List<Course> findTopCourses(@Param("status") CourseStatus status, Pageable pageable);
+
+    /**
+     * Get recently published courses
+     * Returns courses ordered by updatedDate descending (most recent first)
+     */
+    @Query("""
+            SELECT c
+            FROM Course c
+            WHERE c.status = :status
+            ORDER BY c.updatedDate DESC
+            """)
+    List<Course> findRecentPublishedCourses(@Param("status") CourseStatus status, Pageable pageable);
+
+    /**
+     * Get published courses for approval time calculation
+     * Returns courses to calculate average approval time in Java
+     */
+    @Query("""
+            SELECT c
+            FROM Course c
+            WHERE c.status = :status
+            AND c.createdDate IS NOT NULL
+            AND c.updatedDate IS NOT NULL
+            """)
+    List<Course> findCoursesForApprovalTimeCalculation(@Param("status") CourseStatus status);
+
+    /**
+     * Count pending courses (for alerts)
+     */
+    @Query("""
+            SELECT COUNT(c)
+            FROM Course c
+            WHERE c.status = :status
+            """)
+    long countPendingCourses(@Param("status") CourseStatus status);
+
+    /**
+     * Find pending courses to check for overdue status
+     */
+    @Query("""
+            SELECT c
+            FROM Course c
+            WHERE c.status = :status
+            AND c.createdDate IS NOT NULL
+            """)
+    List<Course> findPendingCoursesForOverdueCheck(@Param("status") CourseStatus status);
+
+    /**
+     * Find published courses with no students to check for inactive status
+     */
+    @Query("""
+            SELECT c
+            FROM Course c
+            WHERE c.status = :status
+            AND c.totalStudent = 0
+            AND c.updatedDate IS NOT NULL
+            """)
+    List<Course> findPublishedCoursesForInactiveCheck(@Param("status") CourseStatus status);
+
+    /**
+     * Count low-rated courses (rating below threshold with at least 1 rating)
+     */
+    @Query("""
+            SELECT COUNT(c)
+            FROM Course c
+            WHERE c.status = :status
+            AND c.totalRating > 0
+            AND c.rating < :threshold
+            """)
+    long countLowRatedCourses(@Param("status") CourseStatus status, @Param("threshold") double threshold);
 
 }

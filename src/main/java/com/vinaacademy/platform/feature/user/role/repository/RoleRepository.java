@@ -3,6 +3,8 @@ package com.vinaacademy.platform.feature.user.role.repository;
 import com.vinaacademy.platform.feature.user.role.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface RoleRepository extends JpaRepository<Role, Long> {
-    Role findByCode(String name);
+    Optional<Role> findByCode(String code);
 }

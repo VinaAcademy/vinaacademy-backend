@@ -76,10 +76,8 @@ public class InstructorServiceImpl implements InstructorService {
         }
 
         // Lấy role INSTRUCTOR từ cơ sở dữ liệu
-        Role instructorRole = roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE);
-        if (instructorRole == null) {
-            throw BadRequestException.message("Không tìm thấy vai trò giảng viên trong hệ thống");
-        }
+        Role instructorRole = roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE)
+                .orElseThrow(() -> BadRequestException.message("Không tìm thấy vai trò giảng viên trong hệ thống"));
 
         // Thêm role INSTRUCTOR cho người dùng
         userRoles.add(instructorRole);
