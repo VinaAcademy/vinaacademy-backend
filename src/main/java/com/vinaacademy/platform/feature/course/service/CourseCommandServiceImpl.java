@@ -6,6 +6,7 @@ import com.vinaacademy.platform.feature.category.repository.CategoryRepository;
 import com.vinaacademy.platform.feature.common.utils.SlugUtils;
 import com.vinaacademy.platform.feature.course.dto.CourseDto;
 import com.vinaacademy.platform.feature.course.dto.CourseRequest;
+import com.vinaacademy.platform.feature.course.dto.CourseStatusRequest;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.event.CourseStatusChangedEvent;
@@ -156,9 +157,9 @@ public class CourseCommandServiceImpl implements CourseCommandService {
     @Override
     @Transactional
     @CacheEvict(value = {"coursesByCategory", "courseDetails", "courseExists", "courseById", "courseSlugById"}, allEntries = true)
-    public Boolean updateStatusCourse(UUID id, CourseStatus status) {
-        log.debug("Updating status for course with id: {} to status: {}", id, status);
-
+    public Boolean updateStatusCourse(UUID id, CourseStatusRequest courseStatusRequest) {
+        log.debug("Updating status for course with id: {} to status: {}", id, courseStatusRequest.getStatus());
+        CourseStatus status = courseStatusRequest.getStatus();
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> BadRequestException.messageKey("course.not_found"));
 
@@ -175,7 +176,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         courseRepository.save(course);
 
         // Publish domain event for status change
-        publishCourseStatusChangedEvent(course, previousStatus, status);
+        publishCourseStatusChangedEvent(course, previousStatus, status, courseStatusRequest.getContent());
 
         log.info("Course status updated successfully for course ID: {} to status: {}",
                 course.getId(), status);
@@ -249,7 +250,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
     /**
      * Publish course status changed event
      */
-    private void publishCourseStatusChangedEvent(Course course, CourseStatus previousStatus, CourseStatus newStatus) {
+    private void publishCourseStatusChangedEvent(Course course, CourseStatus previousStatus, CourseStatus newStatus, String content) {
         try {
             User currentUser = securityHelper.getCurrentUser();
             UUID owner = course.getInstructors().stream()
@@ -266,6 +267,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
                     .newStatus(newStatus)
                     .actorId(currentUser.getId())
                     .timestamp(LocalDateTime.now())
+                    .content(content)
                     .owner(owner)
                     .build();
 
