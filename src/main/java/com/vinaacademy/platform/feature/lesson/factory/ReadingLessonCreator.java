@@ -55,7 +55,7 @@ public class ReadingLessonCreator extends LessonCreator {
         validateUpdateRequest(request);
         
         if (!(lesson instanceof Reading reading)) {
-            throw new ValidationException("Cannot update a non-Reading lesson with Reading data");
+            throw new ValidationException("Chỉ có thể cập nhập nội dung bài đọc đối với lesson bài đọc");
         }
         
         reading.setContent(request.getContent());
@@ -66,14 +66,14 @@ public class ReadingLessonCreator extends LessonCreator {
     @Override
     protected void validateRequest(LessonRequest request) {
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new ValidationException("Content is required for reading lessons");
+            throw new ValidationException("Nội dung bài đọc không được thiếu");
         }
     }
     
     @Override
     protected void validateUpdateRequest(LessonRequest request) {
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new ValidationException("Content is required for reading lessons");
+            throw new ValidationException("Nội dung bài đọc không được thiếu");
         }
     }
 }

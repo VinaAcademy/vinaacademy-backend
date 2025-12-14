@@ -2,6 +2,7 @@ package com.vinaacademy.platform.feature.course.service;
 
 import com.vinaacademy.platform.feature.course.dto.CourseDto;
 import com.vinaacademy.platform.feature.course.dto.CourseRequest;
+import com.vinaacademy.platform.feature.course.dto.CourseStatusRequest;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 
 import java.util.UUID;
@@ -43,7 +44,7 @@ public interface CourseCommandService {
      * @param status The new course status
      * @return true if update successful
      */
-    Boolean updateStatusCourse(UUID id, CourseStatus status);
+    Boolean updateStatusCourse(UUID id, CourseStatusRequest courseStatusRequest);
 
     /**
      * Submit course for review (change status to PENDING)

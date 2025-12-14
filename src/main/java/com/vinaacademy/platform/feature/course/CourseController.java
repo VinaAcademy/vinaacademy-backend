@@ -249,7 +249,7 @@ public class CourseController {
                                             """))))
   public ApiResponse<Boolean> updateStatusCourse(
       @PathVariable UUID id, @RequestBody @Valid CourseStatusRequest courseStatusRequest) {
-    Boolean updated = courseCommandService.updateStatusCourse(id, courseStatusRequest.getStatus());
+    Boolean updated = courseCommandService.updateStatusCourse(id, courseStatusRequest);
     log.debug(
         "Updated course status for id={} to status={}, result={}",
         id,
