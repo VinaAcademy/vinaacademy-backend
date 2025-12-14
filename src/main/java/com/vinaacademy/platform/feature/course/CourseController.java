@@ -171,6 +171,87 @@ public class CourseController {
     return ApiResponse.success(courseQueryService.getCountCourses());
   }
 
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/stats")
+  @Operation(
+      summary = "Get dashboard statistics (Admin/Staff only)",
+      description =
+          "Retrieves comprehensive dashboard statistics including total courses, published courses, pending courses, average revenue per course, and monthly growth percentages.")
+  public ApiResponse<CourseDashboardStatsDto> getDashboardStats() {
+    log.debug("Getting dashboard statistics");
+    return ApiResponse.success(courseQueryService.getDashboardStats());
+  }
+
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/category-distribution")
+  @Operation(
+      summary = "Get category distribution (Admin/Staff only)",
+      description =
+          "Retrieves course distribution across categories with counts and percentages. Only includes published courses.")
+  public ApiResponse<CategoryDistributionDto> getCategoryDistribution() {
+    log.debug("Getting category distribution");
+    return ApiResponse.success(courseQueryService.getCategoryDistribution());
+  }
+
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/trend")
+  @Operation(
+      summary = "Get course trend (Admin/Staff only)",
+      description =
+          "Retrieves monthly trend data for courses created and published over the last N months.")
+  public ApiResponse<CourseTrendDto> getCourseTrend(
+      @RequestParam(defaultValue = "6") @Parameter(description = "Number of months to look back", example = "6") int months) {
+    log.debug("Getting course trend for last {} months", months);
+    return ApiResponse.success(courseQueryService.getCourseTrend(months));
+  }
+
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/top-courses")
+  @Operation(
+      summary = "Get top courses (Admin/Staff only)",
+      description =
+          "Retrieves top N courses ranked by students, rating, and revenue.")
+  public ApiResponse<TopCoursesDto> getTopCourses(
+      @RequestParam(defaultValue = "10") @Parameter(description = "Number of top courses to return", example = "10") int limit) {
+    log.debug("Getting top {} courses", limit);
+    return ApiResponse.success(courseQueryService.getTopCourses(limit));
+  }
+
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/top-instructors")
+  @Operation(
+      summary = "Get top instructors (Admin/Staff only)",
+      description =
+          "Retrieves top N instructors ranked by total students and average rating.")
+  public ApiResponse<TopInstructorsDto> getTopInstructors(
+      @RequestParam(defaultValue = "10") @Parameter(description = "Number of top instructors to return", example = "10") int limit) {
+    log.debug("Getting top {} instructors", limit);
+    return ApiResponse.success(courseQueryService.getTopInstructors(limit));
+  }
+
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/recent-courses")
+  @Operation(
+      summary = "Get recent published courses (Admin/Staff only)",
+      description =
+          "Retrieves recently published courses ordered by publish date.")
+  public ApiResponse<RecentCoursesDto> getRecentCourses(
+      @RequestParam(defaultValue = "12") @Parameter(description = "Number of recent courses to return", example = "12") int limit) {
+    log.debug("Getting {} recent courses", limit);
+    return ApiResponse.success(courseQueryService.getRecentCourses(limit));
+  }
+
+  @HasAnyRole({AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE})
+  @GetMapping("/dashboard/alerts-metrics")
+  @Operation(
+      summary = "Get alerts and performance metrics (Admin/Staff only)",
+      description =
+          "Retrieves performance metrics (approval rate, avg approval time, rejection rate) and dynamic alerts based on current data state.")
+  public ApiResponse<com.vinaacademy.platform.feature.course.dto.AlertsAndMetricsDto> getAlertsAndMetrics() {
+    log.debug("Getting alerts and performance metrics");
+    return ApiResponse.success(courseQueryService.getAlertsAndMetrics());
+  }
+
   // ---- Course Management Endpoints ----
 
   @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.INSTRUCTOR_ROLE, AuthConstants.STAFF_ROLE})

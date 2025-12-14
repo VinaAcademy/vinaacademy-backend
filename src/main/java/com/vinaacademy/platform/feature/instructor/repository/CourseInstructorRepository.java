@@ -91,4 +91,23 @@ public interface CourseInstructorRepository extends JpaRepository<CourseInstruct
     List<InstructorInfo> findByCourseId(UUID courseId);
     
     List<CourseInstructor> findAllByCourseId(UUID courseId);
+
+    /**
+     * Get top instructors with aggregated statistics
+     * Returns [instructorId, instructorName, courseCount, totalStudents, avgRating]
+     * Only includes courses with at least one rating (totalRating > 0)
+     */
+    @Query("""
+            SELECT ci.instructor.id,
+                   ci.instructor.fullName,
+                   COUNT(DISTINCT ci.course.id),
+                   SUM(ci.course.totalStudent),
+                   AVG(ci.course.rating)
+            FROM CourseInstructor ci
+            WHERE ci.course.status = 'PUBLISHED'
+            AND ci.course.totalRating > 0
+            GROUP BY ci.instructor.id, ci.instructor.fullName
+            ORDER BY SUM(ci.course.totalStudent) DESC, AVG(ci.course.rating) DESC
+            """)
+    List<Object[]> findTopInstructorsStats(org.springframework.data.domain.Pageable pageable);
 }

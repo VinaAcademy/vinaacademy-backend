@@ -50,20 +50,20 @@ public class UserServiceImpl implements UserService {
 		}
 
 		User admin = User.builder().username("admin").password("admin").email("locn562836@gmail.com").enabled(true)
-				.roles(Set.of(roleRepository.findByCode(AuthConstants.ADMIN_ROLE))).build();
+			.roles(Set.of(roleRepository.findByCode(AuthConstants.ADMIN_ROLE).orElseThrow())).build();
 		admin.setPassword(passwordEncoder.encode(admin.getPassword()));
 
 		User staff = User.builder().username("staff").password("staff").email("huuloc2155@gmail.com").enabled(true)
-				.roles(Set.of(roleRepository.findByCode(AuthConstants.STAFF_ROLE))).build();
+			.roles(Set.of(roleRepository.findByCode(AuthConstants.STAFF_ROLE).orElseThrow())).build();
 		staff.setPassword(passwordEncoder.encode(staff.getPassword()));
 
 		User instructor = User.builder().username("instructor").password("instructor")
 				.email("linhpht263@outlook.com.vn").enabled(true)
-				.roles(Set.of(roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE))).build();
+			.roles(Set.of(roleRepository.findByCode(AuthConstants.INSTRUCTOR_ROLE).orElseThrow())).build();
 		instructor.setPassword(passwordEncoder.encode(instructor.getPassword()));
 
 		User student = User.builder().username("student").password("student").email("trihung987@gmail.com")
-				.enabled(true).roles(Set.of(roleRepository.findByCode(AuthConstants.STUDENT_ROLE))).build();
+			.enabled(true).roles(Set.of(roleRepository.findByCode(AuthConstants.STUDENT_ROLE).orElseThrow())).build();
 		student.setPassword(passwordEncoder.encode(student.getPassword()));
 
 		userRepository.save(admin);

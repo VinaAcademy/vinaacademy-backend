@@ -116,4 +116,13 @@ public interface RevenueRecordRepository extends JpaRepository<RevenueRecord, Lo
             @Param("startDate") java.time.LocalDateTime startDate,
             @Param("endDate") java.time.LocalDateTime endDate
     );
+
+    /**
+     * Get all revenue records for a specific course
+     *
+     * @param courseId Course ID
+     * @return List of RevenueRecord
+     */
+    @Query("SELECT r FROM RevenueRecord r WHERE r.courseId = :courseId AND r.status = 'ACTIVE'")
+    List<RevenueRecord> findByCourseId(@Param("courseId") UUID courseId);
 }
