@@ -35,18 +35,18 @@ import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.auth.service.AuthorizationService;
 import com.vinaacademy.platform.feature.user.constant.ResourceConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +60,7 @@ public class LessonServiceImpl implements LessonService {
     private final UserProgressRepository userProgressRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
+    @Getter
     private final EnrollmentService enrollmentService;
     private final MediaFileRepository mediaFileRepository;
     private final S3Service s3Service;
@@ -106,12 +107,8 @@ public class LessonServiceImpl implements LessonService {
         request.setOrderIndex(existingLessons.size()); // Đặt ở vị trí cuối cùng
 
         // Tạo lesson mới
-        LessonDto newLesson = createLesson(request, currentUser);
 
-        // Cập nhật trạng thái khóa học nếu cần
-        updateCourseStatusAfterAddingLesson(section.getCourse());
-
-        return newLesson;
+      return createLesson(request, currentUser);
     }
 
     /**
@@ -166,6 +163,9 @@ public class LessonServiceImpl implements LessonService {
                 String.format("Created new %s lesson in section: %s",
                         request.getType(), section.getTitle()),
                 null, lessonMapper.lessonToLessonDto(lesson));
+
+        // Cập nhật trạng thái khóa học nếu cần
+        updateCourseStatusAfterAddingLesson(section.getCourse());
 
         return lessonMapper.lessonToLessonDto(lesson);
     }
@@ -266,12 +266,13 @@ public class LessonServiceImpl implements LessonService {
         // Cập nhật lại orderIndex cho các lesson sau lesson bị xóa
         List<Lesson> lessonsToUpdate = lessonRepository.findBySectionOrderByOrderIndex(section).stream()
                 .filter(l -> l.getOrderIndex() > deletedOrderIndex)
-                .collect(Collectors.toList());
+                .toList();
 
         for (Lesson lessonToUpdate : lessonsToUpdate) {
             lessonToUpdate.setOrderIndex(lessonToUpdate.getOrderIndex() - 1);
             lessonRepository.save(lessonToUpdate);
         }
+        course.setTotalLesson(course.getTotalLesson() - 1);
 
         // Cập nhật trạng thái khóa học sau khi xóa bài học
         updateCourseStatusAfterModifyingLessons(course);
@@ -456,7 +457,7 @@ public class LessonServiceImpl implements LessonService {
             // Shift existing lessons from the insertion point onwards
             List<Lesson> lessonsToUpdate = existingLessons.stream()
                     .filter(lesson -> lesson.getOrderIndex() >= orderIndex)
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (Lesson lesson : lessonsToUpdate) {
                 lesson.setOrderIndex(lesson.getOrderIndex() + 1);
@@ -527,7 +528,7 @@ public class LessonServiceImpl implements LessonService {
     public void attachDocuments(UUID lessonId, List<UUID> fileIds) {
         log.info("Attaching {} documents to lesson {}", fileIds.size(), lessonId);
         
-        if (fileIds == null || fileIds.isEmpty()) {
+        if (fileIds.isEmpty()) {
             throw new ValidationException("File IDs list cannot be empty");
         }
         
