@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Getter
@@ -36,4 +38,15 @@ public class CourseReview extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     @Fetch(FetchMode.JOIN)
     private User user;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ReviewKeyPhrase> keyPhrases = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ReviewModerationFlag> moderationFlags = new ArrayList<>();
+
+    @OneToOne(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private ReviewSentimentAnalysis sentimentAnalysis;
 }
