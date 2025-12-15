@@ -6,6 +6,8 @@ import com.vinaacademy.platform.feature.review.enums.PhraseType;
 import com.vinaacademy.platform.feature.review.enums.SentimentType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 
@@ -32,6 +34,7 @@ public class ReviewKeyPhrase extends BaseEntity {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CourseReview review;
     
     @Column(name = "phrase", columnDefinition = "TEXT", nullable = false)

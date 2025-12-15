@@ -4,6 +4,8 @@ import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.review.enums.SentimentType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ public class ReviewSentimentAnalysis extends BaseEntity {
     
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CourseReview review;
     
     // Overall Sentiment

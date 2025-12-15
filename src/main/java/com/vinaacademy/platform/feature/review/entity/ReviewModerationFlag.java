@@ -5,6 +5,8 @@ import com.vinaacademy.platform.feature.review.enums.FlagType;
 import com.vinaacademy.platform.feature.review.enums.ModerationStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,6 +35,7 @@ public class ReviewModerationFlag extends BaseEntity {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CourseReview review;
     
     @Enumerated(EnumType.STRING)
