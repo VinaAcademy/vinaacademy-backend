@@ -55,13 +55,16 @@ public class DiscussionServiceImpl implements DiscussionService {
 			if (course.isPresent()) {
 				Course coursereal = course.get();
 				UUID receiver = parentComment.getUser().getId();
-				NotificationCreateEvent notification = NotificationCreateEvent.builder()
-						.title(user.getFullName() + " đã phản hồi bình luận của bạn").content("Khóa học: "+coursereal.getName())
-						.targetUrl("/learning/"+coursereal.getSlug()+"/lecture/"+lesson.getId())
-						.userId(receiver)
-						.type(NotificationType.MESSAGE).build();
-				log.info("send noti reply to user: {}, slug: {}, lessonId: {}", receiver, coursereal.getSlug(), lesson.getId());
-				notificationProducer.sendNotification(notification);
+				if (!receiver.equals(user.getId())) {
+					NotificationCreateEvent notification = NotificationCreateEvent.builder()
+							.title(user.getFullName() + " đã phản hồi bình luận của bạn").content("Khóa học: "+coursereal.getName())
+							.targetUrl("/learning/"+coursereal.getSlug()+"/lecture/"+lesson.getId())
+							.userId(receiver)
+							.type(NotificationType.SYSTEM).build();
+					log.info("send noti reply to user: {}, slug: {}, lessonId: {}", receiver, coursereal.getSlug(), lesson.getId());
+					notificationProducer.sendNotification(notification);
+				}
+				
 			}
 			
 		}
