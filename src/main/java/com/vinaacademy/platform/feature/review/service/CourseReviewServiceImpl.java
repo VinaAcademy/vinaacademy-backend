@@ -12,10 +12,15 @@ import com.vinaacademy.platform.feature.review.mapper.CourseReviewMapper;
 import com.vinaacademy.platform.feature.review.repository.CourseReviewRepository;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.entity.User;
+import com.vinaacademy.platform.kafka.NotificationProducer;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent;
+import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +36,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseReviewServiceImpl implements CourseReviewService {
 
     private final CourseReviewRepository courseReviewRepository;
@@ -38,6 +44,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final SentimentAnalysisService sentimentAnalysisService;
+    private final NotificationProducer notificationProducer;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -86,6 +93,16 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         
         // Trigger async sentiment analysis
         sentimentAnalysisService.analyzeReviewAsync(courseReview);
+        
+        //send noti to instructor
+        UUID instructorId = course.getInstructors().get(0).getInstructor().getId();
+        NotificationCreateEvent notification = NotificationCreateEvent.builder()
+				.title(user.getFullName() + " đã đánh giá khóa học của bạn").content("Khóa học: "+course.getName())
+				.targetUrl("/courses/"+course.getSlug())
+				.userId(instructorId)
+				.type(NotificationType.SYSTEM).build();
+		log.info("send noti review to instructor: {}, slug: {}", instructorId, course.getSlug());
+		notificationProducer.sendNotification(notification);
 
         return CourseReviewMapper.INSTANCE.toDto(courseReview);
     }
