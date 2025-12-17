@@ -6,6 +6,7 @@ import com.vinaacademy.platform.exception.ValidationException;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonType;
+import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.course.repository.UserProgressRepository;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
@@ -45,6 +46,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +62,7 @@ public class LessonServiceImpl implements LessonService {
     private final UserProgressRepository userProgressRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
+    private final ApplicationEventPublisher eventPublisher;
     @Getter
     private final EnrollmentService enrollmentService;
     private final MediaFileRepository mediaFileRepository;
@@ -110,6 +113,28 @@ public class LessonServiceImpl implements LessonService {
 
       return createLesson(request, currentUser);
     }
+    
+    private void publishCourseSubmittedForReviewEvent(Course course, User instructor) {
+        try {
+            CourseSubmittedForReviewEvent event = CourseSubmittedForReviewEvent.builder()
+                    .courseId(course.getId())
+                    .courseSlug(course.getSlug())
+                    .courseName(course.getName())
+                    .description(course.getDescription())
+                    .instructorName(instructor.getFullName())
+                    .instructorId(instructor.getId())
+                    .timestamp(LocalDateTime.now())
+                    .categoryName(course.getCategory().getName())
+                    .price(course.getPrice())
+                    .build();
+            
+            eventPublisher.publishEvent(event);
+            log.debug("Published course submitted for review event for course: {}", course.getId());
+        } catch (Exception e) {
+            log.error("Failed to publish course submitted for review event for course: {}", course.getId(), e);
+            // Don't rethrow as event publishing failure should not break the main operation
+        }
+    }
 
     /**
      * Cập nhật trạng thái khóa học sau khi thêm bài học mới
@@ -118,13 +143,13 @@ public class LessonServiceImpl implements LessonService {
      *
      * @param course Khóa học cần cập nhật trạng thái
      */
-    private void updateCourseStatusAfterAddingLesson(Course course) {
+    private void updateCourseStatusAfterAddingLesson(Course course, User author) {
         CourseStatus currentStatus = course.getStatus();
 
         // Chỉ thay đổi trạng thái nếu là REJECTED hoặc PUBLISHED
         if (currentStatus == CourseStatus.REJECTED || currentStatus == CourseStatus.PUBLISHED) {
             course.setStatus(CourseStatus.PENDING);
-
+            publishCourseSubmittedForReviewEvent(course, author);
             // Ghi log việc thay đổi trạng thái
             log.info("Course status changed from {} to PENDING due to new lesson addition. Course ID: {}",
                     currentStatus, course.getId());
@@ -165,7 +190,7 @@ public class LessonServiceImpl implements LessonService {
                 null, lessonMapper.lessonToLessonDto(lesson));
 
         // Cập nhật trạng thái khóa học nếu cần
-        updateCourseStatusAfterAddingLesson(section.getCourse());
+        updateCourseStatusAfterAddingLesson(section.getCourse(), author);
 
         return lessonMapper.lessonToLessonDto(lesson);
     }
