@@ -17,6 +17,8 @@ public interface EnrollmentMapper {
     @Mapping(source = "course.image", target = "courseImage")
     @Mapping(source = "course.totalLesson", target = "totalLessons")
     @Mapping(source = "course.category.name", target = "category")
+    @Mapping(source = "course.status", target = "courseStatus")
+    @Mapping(source = "course.slug", target = "courseSlug")
     EnrollmentResponse toDto(Enrollment enrollment);
     
     EnrollmentProgressDto toDto2(Enrollment courseEnrollment);

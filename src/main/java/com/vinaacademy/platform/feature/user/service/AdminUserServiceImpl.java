@@ -1,6 +1,5 @@
 package com.vinaacademy.platform.feature.user.service;
 
-import com.vinaacademy.platform.feature.user.UserMapper;
 import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.user.dto.*;
 import com.vinaacademy.platform.feature.user.entity.User;
@@ -8,6 +7,10 @@ import com.vinaacademy.platform.feature.user.role.entity.Role;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,12 +19,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of AdminUserService for managing users in admin panel
@@ -34,7 +31,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override

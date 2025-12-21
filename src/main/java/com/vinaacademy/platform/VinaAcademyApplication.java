@@ -10,14 +10,15 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import vn.vinaacademy.common.exception.GlobalExceptionHandler;
 
 @SpringBootApplication
 @EnableDiscoveryClient
 @ComponentScan(
     basePackages = {"vn.vinaacademy.common", "com.vinaacademy.platform"},
     excludeFilters = @ComponentScan.Filter(
-        type = FilterType.ANNOTATION,
-        value = org.springframework.web.bind.annotation.ControllerAdvice.class
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = GlobalExceptionHandler.class
     )
 )
 
