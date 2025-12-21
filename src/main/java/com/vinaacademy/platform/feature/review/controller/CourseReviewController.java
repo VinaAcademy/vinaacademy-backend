@@ -154,9 +154,39 @@ public class CourseReviewController {
         UUID userId = securityHelper.getCurrentUser().getId();
         boolean hasReviewed = courseReviewService.hasUserReviewedCourse(userId, courseId);
 
-        return ResponseEntity.ok(new ApiResponse<>("success",
-                hasReviewed ? "Bạn đã đánh giá khóa học này" : "Bạn chưa đánh giá khóa học này",
-                hasReviewed));
+        return ResponseEntity.ok(new ApiResponse<>("success", 
+            hasReviewed ? "Bạn đã đánh giá khóa học này" : "Bạn chưa đánh giá khóa học này", 
+            hasReviewed));
     }
 
+    // ========== ADMIN ENDPOINTS FOR HIDDEN REVIEWS ==========
+
+    @Operation(summary = "Lấy danh sách reviews bị ẩn")
+    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
+    @GetMapping("/admin/hidden")
+    public ResponseEntity<ApiResponse<Page<CourseReviewDto>>> getHiddenReviews(
+            @PageableDefault(size = 20, sort = "hiddenAt") Pageable pageable) {
+
+        Page<CourseReviewDto> hiddenReviews = courseReviewService.getHiddenReviews(pageable);
+
+        log.info("Admin lấy danh sách {} reviews bị ẩn", hiddenReviews.getTotalElements());
+
+        return ResponseEntity.ok(new ApiResponse<>("success", 
+            "Lấy danh sách reviews bị ẩn thành công", hiddenReviews));
+    }
+
+    @Operation(summary = "Khôi phục review bị ẩn")
+    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
+    @PostMapping("/admin/{reviewId}/unhide")
+    public ResponseEntity<ApiResponse<Void>> unhideReview(
+            @PathVariable Long reviewId) {
+
+        UUID moderatorId = securityHelper.getCurrentUser().getId();
+        courseReviewService.unhideReview(reviewId, moderatorId);
+
+        log.info("Moderator {} đã khôi phục review {}", moderatorId, reviewId);
+
+        return ResponseEntity.ok(new ApiResponse<>("success", 
+            "Khôi phục review thành công", null));
+    }
 }

@@ -39,6 +39,20 @@ public class CourseReview extends BaseEntity {
     @Fetch(FetchMode.JOIN)
     private User user;
 
+    // Soft delete fields
+    @Column(name = "is_hidden", nullable = false)
+    @Builder.Default
+    private Boolean isHidden = false;
+
+    @Column(name = "hidden_at")
+    private java.time.LocalDateTime hiddenAt;
+
+    @Column(name = "hidden_reason", columnDefinition = "TEXT")
+    private String hiddenReason;
+
+    @Column(name = "hidden_by")
+    private java.util.UUID hiddenBy;
+
     @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReviewKeyPhrase> keyPhrases = new ArrayList<>();

@@ -171,7 +171,7 @@ public class RevenueDistributionServiceImpl implements RevenueDistributionServic
      * <ol>
      *   <li><b>Tìm kiếm giảng viên:</b>
      *       <ul>
-     *         <li>Gọi {@link #getInstructorIdFromCourseInstructor(UUID)} để lấy instructorId</li>
+     *         <li>Gọi  để lấy instructorId</li>
      *         <li>Nếu không tìm thấy giảng viên, ghi log cảnh báo và bỏ qua khóa học này</li>
      *         <li>Điều này có thể xảy ra với các khóa học chưa được gán giảng viên</li>
      *       </ul>
@@ -228,7 +228,6 @@ public class RevenueDistributionServiceImpl implements RevenueDistributionServic
      * 
      * @throws RuntimeException nếu có lỗi trong quá trình xử lý sau khi tìm thấy giảng viên
      * 
-     * @see #getInstructorIdFromCourseInstructor(UUID)
      * @see #calculateRevenue(BigDecimal)
      * @see #createRevenueRecord(OrderItem, Payment, RevenueCalculation, Map, UUID)
      * @see #updateInstructorWallet(UUID, BigDecimal, RevenueRecord)
@@ -307,7 +306,7 @@ public class RevenueDistributionServiceImpl implements RevenueDistributionServic
      *   <li><b>Dữ liệu không nhất quán:</b> Có thể xảy ra nếu CourseInstructor tồn tại nhưng Instructor đã bị xóa</li>
      * </ul>
      * 
-     * @param courseId ID duy nhất của khóa học cần tìm giảng viên
+     * @param course ID duy nhất của khóa học cần tìm giảng viên
      *                 Không được null, phải là UUID hợp lệ
      * 
      * @return UUID của giảng viên liên kết với khóa học, hoặc null nếu không tìm thấy

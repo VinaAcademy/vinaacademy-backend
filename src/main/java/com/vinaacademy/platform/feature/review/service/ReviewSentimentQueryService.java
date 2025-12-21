@@ -1,11 +1,13 @@
 package com.vinaacademy.platform.feature.review.service;
 
 import com.vinaacademy.platform.feature.common.exception.ResourceNotFoundException;
+import com.vinaacademy.platform.feature.user.UserRepository;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.review.dto.CourseReviewDto;
 import com.vinaacademy.platform.feature.review.dto.sentiment.*;
 import com.vinaacademy.platform.feature.review.entity.*;
+import com.vinaacademy.platform.feature.review.enums.FlagType;
 import com.vinaacademy.platform.feature.review.enums.ModerationStatus;
 import com.vinaacademy.platform.feature.review.enums.PhraseType;
 import com.vinaacademy.platform.feature.review.enums.SentimentType;
@@ -39,6 +41,7 @@ public class ReviewSentimentQueryService {
     private final ReviewModerationFlagRepository flagRepository;
     private final CourseSentimentStatisticsRepository statisticsRepository;
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     
     /**
      * Lấy tóm tắt điểm cộng/điểm trừ cho khóa học (cho sinh viên)
@@ -167,17 +170,31 @@ public class ReviewSentimentQueryService {
     
     /**
      * Lấy các đánh giá bị gắn cờ để admin kiểm duyệt
+     * Nếu status = null, trả về TẤT CẢ các flags (bao gồm PENDING, APPROVED, REJECTED, AUTO_APPROVED)
+     * với PENDING được ưu tiên lên trước
      */
     @Transactional(readOnly = true)
     public Page<FlaggedReviewDto> getFlaggedReviews(ModerationStatus status, Pageable pageable) {
         Page<ReviewModerationFlag> flags;
         
         if (status != null) {
+            // Lọc theo status cụ thể
             flags = flagRepository.findByStatus(status, pageable);
         } else {
-            flags = flagRepository.findPendingFlags(pageable);
+            // Lấy TẤT CẢ flags, PENDING lên trước, sort theo severity
+            flags = flagRepository.findAllFlagsOrderedForQueue(pageable);
         }
         
+        return flags.map(this::convertToFlaggedReviewDto);
+    }
+    
+    /**
+     * Lấy các đánh giá đã xử lý (APPROVED, REJECTED, AUTO_APPROVED)
+     * Dành riêng cho tab Lịch sử kiểm duyệt
+     */
+    @Transactional(readOnly = true)
+    public Page<FlaggedReviewDto> getProcessedFlags(Pageable pageable) {
+        Page<ReviewModerationFlag> flags = flagRepository.findProcessedFlags(pageable);
         return flags.map(this::convertToFlaggedReviewDto);
     }
     
@@ -185,7 +202,7 @@ public class ReviewSentimentQueryService {
      * Lấy thống kê kiểm duyệt cho dashboard admin
      */
     @Transactional(readOnly = true)
-    public Map<String, Object> getModerationStatistics() {
+    public ModerationStatisticsDto getModerationStatistics() {
         List<Object[]> stats = flagRepository.getModerationStatistics();
         
         Map<String, Long> statusCounts = new HashMap<>();
@@ -195,12 +212,18 @@ public class ReviewSentimentQueryService {
             statusCounts.put(status.name(), count);
         }
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("statusCounts", statusCounts);
-        result.put("pendingCount", statusCounts.getOrDefault("PENDING", 0L));
-        result.put("totalFlagged", statusCounts.values().stream().mapToLong(Long::longValue).sum());
+        long criticalPending = flagRepository.countCriticalPending();
+        long totalFlags = statusCounts.values().stream().mapToLong(Long::longValue).sum();
         
-        return result;
+        return ModerationStatisticsDto.builder()
+            .pending(statusCounts.getOrDefault("PENDING", 0L))
+            .reviewed(statusCounts.getOrDefault("REVIEWED", 0L))
+            .approved(statusCounts.getOrDefault("APPROVED", 0L))
+            .rejected(statusCounts.getOrDefault("REJECTED", 0L))
+            .autoApproved(statusCounts.getOrDefault("AUTO_APPROVED", 0L))
+            .totalFlags(totalFlags)
+            .criticalPending(criticalPending)
+            .build();
     }
     
     // ========== Helper Methods ==========
@@ -254,8 +277,15 @@ public class ReviewSentimentQueryService {
             .build();
     }
     
-    private FlaggedReviewDto convertToFlaggedReviewDto(ReviewModerationFlag flag) {
+    public FlaggedReviewDto convertToFlaggedReviewDto(ReviewModerationFlag flag) {
         CourseReview review = flag.getReview();
+        
+        // Nếu review đã bị xóa, return null hoặc skip (pending flags shouldn't have deleted reviews)
+        if (review == null) {
+            log.warn("Flag {} references deleted review, skipping", flag.getId());
+            return null;
+        }
+        
         CourseReviewDto reviewDto = CourseReviewMapper.INSTANCE.toDto(review);
         
         Optional<ReviewSentimentAnalysis> sentiment = sentimentRepository.findByReviewId(review.getId());
@@ -273,6 +303,14 @@ public class ReviewSentimentQueryService {
             .build()
         ).orElse(null);
         
+        // Lấy tên người xử lý nếu có
+        String reviewedByName = null;
+        if (flag.getReviewedBy() != null) {
+            reviewedByName = userRepository.findById(flag.getReviewedBy())
+                .map(user -> user.getFullName())
+                .orElse(null);
+        }
+        
         return FlaggedReviewDto.builder()
             .flagId(flag.getId())
             .review(reviewDto)
@@ -284,6 +322,7 @@ public class ReviewSentimentQueryService {
             .status(flag.getStatus())
             .flaggedAt(flag.getCreatedDate())
             .reviewedBy(flag.getReviewedBy())
+            .reviewedByName(reviewedByName)
             .reviewedAt(flag.getReviewedAt())
             .moderatorNotes(flag.getModeratorNotes())
             .build();

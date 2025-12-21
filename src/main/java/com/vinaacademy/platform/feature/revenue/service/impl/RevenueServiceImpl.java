@@ -151,11 +151,11 @@ public class RevenueServiceImpl implements RevenueService {
 	}
 
 	/**
-     * Xử lý hoàn tiền: trừ doanh thu khỏi ví giảng viên và cập nhật các bản ghi liên quan.
+     * Xử lý hoàn tiền cho 1 khóa học cụ thể: trừ doanh thu khỏi ví giảng viên và cập nhật bản ghi liên quan.
      * <p>
      * Quy trình:
      * <ul>
-     *   <li>Tìm bản ghi doanh thu theo vnpayTxnRef.</li>
+     *   <li>Tìm bản ghi doanh thu theo paymentId, instructorId và courseId (khóa học cụ thể cần hoàn tiền).</li>
      *   <li>Kiểm tra trạng thái đã hoàn tiền chưa.</li>
      *   <li>Cập nhật trạng thái bản ghi doanh thu sang REFUNDED, lưu lý do hoàn tiền.</li>
      *   <li>Lưu lại bản ghi doanh thu đã cập nhật.</li>
@@ -165,19 +165,23 @@ public class RevenueServiceImpl implements RevenueService {
      *   <li>Tạo bản ghi giao dịch ví với số tiền âm (loại REFUND).</li>
      *   <li>Lưu bản ghi giao dịch hoàn tiền.</li>
      * </ul>
-     * @param vnpayTxnRef   Mã giao dịch VNPAY
+     * @param paymentId     ID giao dịch thanh toán
+     * @param instructorId  ID giảng viên
+     * @param courseId      ID khóa học cần hoàn tiền
      * @param refundReason  Lý do hoàn tiền
      * @throws RuntimeException nếu không tìm thấy bản ghi doanh thu hoặc ví giảng viên
      */
 	@Override
-	public void processRefund(String vnpayTxnRef, String refundReason) {
-		log.info("Processing refund for transaction: {}", vnpayTxnRef);
-        // 1. Tìm bản ghi doanh thu
-        RevenueRecord revenueRecord = revenueRecordRepository.findByVnpayTxnRef(vnpayTxnRef)
-            .orElseThrow(() -> new RuntimeException("Revenue record not found: " + vnpayTxnRef));
+	public void processRefund(UUID paymentId, UUID instructorId, UUID courseId, String refundReason) {
+		log.info("Processing refund for paymentId={}, instructorId={}, courseId={}", paymentId, instructorId, courseId);
+        // 1. Tìm bản ghi doanh thu cho khóa học cụ thể
+        RevenueRecord revenueRecord = revenueRecordRepository.findByPaymentIdAndInstructorIdAndCourseId(
+                paymentId, instructorId, courseId)
+            .orElseThrow(() -> new RuntimeException("Revenue record not found for paymentId=" + paymentId 
+                + ", instructorId=" + instructorId + ", courseId=" + courseId));
         // 2. Kiểm tra trạng thái hoàn tiền
         if (revenueRecord.getStatus() == RevenueStatus.REFUNDED) {
-            throw new RuntimeException("Transaction already refunded: " + vnpayTxnRef);
+            throw new RuntimeException("Course already refunded: courseId=" + courseId + ", paymentId=" + paymentId);
         }
         // 3. Cập nhật trạng thái và lý do hoàn tiền
         revenueRecord.setStatus(RevenueStatus.REFUNDED);
@@ -205,8 +209,8 @@ public class RevenueServiceImpl implements RevenueService {
             .build();
         // 9. Lưu bản ghi giao dịch hoàn tiền
         walletTransactionRepository.save(transaction);
-        log.info("Refund processed successfully. Amount: {}, New balance: {}", 
-                refundAmount, savedWallet.getBalance());
+        log.info("Refund processed successfully for courseId={}. Amount: {}, New balance: {}", 
+                courseId, refundAmount, savedWallet.getBalance());
 	}
 
 	/**

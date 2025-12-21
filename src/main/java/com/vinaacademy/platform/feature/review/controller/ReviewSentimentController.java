@@ -22,6 +22,7 @@ import com.vinaacademy.platform.feature.common.response.ApiResponse;
 import com.vinaacademy.platform.feature.course.service.CourseManagementService;
 import com.vinaacademy.platform.feature.review.dto.sentiment.FlaggedReviewDto;
 import com.vinaacademy.platform.feature.review.dto.sentiment.ModerationActionRequest;
+import com.vinaacademy.platform.feature.review.dto.sentiment.ModerationStatisticsDto;
 import com.vinaacademy.platform.feature.review.dto.sentiment.ProsConsResponse;
 import com.vinaacademy.platform.feature.review.dto.sentiment.ReviewWithSentimentDto;
 import com.vinaacademy.platform.feature.review.dto.sentiment.SentimentDashboardResponse;
@@ -156,6 +157,23 @@ public class ReviewSentimentController {
         ));
     }
     
+    @Operation(summary = "Lấy lịch sử đã kiểm duyệt (chỉ các flags đã xử lý)")
+    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
+    @GetMapping("/admin/flagged/history")
+    public ResponseEntity<ApiResponse<Page<FlaggedReviewDto>>> getModerationHistory(
+        @PageableDefault(size = 20) Pageable pageable
+    ) {
+        log.debug("Lấy lịch sử kiểm duyệt (flags đã xử lý)");
+        
+        Page<FlaggedReviewDto> processedFlags = queryService.getProcessedFlags(pageable);
+        
+        return ResponseEntity.ok(new ApiResponse<>(
+            "success",
+            "Lấy lịch sử kiểm duyệt thành công",
+            processedFlags
+        ));
+    }
+    
     @Operation(summary = "Xử lý đánh giá bị flag (approve/reject)")
     @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
     @PostMapping("/admin/flags/{flagId}/moderate")
@@ -169,23 +187,33 @@ public class ReviewSentimentController {
             .orElseThrow(() -> new RuntimeException("Không tìm thấy cờ: " + flagId));
         
         UUID moderatorId = securityHelper.getCurrentUser().getId();
+        UUID reviewOwnerId = flag.getReview().getUser().getId();
+        Long reviewId = flag.getReview().getId();
         
         if ("approve".equalsIgnoreCase(request.getAction())) {
+            // APPROVE = Xác nhận vi phạm → ẨN review
             flag.approve(moderatorId, request.getNotes());
             
-            // Nếu được yêu cầu, cũng xóa/ẩn đánh giá
-            if (Boolean.TRUE.equals(request.getDeleteReview())) {
-                // TODO: Triển khai chức năng ẩn/xóa đánh giá
-                log.info("Đánh giá {} cần được xóa/ẩn", flag.getReview().getId());
-            }
+            // Ẩn review thay vì xóa
+            courseReviewService.hideReview(reviewId, request.getNotes(), moderatorId);
+            
+            // Gửi thông báo cho người dùng
+           NotificationCreateEvent notification = NotificationCreateEvent.builder()
+               .title("Đánh giá của bạn đã bị ẩn do vi phạm")
+               .content("Lý do: " + request.getNotes())
+               .targetUrl(null)
+               .userId(reviewOwnerId)
+               .type(NotificationType.SYSTEM)
+               .build();
+
+           notificationProducer.sendNotification(notification);
+           log.info("Đã ẩn review {} và gửi thông báo cho user {}", reviewId, reviewOwnerId);
+            
         } else if ("reject".equalsIgnoreCase(request.getAction())) {
+            // REJECT = Từ chối cờ, review không vi phạm → GIỮ LẠI review
             flag.reject(moderatorId, request.getNotes());
-            courseReviewService.deleteReview(request.getUserId(), request.getReviewId());
-            NotificationCreateEvent notification = NotificationCreateEvent.builder().title("Đánh giá của bạn đã bị xóa").content("Lí do: "+request.getNotes())
-    				.targetUrl(null).userId(request.getUserId()).type(NotificationType.SYSTEM).build();
-    		
-    		notificationProducer.sendNotification(notification);
-    		log.info("Send notification reject review {}",request.getReviewId());
+            log.info("Đã từ chối cờ {}, giữ lại review {}", flagId, reviewId);
+            
         } else {
             return ResponseEntity.badRequest().body(new ApiResponse<>(
                 "error",
@@ -206,10 +234,10 @@ public class ReviewSentimentController {
     @Operation(summary = "Lấy thống kê kiểm duyệt tổng quan")
     @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
     @GetMapping("/admin/moderation-stats")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getModerationStatistics() {
+    public ResponseEntity<ApiResponse<ModerationStatisticsDto>> getModerationStatistics() {
         log.debug("Lấy thống kê kiểm duyệt");
         
-        Map<String, Object> stats = queryService.getModerationStatistics();
+        ModerationStatisticsDto stats = queryService.getModerationStatistics();
         
         return ResponseEntity.ok(new ApiResponse<>(
             "success",
