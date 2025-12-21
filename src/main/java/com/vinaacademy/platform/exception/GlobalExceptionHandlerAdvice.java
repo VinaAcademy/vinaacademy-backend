@@ -1,8 +1,11 @@
 package com.vinaacademy.platform.exception;
 
+import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
+
 import com.vinaacademy.platform.feature.common.exception.ResourceNotFoundException;
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
 import com.vinaacademy.platform.feature.common.service.MessageService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -20,10 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.List;
-
-import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
-
 /**
  * Global exception handler with internationalization support.
  * Maps exceptions to ApiResponse with localized error messages.
@@ -32,7 +31,7 @@ import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 @ResponseBody
 @Order(HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
     private final MessageService messageService;
 
