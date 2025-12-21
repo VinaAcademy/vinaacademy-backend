@@ -14,7 +14,7 @@ public interface RevenueService {
 
 	RevenueRecord createRevenueRecord(CreateRevenueRecordRequest request);
 	void updateInstructorWallet(UUID instructorId, BigDecimal earning, Long revenueRecordId);
-	void processRefund(String vnpayTxnRef, String refundReason);
+	void processRefund(UUID paymentId, UUID instructorId, UUID courseId, String refundReason);
 	Page<RevenueRecord> getInstructorRevenue(Pageable pageable);
 	RevenueDashboardDto getDashboardStats();
 }

@@ -21,7 +21,11 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "revenue_records")
+@Table(name = "revenue_records",
+		uniqueConstraints = @UniqueConstraint(
+				columnNames = {"payment_id", "instructor_id", "course_id"}
+		)
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -75,7 +79,7 @@ public class RevenueRecord extends BaseEntity {
 	 * Mã giao dịch từ VNPAY (vnp_TxnRef)
 	 * Đây là ID unique được gửi đi và nhận về từ VNPAY
 	 */
-	@Column(name = "vnpay_txn_ref", nullable = false, unique = true, length = 100)
+	@Column(name = "vnpay_txn_ref", nullable = false, length = 100)
 	private String vnpayTxnRef;
 
 	/**

@@ -101,28 +101,33 @@ public class AdminRevenueController {
     }
     
     /**
-     * Xử lý hoàn tiền cho giao dịch thanh toán qua VNPay.
+     * Xử lý hoàn tiền cho 1 khóa học cụ thể trong giao dịch thanh toán.
      * <p>
      * Luồng hoạt động:
      * <ul>
-     *   <li>Nhận PUT request với mã giao dịch và lý do hoàn tiền.</li>
+     *   <li>Nhận PUT request với paymentId, instructorId, courseId và lý do hoàn tiền.</li>
      *   <li>Ghi log thao tác hoàn tiền.</li>
-     *   <li>Gọi {@link RevenueService#processRefund(String, String)} để thực hiện hoàn tiền.</li>
+     *   <li>Gọi  để thực hiện hoàn tiền cho khóa học cụ thể.</li>
      *   <li>Trả về thông báo thành công cho phía client.</li>
      * </ul>
      *
-     * @param vnpayTxnRef mã giao dịch VNPay cần hoàn tiền
+     * @param paymentId ID của giao dịch thanh toán
+     * @param instructorId ID của giảng viên
+     * @param courseId ID của khóa học cần hoàn tiền
      * @param reason lý do hoàn tiền
      * @return ResponseEntity chứa ApiResponse<String> thông báo hoàn tiền thành công
      */
     @PutMapping("/refund")
     public ResponseEntity<ApiResponse<String>> processRefund(
-            @RequestParam String vnpayTxnRef,
+            @RequestParam java.util.UUID paymentId,
+            @RequestParam java.util.UUID instructorId,
+            @RequestParam java.util.UUID courseId,
             @RequestParam String reason) {
         // Ghi log thao tác hoàn tiền
-        log.info("Admin processing refund for transaction: {}, reason: {}", vnpayTxnRef, reason);
-        // Thực hiện hoàn tiền
-        revenueService.processRefund(vnpayTxnRef, reason);
-        return ResponseEntity.ok(ApiResponse.success("Hoàn tiền thành công", "Refund processed successfully"));
+        log.info("Admin processing refund for paymentId: {}, instructorId: {}, courseId: {}, reason: {}", 
+                paymentId, instructorId, courseId, reason);
+        // Thực hiện hoàn tiền cho khóa học cụ thể
+        revenueService.processRefund(paymentId, instructorId, courseId, reason);
+        return ResponseEntity.ok(ApiResponse.success("Hoàn tiền thành công", "Refund processed successfully for course"));
     }
 }

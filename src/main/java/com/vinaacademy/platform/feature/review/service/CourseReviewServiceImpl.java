@@ -164,6 +164,69 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     }
 
     @Override
+    @Transactional
+    public void hideReview(Long reviewId, String reason, UUID moderatorId) {
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đánh giá với ID: " + reviewId));
+
+        if (Boolean.TRUE.equals(review.getIsHidden())) {
+            log.warn("Đánh giá {} đã bị ẩn từ trước", reviewId);
+            return;
+        }
+
+        // Cập nhật trạng thái ẩn
+        int updated = courseReviewRepository.updateHiddenStatus(
+            reviewId,
+            true,
+            LocalDateTime.now(),
+            reason,
+            moderatorId
+        );
+
+        if (updated == 0) {
+            throw new RuntimeException("Không thể ẩn đánh giá");
+        }
+
+        // Cập nhật rating trung bình của khóa học (loại trừ review bị ẩn)
+        updateCourseAverageRating(review.getCourse().getId());
+
+        log.info("Đã ẩn đánh giá {} bởi moderator {}. Lý do: {}", reviewId, moderatorId, reason);
+    }
+
+    @Override
+    @Transactional
+    public void unhideReview(Long reviewId, UUID moderatorId) {
+        CourseReview review = courseReviewRepository.findHiddenReviewById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Không tìm thấy đánh giá bị ẩn với ID: " + reviewId));
+
+        // Khôi phục review
+        int updated = courseReviewRepository.updateHiddenStatus(
+            reviewId,
+            false,
+            null,
+            null,
+            null
+        );
+
+        if (updated == 0) {
+            throw new RuntimeException("Không thể khôi phục đánh giá");
+        }
+
+        // Cập nhật lại rating trung bình của khóa học
+        updateCourseAverageRating(review.getCourse().getId());
+
+        log.info("Đã khôi phục đánh giá {} bởi moderator {}", reviewId, moderatorId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CourseReviewDto> getHiddenReviews(Pageable pageable) {
+        Page<CourseReview> hiddenReviews = courseReviewRepository.findHiddenReviews(pageable);
+        return hiddenReviews.map(CourseReviewMapper.INSTANCE::toDto);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Map<String, Object> getCourseReviewStatistics(UUID courseId) {
         // Kiểm tra khóa học tồn tại

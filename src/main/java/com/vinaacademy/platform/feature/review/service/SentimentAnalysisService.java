@@ -33,6 +33,7 @@ public class SentimentAnalysisService {
     private final ReviewKeyPhraseRepository keyPhraseRepository;
     private final ReviewModerationFlagRepository flagRepository;
     private final SentimentStatisticsService statisticsService;
+    private final CourseReviewRepository reviewRepository;
     
     // Thresholds for toxicity detection
     private static final BigDecimal TOXIC_THRESHOLD = new BigDecimal("0.85");
@@ -47,12 +48,28 @@ public class SentimentAnalysisService {
     /**
      * Phân tích đánh giá bất đồng bộ
      * Đây là điểm vào chính được gọi khi đánh giá được tạo/cập nhật
+     * 
+     * Note: Không dùng @Transactional ở đây vì:
+     * - Async method cần transaction riêng độc lập
+     * - Tránh vấn đề isolation với transaction cha chưa commit
+     * - Mỗi bước bên trong (save sentiment, save phrases) có transaction riêng
      */
     @Async("sentimentAnalysisExecutor")
-    @Transactional
     public CompletableFuture<Void> analyzeReviewAsync(CourseReview review) {
         try {
             log.info("Đang bắt đầu phân tích cảm xúc cho đánh giá ID: {}", review.getId());
+            
+            // Kiểm tra review có null không
+            if (review == null || review.getId() == null) {
+                log.warn("Review null hoặc không có ID, bỏ qua phân tích");
+                return CompletableFuture.completedFuture(null);
+            }
+            
+            // Kiểm tra review có bị ẩn không
+            if (Boolean.TRUE.equals(review.getIsHidden())) {
+                log.warn("Review {} đã bị ẩn, bỏ qua phân tích", review.getId());
+                return CompletableFuture.completedFuture(null);
+            }
             
             // Kiểm tra xem Lang-AI service có khả dụng không
             if (!langAiClient.isServiceAvailable()) {
@@ -93,7 +110,9 @@ public class SentimentAnalysisService {
     
     /**
      * Lưu kết quả phân tích cảm xúc vào database
+     * Transaction được quản lý riêng cho từng bước
      */
+    @Transactional
     private ReviewSentimentAnalysis saveSentimentAnalysis(
         CourseReview review,
         LangAiSentimentResponse response
@@ -134,7 +153,9 @@ public class SentimentAnalysisService {
     
     /**
      * Trích xuất và lưu cụm từ khóa với phân loại
+     * Transaction được quản lý riêng
      */
+    @Transactional
     private void saveKeyPhrases(
         CourseReview review,
         LangAiKeyPhrasesResponse response,
@@ -256,7 +277,11 @@ public class SentimentAnalysisService {
     
     /**
      * Kiểm tra xem đánh giá có nên được gắn cờ để kiểm duyệt không
+    /**
+     * Tự động gắn cờ kiểm duyệt nếu phát hiện nội dung vi phạm
+     * Transaction được quản lý riêng
      */
+    @Transactional
     private void checkAndFlagReview(CourseReview review, ReviewSentimentAnalysis sentiment) {
         List<ReviewModerationFlag> flags = new ArrayList<>();
         

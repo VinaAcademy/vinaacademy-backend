@@ -31,6 +31,7 @@ public class FlaggedReviewDto {
     private ModerationStatus status;
     private LocalDateTime flaggedAt;
     private UUID reviewedBy;
+    private String reviewedByName; // Tên người xử lý (moderator name)
     private LocalDateTime reviewedAt;
     private String moderatorNotes;
 }

@@ -28,6 +28,15 @@ public interface CourseReviewService {
     //Xóa một đánh giá
     void deleteReview(UUID userId, Long reviewId);
 
+    //Ẩn đánh giá (soft delete)
+    void hideReview(Long reviewId, String reason, UUID moderatorId);
+
+    //Khôi phục đánh giá bị ẩn
+    void unhideReview(Long reviewId, UUID moderatorId);
+
+    //Lấy danh sách reviews bị ẩn (cho admin)
+    org.springframework.data.domain.Page<CourseReviewDto> getHiddenReviews(Pageable pageable);
+
     //Lấy thống kê đánh giá của một khóa học
     Map<String, Object> getCourseReviewStatistics(UUID courseId);
 
