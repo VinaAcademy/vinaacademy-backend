@@ -68,7 +68,7 @@ public class CartItemServiceImpl implements CartItemService{
 		CartItem cartItem = CartItem.builder()
 				.course(course)
 				.cart(cart)
-				.price(request.getPrice())
+				.price(course.getPrice())
 				.addedAt(LocalDateTime.now())
 				.build();
 		
