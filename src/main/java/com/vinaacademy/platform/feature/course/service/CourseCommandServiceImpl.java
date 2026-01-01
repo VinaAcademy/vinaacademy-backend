@@ -9,18 +9,18 @@ import com.vinaacademy.platform.feature.course.dto.CourseRequest;
 import com.vinaacademy.platform.feature.course.dto.CourseStatusRequest;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.event.CourseStatusChangedEvent;
 import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
 import com.vinaacademy.platform.feature.course.mapper.CourseMapper;
 import com.vinaacademy.platform.feature.course.permission.CoursePermissionService;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
-import com.vinaacademy.platform.feature.user.UserRepository;
+import com.vinaacademy.platform.feature.lesson.entity.Lesson;
+import com.vinaacademy.platform.feature.lesson.repository.LessonRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
-import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +29,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.vinaacademy.common.helpers.SlugGeneratorHelper;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Implementation of course command service.
@@ -46,7 +50,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
     private final SlugGeneratorHelper slugGeneratorHelper;
     private final CoursePermissionService coursePermissionService;
     private final ApplicationEventPublisher eventPublisher;
-    private final UserRepository userRepository;
+    private final LessonRepository lessonRepository;
 
     @Override
     @Transactional
@@ -175,6 +179,16 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         course.setStatus(status);
         courseRepository.save(course);
 
+        List<Lesson> pendingLessons = lessonRepository.findByCourseIdAndLessonStatus(course.getId(), LessonStatus.PENDING);
+        for (Lesson lesson : pendingLessons) {
+            if (status == CourseStatus.PUBLISHED) {
+                lesson.setLessonStatus(LessonStatus.PUBLISHED);
+            } else if (status == CourseStatus.REJECTED) {
+                lesson.setLessonStatus(LessonStatus.REJECTED);
+            }
+            lessonRepository.save(lesson);
+        }
+
         // Publish domain event for status change
         publishCourseStatusChangedEvent(course, previousStatus, status, courseStatusRequest.getContent());
 
@@ -201,8 +215,23 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         }
 
         CourseStatus previousStatus = course.getStatus();
-        course.setStatus(CourseStatus.PENDING);
+        course.setStatus(previousStatus == CourseStatus.DRAFT || previousStatus == CourseStatus.REJECTED
+                ? CourseStatus.PENDING
+                : previousStatus);
         courseRepository.save(course);
+
+        List<Lesson> lessons = lessonRepository.findByCourseId(course.getId());
+        for (Lesson lesson : lessons) {
+            if (lesson.getLessonStatus() == LessonStatus.DRAFT) {
+                lesson.setLessonStatus(LessonStatus.PENDING);
+                lessonRepository.save(lesson);
+            }
+        }
+        boolean hasPendingStatus = course.getStatus() == CourseStatus.PENDING && previousStatus != CourseStatus.PENDING
+                || lessons.stream().anyMatch(lesson -> lesson.getLessonStatus() == LessonStatus.PENDING);
+        if (!hasPendingStatus) {
+            throw BadRequestException.messageKey("course.no_pending_content");
+        }
         
         // Publish domain event for course submission
         publishCourseSubmittedForReviewEvent(course, currentUser);

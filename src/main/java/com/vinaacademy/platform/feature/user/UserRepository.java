@@ -1,16 +1,18 @@
 package com.vinaacademy.platform.feature.user;
 
+import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
 
@@ -70,27 +72,34 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     // Count user's completed courses
     @Query("SELECT COUNT(e) FROM Enrollment e WHERE e.user.id = :userId AND e.status = 'COMPLETED'")
     long countCompletedCoursesByUserId(@Param("userId") UUID userId);
-    
+
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.code IN :roleCodes")
+    List<User> findAllByRolesCodeIn(@Param("roleCodes") List<String> roleCodes);
+
+    default List<User> findAllStaffAndAdminUsers() {
+        return findAllByRolesCodeIn(List.of(AuthConstants.STAFF_ROLE, AuthConstants.ADMIN_ROLE));
+    }
+
     // ==================== Admin Dashboard Queries ====================
-    
+
     /**
      * Đếm số users theo role và created sau một thời điểm
      * Dùng cho dashboard stats với time range
      */
     @Query("SELECT COUNT(DISTINCT u) FROM User u JOIN u.roles r " +
            "WHERE r.code = :roleCode AND u.createdDate >= :startDate")
-    Long countByRoleAndCreatedDateAfter(@Param("roleCode") String roleCode, 
+    Long countByRoleAndCreatedDateAfter(@Param("roleCode") String roleCode,
                                         @Param("startDate") LocalDateTime startDate);
-    
+
     /**
      * Đếm số users created trong khoảng thời gian
      * Dùng để so sánh với kỳ trước
      */
     @Query("SELECT COUNT(u) FROM User u " +
            "WHERE u.createdDate >= :startDate AND u.createdDate < :endDate")
-    Long countByCreatedDateBetween(@Param("startDate") LocalDateTime startDate, 
+    Long countByCreatedDateBetween(@Param("startDate") LocalDateTime startDate,
                                    @Param("endDate") LocalDateTime endDate);
-    
+
     /**
      * Đếm số users theo role created trong khoảng thời gian
      */
@@ -98,9 +107,9 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
            "WHERE r.code = :roleCode " +
            "AND u.createdDate >= :startDate AND u.createdDate < :endDate")
     Long countByRoleAndCreatedDateBetween(@Param("roleCode") String roleCode,
-                                         @Param("startDate") LocalDateTime startDate, 
+                                         @Param("startDate") LocalDateTime startDate,
                                          @Param("endDate") LocalDateTime endDate);
-    
+
     /**
      * Đếm active users (có enrollment sau một thời điểm)
      * Dùng cho retention rate calculation
@@ -108,7 +117,7 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     @Query("SELECT COUNT(DISTINCT e.user.id) FROM Enrollment e " +
            "WHERE e.startAt >= :startDate")
     Long countActiveUsersSince(@Param("startDate") LocalDateTime startDate);
-    
+
     /**
      * Lấy monthly user statistics cho 12 tháng
      * Returns: [year-month, count]
@@ -119,14 +128,14 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
            "GROUP BY TO_CHAR(u.createdDate, 'YYYY-MM') " +
            "ORDER BY TO_CHAR(u.createdDate, 'YYYY-MM')")
     List<Object[]> getMonthlyUserStats(@Param("startDate") LocalDateTime startDate);
-    
+
     /**
      * Đếm users theo role
      * Dùng cho phân tích student/instructor percentage
      */
     @Query("SELECT COUNT(DISTINCT u) FROM User u JOIN u.roles r WHERE r.code = :roleCode")
     Long countByRole(@Param("roleCode") String roleCode);
-    
+
     /**
      * Lấy recent instructors (giảng viên mới)
      * Chỉ lấy users có role INSTRUCTOR

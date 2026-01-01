@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.lesson.factory;
 
 import com.vinaacademy.platform.exception.ValidationException;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.reading.Reading;
@@ -39,6 +40,7 @@ public class ReadingLessonCreator extends LessonCreator {
         
         Reading reading = Reading.builder()
                 .title(request.getTitle())
+                .lessonStatus(LessonStatus.DRAFT)
                 .description(request.getDescription())
                 .section(section)
                 .free(request.isFree())

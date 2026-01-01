@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.lesson.dto;
 
 import com.vinaacademy.platform.feature.common.dto.BaseDto;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonType;
 import com.vinaacademy.platform.feature.lesson.entity.UserProgress;
 import com.vinaacademy.platform.feature.storage.dto.MediaFileDto;
@@ -24,6 +25,7 @@ public class LessonDto extends BaseDto {
     private String title;
     private String description;
     private LessonType type;
+    private LessonStatus lessonStatus;
     private boolean free;
     private int orderIndex;
     private UUID sectionId;

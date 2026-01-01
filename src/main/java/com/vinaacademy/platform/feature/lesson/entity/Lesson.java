@@ -1,15 +1,18 @@
 package com.vinaacademy.platform.feature.lesson.entity;
 
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonType;
 import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.storage.entity.MediaFile;
 import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
-import java.util.List;
-import java.util.UUID;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Getter
@@ -41,6 +44,11 @@ public abstract class Lesson extends BaseEntity {
     @Column(name = "lesson_type", nullable = false, insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     protected LessonType type = LessonType.READING;
+
+    @Column(name = "lesson_status", nullable = false)
+    @ColumnDefault("'DRAFT'")
+    @Enumerated(EnumType.STRING)
+    protected LessonStatus lessonStatus = LessonStatus.DRAFT;
 
     @Column(name = "is_free")
     protected boolean free = false;
