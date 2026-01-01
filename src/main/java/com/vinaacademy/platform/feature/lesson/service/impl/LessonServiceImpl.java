@@ -353,6 +353,9 @@ public class LessonServiceImpl implements LessonService {
     public void completeLesson(UUID lessonId) {
         User currentUser = securityHelper.getCurrentUser();
         Lesson lesson = findLessonById(lessonId);
+        if (lesson.getLessonStatus() != LessonStatus.PUBLISHED) {
+            throw BadRequestException.message("Bài học chưa được xuất bản, không thể đánh dấu hoàn thành");
+        }
 
         if (lesson.getType() == LessonType.QUIZ) {
             throw BadRequestException.message("Bài học này là bài kiểm tra, không thể đánh dấu hoàn thành");
