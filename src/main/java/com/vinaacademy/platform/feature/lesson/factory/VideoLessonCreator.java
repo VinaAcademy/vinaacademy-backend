@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.lesson.factory;
 
 import com.vinaacademy.platform.exception.ValidationException;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.section.entity.Section;
@@ -40,6 +41,7 @@ public class VideoLessonCreator extends LessonCreator {
         
         Video video = Video.builder()
                 .title(request.getTitle())
+                .lessonStatus(LessonStatus.DRAFT)
                 .description(request.getDescription())
                 .section(section)
                 .free(request.isFree())

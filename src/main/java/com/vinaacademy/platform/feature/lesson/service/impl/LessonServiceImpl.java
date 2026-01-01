@@ -5,6 +5,7 @@ import com.vinaacademy.platform.exception.NotFoundException;
 import com.vinaacademy.platform.exception.ValidationException;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonType;
 import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
@@ -36,12 +37,6 @@ import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
 import com.vinaacademy.platform.feature.user.auth.service.AuthorizationService;
 import com.vinaacademy.platform.feature.user.constant.ResourceConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +44,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -111,7 +113,7 @@ public class LessonServiceImpl implements LessonService {
 
         // Tạo lesson mới
 
-      return createLesson(request, currentUser);
+        return createLesson(request, currentUser);
     }
     
     private void publishCourseSubmittedForReviewEvent(Course course, User instructor) {
@@ -148,11 +150,13 @@ public class LessonServiceImpl implements LessonService {
 
         // Chỉ thay đổi trạng thái nếu là REJECTED hoặc PUBLISHED
         if (currentStatus == CourseStatus.REJECTED || currentStatus == CourseStatus.PUBLISHED) {
-            course.setStatus(CourseStatus.PENDING);
             publishCourseSubmittedForReviewEvent(course, author);
             // Ghi log việc thay đổi trạng thái
             log.info("Course status changed from {} to PENDING due to new lesson addition. Course ID: {}",
                     currentStatus, course.getId());
+        }
+        if (currentStatus == CourseStatus.REJECTED) {
+            course.setStatus(CourseStatus.PENDING);
         }
         course.setTotalLesson(course.getTotalLesson() + 1);
         courseRepository.save(course);
@@ -177,6 +181,11 @@ public class LessonServiceImpl implements LessonService {
 
         // Use the factory method to create the lesson
         Lesson lesson = creator.createLesson(request, section, author);
+        LessonStatus lessonStatus = section.getCourse().getStatus() == CourseStatus.DRAFT
+                ? LessonStatus.DRAFT
+                : LessonStatus.PENDING;
+        lesson.setLessonStatus(lessonStatus);
+        lessonRepository.save(lesson);
 
         // Attach documents if provided
         if (request.getAttachmentIds() != null && !request.getAttachmentIds().isEmpty()) {
@@ -246,6 +255,11 @@ public class LessonServiceImpl implements LessonService {
                 attachDocumentsToLesson(existingLesson, request.getAttachmentIds());
             }
         }
+
+        existingLesson.setLessonStatus(course.getStatus() == CourseStatus.DRAFT
+                ? LessonStatus.DRAFT
+                : LessonStatus.PENDING);
+        lessonRepository.save(existingLesson);
 
         // Cập nhật trạng thái khóa học sau khi cập nhật bài học
         boolean isQuizWithSettings = LessonType.QUIZ.equals(request.getType())

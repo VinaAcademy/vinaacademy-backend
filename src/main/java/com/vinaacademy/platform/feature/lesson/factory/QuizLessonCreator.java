@@ -1,6 +1,7 @@
 package com.vinaacademy.platform.feature.lesson.factory;
 
 import com.vinaacademy.platform.exception.ValidationException;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
@@ -44,6 +45,7 @@ public class QuizLessonCreator extends LessonCreator {
         Quiz quiz = Quiz.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
+                .lessonStatus(LessonStatus.DRAFT)
                 .section(section)
                 .free(request.isFree())
                 .orderIndex(request.getOrderIndex())

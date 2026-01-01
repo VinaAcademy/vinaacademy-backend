@@ -77,5 +77,6 @@ public interface LessonRepository extends JpaRepository<Lesson, UUID> {
 
     long countBySectionCourseId(UUID id);
 
-
+    @Query("SELECT l FROM Lesson l WHERE l.section.course.id = :id")
+    List<Lesson> findByCourseId(UUID id);
 }
