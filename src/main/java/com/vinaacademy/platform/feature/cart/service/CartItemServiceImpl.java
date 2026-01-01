@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -60,10 +61,14 @@ public class CartItemServiceImpl implements CartItemService{
 		if (cartItemRepository.existsByCourseIdAndCart(course.getId(), cart))
 			throw BadRequestException.message("Duplicate course: Course id này đã tồn tại trong giỏ hàng");
 		
+		if (course.getPrice().compareTo(BigDecimal.ZERO) == 0) {
+		    throw BadRequestException.message("Khóa học này FREE không thể thêm vào");
+		}
+		
 		CartItem cartItem = CartItem.builder()
 				.course(course)
 				.cart(cart)
-				.price(request.getPrice())
+				.price(course.getPrice())
 				.addedAt(LocalDateTime.now())
 				.build();
 		
