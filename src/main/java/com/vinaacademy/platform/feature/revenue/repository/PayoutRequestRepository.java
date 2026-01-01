@@ -40,4 +40,10 @@ public interface PayoutRequestRepository extends JpaRepository<PayoutRequest, Lo
     @Query("SELECT COUNT(p) FROM PayoutRequest p WHERE p.instructorId = :instructorId AND p.status IN ('PENDING', 'REVIEWING', 'APPROVED')")
     long countPendingRequestsByInstructor(@Param("instructorId") UUID instructorId);
     
+    /**
+     * Đếm số lượng yêu cầu rút tiền theo status
+     * Dùng cho admin dashboard
+     */
+    Long countByStatus(PayoutStatus status);
+    
 }

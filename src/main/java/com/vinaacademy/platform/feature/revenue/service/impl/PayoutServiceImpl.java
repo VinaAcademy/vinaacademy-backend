@@ -442,4 +442,15 @@ public class PayoutServiceImpl implements PayoutService {
         return payoutTransactionRepository.findByInstructorIdOrderByCreatedDateDesc(instructorId, pageable);
 	}
 
+	/**
+	 * Đếm số lượng yêu cầu rút tiền đang chờ xử lý
+	 * Dùng cho admin dashboard quick actions
+	 * 
+	 * @return Số lượng payout requests có status = PENDING
+	 */
+	@Override
+	public Long countPendingPayouts() {
+		return payoutRequestRepository.countByStatus(PayoutStatus.PENDING);
+	}
+
 }
