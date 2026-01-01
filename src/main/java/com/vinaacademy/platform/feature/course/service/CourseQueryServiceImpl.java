@@ -18,6 +18,7 @@ import com.vinaacademy.platform.feature.course.mapper.CourseMapper;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.course.repository.UserProgressRepository;
 import com.vinaacademy.platform.feature.course.repository.specification.CourseSpecBuilder;
+import com.vinaacademy.platform.feature.course.repository.specification.CourseSpecification;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
 import com.vinaacademy.platform.feature.enrollment.dto.EnrollmentProgressDto;
 import com.vinaacademy.platform.feature.enrollment.mapper.EnrollmentMapper;
@@ -324,6 +325,11 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         }
       }
     }
+
+    Specification<Course> pendingSpec = Specification.where(CourseSpecification.hasStatus(CourseStatus.PENDING))
+            .or(CourseSpecification.hasPendingLesson());
+    pendingSpec = pendingSpec.and(CourseSpecification.dontHasStatus(CourseStatus.DRAFT));
+    totalPending = courseRepository.count(pendingSpec);
 
     return CourseCountStatusDto.builder()
         .totalPending(totalPending)

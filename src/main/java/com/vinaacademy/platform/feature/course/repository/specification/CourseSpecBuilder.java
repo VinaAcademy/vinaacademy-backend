@@ -41,12 +41,19 @@ public class CourseSpecBuilder {
      * @return Specification for admin course search
      */
     public static Specification<Course> buildAdminSearch(CourseSearchRequest searchRequest) {
-        return Specification.where(CourseSpecification.hasKeyword(searchRequest.getKeyword()))
-                .and(CourseSpecification.hasStatus(
-                        searchRequest.getStatus() != null ? searchRequest.getStatus() : null))
-                .and(CourseSpecification.dontHasStatus(CourseStatus.DRAFT))
+        Specification<Course> spec = Specification.where(CourseSpecification.hasKeyword(searchRequest.getKeyword()));
+
+        if (searchRequest.getStatus() == CourseStatus.PENDING) {
+            spec = spec.and(Specification.where(CourseSpecification.hasStatus(CourseStatus.PENDING))
+                    .or(CourseSpecification.hasPendingLesson()));
+        } else {
+            spec = spec.and(CourseSpecification.hasStatus(
+                    searchRequest.getStatus() != null ? searchRequest.getStatus() : null));
+        }
+
+        return spec.and(CourseSpecification.dontHasStatus(CourseStatus.DRAFT))
                 .and(CourseSpecification.hasCategory(searchRequest.getCategorySlug()))
-        .and(CourseSpecification.hasCategories(searchRequest.getCategorieSlugs()))
+                .and(CourseSpecification.hasCategories(searchRequest.getCategorieSlugs()))
                 .and(CourseSpecification.hasLevel(searchRequest.getLevel()))
                 .and(CourseSpecification.hasLanguage(searchRequest.getLanguage()))
                 .and(CourseSpecification.hasMinPrice(searchRequest.getMinPrice()))

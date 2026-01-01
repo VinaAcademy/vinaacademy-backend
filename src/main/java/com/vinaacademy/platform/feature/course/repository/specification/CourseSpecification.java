@@ -3,6 +3,7 @@ package com.vinaacademy.platform.feature.course.repository.specification;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
@@ -49,6 +50,15 @@ public class CourseSpecification {
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.equal(root.get("status"), status);
+        };
+    }
+
+    public static Specification<Course> hasPendingLesson() {
+        return (root, query, criteriaBuilder) -> {
+            Join<Object, Object> sections = root.join("sections", JoinType.LEFT);
+            Join<Object, Object> lessons = sections.join("lessons", JoinType.LEFT);
+            query.distinct(true);
+            return criteriaBuilder.equal(lessons.get("lessonStatus"), LessonStatus.PENDING);
         };
     }
 

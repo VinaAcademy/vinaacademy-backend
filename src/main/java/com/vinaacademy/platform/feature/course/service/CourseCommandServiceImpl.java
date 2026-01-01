@@ -179,6 +179,16 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         course.setStatus(status);
         courseRepository.save(course);
 
+        List<Lesson> pendingLessons = lessonRepository.findByCourseIdAndLessonStatus(course.getId(), LessonStatus.PENDING);
+        for (Lesson lesson : pendingLessons) {
+            if (status == CourseStatus.PUBLISHED) {
+                lesson.setLessonStatus(LessonStatus.PUBLISHED);
+            } else if (status == CourseStatus.REJECTED) {
+                lesson.setLessonStatus(LessonStatus.REJECTED);
+            }
+            lessonRepository.save(lesson);
+        }
+
         // Publish domain event for status change
         publishCourseStatusChangedEvent(course, previousStatus, status, courseStatusRequest.getContent());
 

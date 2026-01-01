@@ -1,10 +1,7 @@
 package com.vinaacademy.platform.feature.lesson;
 
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
-import com.vinaacademy.platform.feature.lesson.dto.LessonDto;
-import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
-import com.vinaacademy.platform.feature.lesson.dto.TTSRequestDto;
-import com.vinaacademy.platform.feature.lesson.dto.TTSResponseDto;
+import com.vinaacademy.platform.feature.lesson.dto.*;
 import com.vinaacademy.platform.feature.lesson.service.LessonReorderService;
 import com.vinaacademy.platform.feature.lesson.service.LessonService;
 import com.vinaacademy.platform.feature.lesson.service.LessonTTSService;
@@ -18,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -97,6 +93,13 @@ public class LessonController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<LessonDto> createLesson(@RequestBody @Valid LessonRequest request) {
         return ApiResponse.success(lessonService.createLesson(request));
+    }
+
+    @HasAnyRole({AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE})
+    @PostMapping("/moderate")
+    public ApiResponse<?> moderateLesson(@RequestBody @Valid LessonReviewRequest request) {
+        lessonService.moderateLesson(request);
+        return ApiResponse.success("Kiểm duyệt bài học thành công");
     }
 
     @Operation(summary = "Update lesson")

@@ -1,25 +1,25 @@
 package com.vinaacademy.platform.feature.course.event.listener;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-
 import com.vinaacademy.platform.configuration.AppConfig;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.event.CourseStatusChangedEvent;
 import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
 import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentRepository;
+import com.vinaacademy.platform.feature.user.UserRepository;
+import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.kafka.NotificationProducer;
 import com.vinaacademy.platform.kafka.VectorUpdateProducer;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import vn.vinaacademy.kafka.event.CourseEmbeddedEvent;
 import vn.vinaacademy.kafka.event.NotificationCreateEvent;
 import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Event listener for course-related domain events. Handles notifications and
@@ -32,6 +32,7 @@ public class CourseEventListener {
 	private final NotificationProducer notificationProducer;
 	private final VectorUpdateProducer vectorUpdateProducer;
 	private final EnrollmentRepository enrollmentRepository;
+	private final UserRepository userRepository;
 
 	/**
 	 * Handle course status changed events by sending notifications to instructors
@@ -124,7 +125,18 @@ public class CourseEventListener {
 		log.info("Course {} ({}) submitted for review by instructor: {}", event.getCourseName(), event.getCourseId(),
 				event.getInstructorId());
 
-		// TODO: Implement notification to staff/admin users about course submission
 		// This could query for all users with STAFF/ADMIN roles and send notifications
+		List<User> staffUsers = userRepository.findAllStaffAndAdminUsers();
+		staffUsers.forEach(user -> {
+			NotificationCreateEvent notification = NotificationCreateEvent.builder()
+					.title("Khóa học mới chờ duyệt: " + event.getCourseName())
+					.content("Khóa học \"" + event.getCourseName() + "\" đã được gửi để xem xét.")
+					.targetUrl(String.format("%s/admin/courses/requests", AppConfig.INSTANCE.getFrontendUrl()))
+					.userId(user.getId())
+					.type(NotificationType.COURSE_REVIEW)
+					.build();
+			notificationProducer.sendNotification(notification);
+		});
+		log.debug("Submission notifications sent to staff/admin users for course: {}", event.getCourseId());
 	}
 }

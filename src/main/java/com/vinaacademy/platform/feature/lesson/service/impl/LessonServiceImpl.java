@@ -7,15 +7,19 @@ import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonType;
+import com.vinaacademy.platform.feature.course.event.CourseStatusChangedEvent;
 import com.vinaacademy.platform.feature.course.event.CourseSubmittedForReviewEvent;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.course.repository.UserProgressRepository;
+import com.vinaacademy.platform.feature.course.service.CourseCommandServiceImpl;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
 import com.vinaacademy.platform.feature.enrollment.enums.ProgressStatus;
 import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentRepository;
 import com.vinaacademy.platform.feature.enrollment.service.EnrollmentService;
+import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import com.vinaacademy.platform.feature.lesson.dto.LessonDto;
 import com.vinaacademy.platform.feature.lesson.dto.LessonRequest;
+import com.vinaacademy.platform.feature.lesson.dto.LessonReviewRequest;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.lesson.entity.UserProgress;
 import com.vinaacademy.platform.feature.lesson.factory.LessonCreator;
@@ -46,10 +50,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +70,8 @@ public class LessonServiceImpl implements LessonService {
     private final EnrollmentService enrollmentService;
     private final MediaFileRepository mediaFileRepository;
     private final S3Service s3Service;
+
+    private final CourseCommandServiceImpl courseCommandService;
 
     @Autowired
     private LessonMapper lessonMapper;
@@ -334,7 +337,7 @@ public class LessonServiceImpl implements LessonService {
         CourseStatus currentStatus = course.getStatus();
 
         // Chỉ thay đổi trạng thái nếu là REJECTED hoặc PUBLISHED
-        if (currentStatus == CourseStatus.REJECTED || currentStatus == CourseStatus.PUBLISHED) {
+        if (currentStatus == CourseStatus.REJECTED) {
             course.setStatus(CourseStatus.PENDING);
             courseRepository.save(course);
 
@@ -649,5 +652,58 @@ public class LessonServiceImpl implements LessonService {
         
         log.info("Generated presigned URL for attachment {} in lesson {}", attachmentId, lessonId);
         return presignedUrl;
+    }
+
+    @Transactional
+    @Override
+    public void moderateLesson(LessonReviewRequest request) {
+        List<Lesson> lessons = lessonRepository.findAllById(request.getLessonIds());
+        Set<Course> affectedCourses = new HashSet<>();
+        for (Lesson lesson : lessons) {
+            lesson.setLessonStatus(request.getStatus());
+            lessonRepository.save(lesson);
+            affectedCourses.add(lesson.getSection().getCourse());
+        }
+        // Cập nhật trạng thái khóa học liên quan
+        for (Course course : affectedCourses) {
+            updateCourseStatusAfterModifyingLessons(course);
+            publishCourseStatusChangedEvent(course,
+                    course.getStatus(), request.getStatus() == LessonStatus.PUBLISHED
+                            ? CourseStatus.PUBLISHED
+                            : CourseStatus.REJECTED,
+                    "Lesson moderation changed to " + request.getStatus());
+        }
+    }
+
+    /**
+     * Publish course status changed event
+     */
+    private void publishCourseStatusChangedEvent(Course course, CourseStatus previousStatus, CourseStatus newStatus, String content) {
+        try {
+            User currentUser = securityHelper.getCurrentUser();
+            UUID owner = course.getInstructors().stream()
+                    .filter(CourseInstructor::getIsOwner)
+                    .findFirst()
+                    .map(ci -> ci.getInstructor().getId())
+                    .orElse(course.getInstructors().get(0).getInstructor().getId());
+
+            CourseStatusChangedEvent event = CourseStatusChangedEvent.builder()
+                    .courseId(course.getId())
+                    .courseSlug(course.getSlug())
+                    .courseName(course.getName())
+                    .previousStatus(previousStatus)
+                    .newStatus(newStatus)
+                    .actorId(currentUser.getId())
+                    .timestamp(LocalDateTime.now())
+                    .content(content)
+                    .owner(owner)
+                    .build();
+
+            eventPublisher.publishEvent(event);
+            log.debug("Published course status changed event for course: {}", course.getId());
+        } catch (Exception e) {
+            log.error("Failed to publish course status changed event for course: {}", course.getId(), e);
+            // Don't rethrow as event publishing failure should not break the main operation
+        }
     }
 }

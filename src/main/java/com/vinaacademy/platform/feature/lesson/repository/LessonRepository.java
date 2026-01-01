@@ -1,5 +1,6 @@
 package com.vinaacademy.platform.feature.lesson.repository;
 
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.lesson.repository.projection.LessonAccessInfoDto;
 import com.vinaacademy.platform.feature.section.entity.Section;
@@ -79,4 +80,7 @@ public interface LessonRepository extends JpaRepository<Lesson, UUID> {
 
     @Query("SELECT l FROM Lesson l WHERE l.section.course.id = :id")
     List<Lesson> findByCourseId(UUID id);
+
+    @Query("SELECT l FROM Lesson l WHERE l.section.course.id = :courseId AND l.lessonStatus = :lessonStatus")
+    List<Lesson> findByCourseIdAndLessonStatus(UUID courseId, LessonStatus lessonStatus);
 }
