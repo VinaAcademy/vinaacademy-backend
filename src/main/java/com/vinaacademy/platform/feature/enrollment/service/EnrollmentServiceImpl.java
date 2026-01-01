@@ -5,6 +5,7 @@ import com.vinaacademy.platform.feature.common.exception.ResourceNotFoundExcepti
 import com.vinaacademy.platform.feature.common.response.PaginationResponse;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+import com.vinaacademy.platform.feature.course.permission.CoursePermissionService;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
 import com.vinaacademy.platform.feature.enrollment.dto.EnrollmentRequest;
@@ -45,6 +46,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	private final CourseInstructorRepository courseInstructorRepository;
 	private final StudentProgressMapper studentProgressMapper;
 	private final OrderRepository orderRepository;
+	private final CoursePermissionService coursePermissionService;
 
 	@Override
 	@Transactional
@@ -64,8 +66,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
 		if (course.getStatus() != CourseStatus.PUBLISHED)
 			throw BadRequestException.message("Khóa học này chưa được xuất bản");
-
-		if (course.getPrice().longValue() != 0) {
+		
+		boolean canAccess = coursePermissionService.canAccessCourseForLearning(course.getId(), userId);
+		
+		if (course.getPrice().longValue() != 0 && !canAccess) {
 			// because price > 0 so check if user has order complete for this course (anti bypass course)
 			Optional<Order> order = orderRepository.findFirstByUser_IdAndOrderItems_Course_IdAndStatusOrderByCreatedDateAsc(userId, course.getId(),
 					OrderStatus.PAID);

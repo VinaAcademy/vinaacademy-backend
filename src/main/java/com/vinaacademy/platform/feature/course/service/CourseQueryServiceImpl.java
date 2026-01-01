@@ -15,6 +15,7 @@ import com.vinaacademy.platform.feature.course.dto.RecentCoursesDto;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.mapper.CourseMapper;
+import com.vinaacademy.platform.feature.course.permission.CoursePermissionService;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.course.repository.UserProgressRepository;
 import com.vinaacademy.platform.feature.course.repository.specification.CourseSpecBuilder;
@@ -68,6 +69,7 @@ public class CourseQueryServiceImpl implements CourseQueryService {
   private final CourseMapper courseMapper;
   private final SecurityHelper securityHelper;
   private final CourseAssembler courseAssembler;
+  private final CoursePermissionService coursePermissionService;
 
   @Override
   @Cacheable(value = "courseDetails", key = "#slug", unless = "#result == null")
@@ -219,7 +221,8 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     // Set enrollment progress
     List<User> instructors =
         course.getInstructors().stream().map(CourseInstructor::getInstructor).toList();
-
+    
+    
     if (!securityHelper.hasAnyRole(AuthConstants.ADMIN_ROLE, AuthConstants.STAFF_ROLE)
         && !instructors.contains(currentUser)) {
       Enrollment courseEnrollment =
