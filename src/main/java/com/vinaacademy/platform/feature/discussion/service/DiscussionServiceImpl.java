@@ -57,16 +57,32 @@ public class DiscussionServiceImpl implements DiscussionService {
 				UUID receiver = parentComment.getUser().getId();
 				if (!receiver.equals(user.getId())) {
 					NotificationCreateEvent notification = NotificationCreateEvent.builder()
-							.title(user.getFullName() + " đã phản hồi bình luận của bạn").content("Khóa học: "+coursereal.getName())
-							.targetUrl("/learning/"+coursereal.getSlug()+"/lecture/"+lesson.getId())
-							.userId(receiver)
-							.type(NotificationType.SYSTEM).build();
-					log.info("send noti reply to user: {}, slug: {}, lessonId: {}", receiver, coursereal.getSlug(), lesson.getId());
+							.title(user.getFullName() + " đã phản hồi bình luận của bạn")
+							.content("Khóa học: " + coursereal.getName())
+							.targetUrl("/learning/" + coursereal.getSlug() + "/lecture/" + lesson.getId())
+							.userId(receiver).type(NotificationType.SYSTEM).build();
+					log.info("send noti reply to user: {}, slug: {}, lessonId: {}", receiver, coursereal.getSlug(),
+							lesson.getId());
 					notificationProducer.sendNotification(notification);
 				}
-				
+
 			}
-			
+
+		} else {
+			if (course.isPresent()) {
+				Course coursereal = course.get();
+				UUID insId = lesson.getAuthor().getId();
+				if (!insId.equals(user.getId())) {
+					NotificationCreateEvent notification = NotificationCreateEvent.builder()
+							.title(user.getFullName() + " đã bình luận vào khóa học của bạn")
+							.content("Khóa học: " + coursereal.getName()).targetUrl("/instructor/courses/"
+									+ coursereal.getId() + "/analytics?tab=feedback&lesson=" + lesson.getId())
+							.userId(insId).type(NotificationType.SYSTEM).build();
+					log.info("send noti feedback to instructor: {}, slug: {}, lessonId: {}", insId,
+							coursereal.getSlug(), lesson.getId());
+					notificationProducer.sendNotification(notification);
+				}
+			}
 		}
 
 		Discussion discussion = Discussion.builder().lesson(lesson).user(user).comment(request.getComment())
@@ -81,7 +97,8 @@ public class DiscussionServiceImpl implements DiscussionService {
 	@Override
 	public Page<DiscussionDto> getRepliesWithReplyCount(UUID parentId, Pageable pageable) {
 		UUID currentUserId = securityHelper.getCurrentUser().getId();
-		Page<DiscussionSummaryDto> pageResult = discussionRepository.findReplySummariesWithPriority(parentId, currentUserId, pageable);
+		Page<DiscussionSummaryDto> pageResult = discussionRepository.findReplySummariesWithPriority(parentId,
+				currentUserId, pageable);
 
 		return pageResult.map(p -> DiscussionDto.builder().id(p.getId()).comment(p.getComment())
 				.lessonId(p.getLessonId()).userId(p.getUserId()).replyCount(p.getReplyCount())
@@ -93,8 +110,8 @@ public class DiscussionServiceImpl implements DiscussionService {
 	@Override
 	public Page<DiscussionDto> getRootCommentsWithReplyCount(UUID lessonId, Pageable pageable) {
 		UUID currentUserId = securityHelper.getCurrentUser().getId();
-		Page<DiscussionSummaryDto> pageResult = discussionRepository.findRootCommentSummariesWithPriority(lessonId, currentUserId,
-				pageable);
+		Page<DiscussionSummaryDto> pageResult = discussionRepository.findRootCommentSummariesWithPriority(lessonId,
+				currentUserId, pageable);
 
 		return pageResult.map(p -> DiscussionDto.builder().id(p.getId()).comment(p.getComment())
 				.lessonId(p.getLessonId()).userId(p.getUserId()).replyCount(p.getReplyCount())
