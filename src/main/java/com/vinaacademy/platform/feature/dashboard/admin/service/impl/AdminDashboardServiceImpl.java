@@ -43,8 +43,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private final EnrollmentRepository enrollmentRepository;
     private final PayoutService payoutService;
 
-    private static final String ROLE_INSTRUCTOR = "INSTRUCTOR";
-    private static final String ROLE_STUDENT = "STUDENT";
+    private static final String ROLE_INSTRUCTOR = "instructor";
+    private static final String ROLE_STUDENT = "student";
     private static final BigDecimal PLATFORM_FEE_RATE = new BigDecimal("0.20"); // 20%
 
     @Override
