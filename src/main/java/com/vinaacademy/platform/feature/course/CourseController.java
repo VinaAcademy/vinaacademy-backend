@@ -433,6 +433,56 @@ public class CourseController {
     return ApiResponse.success(courseQueryService.getCourseLearningById(id));
   }
 
+  @GetMapping("/by-id/{id}/can-access-learning")
+  @PreAuthorize("isAuthenticated()")
+  @Operation(
+      summary = "Check learning access (Authenticated users only)",
+      description =
+          "Checks whether the current user can access the course for learning based on enrollment or instructor/admin permissions.",
+      parameters = {
+        @Parameter(
+            name = "id",
+            description = "Course UUID",
+            example = "550e8400-e29b-41d4-a716-446655440000")
+      })
+  public ApiResponse<Boolean> canAccessCourseForLearning(@PathVariable UUID id) {
+    User currentUser = securityHelper.getCurrentUser();
+    boolean canAccess = coursePermissionService.canAccessCourseForLearning(id, currentUser.getId());
+    log.debug(
+        "Learning access check for courseId={}, userId={}, result={}",
+        id,
+        currentUser.getId(),
+        canAccess);
+    return ApiResponse.success(canAccess);
+  }
+
+  @GetMapping("/by-id/{id}/is-instructor")
+  @PreAuthorize("isAuthenticated()")
+  @Operation(
+      summary = "Check instructor ownership (Authenticated users only)",
+      description =
+          "Checks whether the specified user is an instructor of the course. Useful for client-side gating of instructor-only actions.",
+      parameters = {
+        @Parameter(
+            name = "id",
+            description = "Course UUID",
+            example = "550e8400-e29b-41d4-a716-446655440000"),
+        @Parameter(
+            name = "userId",
+            description = "User UUID to verify",
+            example = "550e8400-e29b-41d4-a716-446655440001")
+      })
+  public ApiResponse<Boolean> isInstructorOfCourse(
+      @PathVariable UUID id, @RequestParam UUID userId) {
+    boolean isInstructor = coursePermissionService.isInstructorOfCourse(id, userId);
+    log.debug(
+        "Instructor ownership check for courseId={}, userId={}, result={}",
+        id,
+        userId,
+        isInstructor);
+    return ApiResponse.success(isInstructor);
+  }
+
   @GetMapping("/by-id/{id}")
   @Operation(
       summary = "Get course by ID",
