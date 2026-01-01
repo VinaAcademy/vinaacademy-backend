@@ -91,4 +91,24 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
                           @Param("reason") String reason,
                           @Param("hiddenBy") UUID hiddenBy);
 
+    // ==================== Admin Dashboard Queries ====================
+    
+    /**
+     * Lấy recent reviews (không bị ẩn)
+     * Dùng cho dashboard recent activities
+     */
+    @Query("SELECT cr FROM CourseReview cr " +
+           "WHERE cr.isHidden = false OR cr.isHidden IS NULL " +
+           "ORDER BY cr.createdDate DESC")
+    Page<CourseReview> findRecentReviews(Pageable pageable);
+    
+    /**
+     * Đếm reviews created sau một thời điểm
+     */
+    @Query("SELECT COUNT(cr) FROM CourseReview cr " +
+           "WHERE cr.createdDate >= :startDate " +
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL)")
+    Long countReviewsSince(@Param("startDate") LocalDateTime startDate);
+
 }
+

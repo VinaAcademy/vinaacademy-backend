@@ -324,4 +324,66 @@ public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecif
             """)
     long countLowRatedCourses(@Param("status") CourseStatus status, @Param("threshold") double threshold);
 
+    // ==================== Admin Dashboard Queries ====================
+    
+    /**
+     * Đếm courses created sau một thời điểm
+     * Dùng cho dashboard stats
+     */
+    @Query("SELECT COUNT(c) FROM Course c WHERE c.createdDate >= :startDate")
+    Long countByCreatedDateAfter(@Param("startDate") java.time.LocalDateTime startDate);
+    
+    /**
+     * Đếm courses theo status created sau một thời điểm
+     */
+    @Query("SELECT COUNT(c) FROM Course c " +
+           "WHERE c.status = :status AND c.createdDate >= :startDate")
+    Long countByStatusAndCreatedDateAfter(@Param("status") CourseStatus status,
+                                          @Param("startDate") java.time.LocalDateTime startDate);
+    
+    /**
+     * Đếm courses created trong khoảng thời gian
+     */
+    @Query("SELECT COUNT(c) FROM Course c " +
+           "WHERE c.createdDate >= :startDate AND c.createdDate < :endDate")
+    Long countByCreatedDateBetween(@Param("startDate") java.time.LocalDateTime startDate,
+                                   @Param("endDate") java.time.LocalDateTime endDate);
+    
+    /**
+     * Lấy monthly course creation trend
+     * Returns: [year-month, created_count, published_count]
+     */
+    @Query("SELECT TO_CHAR(c.createdDate, 'YYYY-MM') as month, " +
+           "COUNT(c) as courseCount, " +
+           "SUM(CASE WHEN c.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedCount " +
+           "FROM Course c " +
+           "WHERE c.createdDate >= :startDate " +
+           "GROUP BY TO_CHAR(c.createdDate, 'YYYY-MM') " +
+           "ORDER BY TO_CHAR(c.createdDate, 'YYYY-MM')")
+    List<Object[]> getMonthlyCourseTrend(@Param("startDate") java.time.LocalDateTime startDate);
+    
+    /**
+     * Lấy top courses theo số lượng students
+     * Returns courses với enrollment count
+     */
+    @Query("SELECT c FROM Course c " +
+           "WHERE c.status = 'PUBLISHED' " +
+           "ORDER BY c.totalStudent DESC")
+    Page<Course> findTopCoursesByStudents(Pageable pageable);
+    
+    /**
+     * Lấy recent published courses
+     */
+    @Query("SELECT c FROM Course c " +
+           "WHERE c.status = 'PUBLISHED' " +
+           "ORDER BY c.createdDate DESC")
+    Page<Course> findRecentPublishedCourses(Pageable pageable);
+    
+    /**
+     * Lấy recent courses (bất kể status)
+     */
+    @Query("SELECT c FROM Course c ORDER BY c.createdDate DESC")
+    Page<Course> findRecentCourses(Pageable pageable);
+
 }
+

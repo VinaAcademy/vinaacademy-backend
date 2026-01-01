@@ -23,4 +23,10 @@ public interface PayoutService {
 	Page<WalletTransaction> getWalletTransactions(UUID instructorId, Pageable pageable);
 	Page<PayoutTransaction> getPayoutTransactions(UUID instructorId, Pageable pageable);
 	WalletBalanceDto getWalletBalance();
+	
+	/**
+	 * Đếm số lượng yêu cầu rút tiền đang chờ xử lý
+	 * Dùng cho admin dashboard quick actions
+	 */
+	Long countPendingPayouts();
 }
