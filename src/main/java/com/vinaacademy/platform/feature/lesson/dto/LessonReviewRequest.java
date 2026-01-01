@@ -15,5 +15,6 @@ import java.util.UUID;
 public class LessonReviewRequest {
     @NotNull(message = "Lesson IDs cannot be null")
     private List<UUID> lessonIds;
+    @NotNull(message = "Status cannot be null")
     private LessonStatus status;
 }

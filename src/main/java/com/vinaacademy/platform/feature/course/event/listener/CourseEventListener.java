@@ -64,19 +64,19 @@ public class CourseEventListener {
 	public void handleCourseSubmittedForReview(CourseSubmittedForReviewEvent event) {
 		try {
 			log.debug("Handling course submitted for review event for course: {}", event.getCourseId());
-			
+
 			List<UUID> enrollments = enrollmentRepository.findUserIdsByCourseId(event.getCourseId());
 			sendSubmissionNotification(event); //gui noti cho admin staff
-			
+
 			//gui Noti cho toàn bộ học viên đã tham gia khóa này
 			enrollments.forEach(enroll->{
 				NotificationCreateEvent notification = NotificationCreateEvent.builder().title("Khóa học "+event.getCourseName()+" đang được cập nhật lại").content("Slug: "+event.getCourseName())
 	    				.targetUrl(null).userId(enroll).type(NotificationType.SYSTEM).build();
 				notificationProducer.sendNotification(notification);
 			});
-			
-    		
-    		
+
+
+
 			CourseEmbeddedEvent courseEmbeddedEvent = CourseEmbeddedEvent.builder()
 					.id(event.getCourseId())
 					.title(event.getCourseName())
@@ -108,7 +108,7 @@ public class CourseEventListener {
 		}
 		NotificationCreateEvent notification = NotificationCreateEvent.builder().title(title).content(content)
 				.targetUrl(url).userId(event.getOwner()).type(NotificationType.COURSE_APPROVAL).build();
-		
+
 		notificationProducer.sendNotification(notification);
 		log.debug("Status change notification sent to instructor: {} for course: {}", event.getOwner(),
 				event.getCourseId());
@@ -126,7 +126,8 @@ public class CourseEventListener {
 				event.getInstructorId());
 
 		// This could query for all users with STAFF/ADMIN roles and send notifications
-		List<User> staffUsers = userRepository.findAllStaffAndAdminUsers();
+        List<User> staffUsers = userRepository.findAllStaffAndAdminUsers().stream()
+                .limit(5).toList();
 		staffUsers.forEach(user -> {
 			NotificationCreateEvent notification = NotificationCreateEvent.builder()
 					.title("Khóa học mới chờ duyệt: " + event.getCourseName())
