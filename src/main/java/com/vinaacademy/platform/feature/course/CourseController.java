@@ -305,7 +305,7 @@ public class CourseController {
   @Operation(
       summary = "Update course status (Admin/Staff only)",
       description =
-          "Updates the status of a course. Only admins and staff can change course status between DRAFT, PENDING_APPROVAL, PUBLISHED, and ARCHIVED states.",
+          "Updates the status of a course. Only admins and staff can change course status between DRAFT, PENDING, PUBLISHED, and REJECTED states.",
       parameters = {
         @Parameter(
             name = "id",
