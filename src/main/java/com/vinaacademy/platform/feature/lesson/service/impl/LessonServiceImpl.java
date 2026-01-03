@@ -99,7 +99,6 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    @Transactional
     @RequiresResourcePermission(
             resourceType = ResourceConstants.SECTION,
             permission = ResourceConstants.VIEW_OWN,
@@ -166,7 +165,6 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    @Transactional
     @RequiresResourcePermission(
             resourceType = ResourceConstants.SECTION,
             permission = ResourceConstants.VIEW_OWN,
