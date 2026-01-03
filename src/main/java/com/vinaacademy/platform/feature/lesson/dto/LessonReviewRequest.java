@@ -17,4 +17,5 @@ public class LessonReviewRequest {
     private List<UUID> lessonIds;
     @NotNull(message = "Status cannot be null")
     private LessonStatus status;
+    private String content;
 }

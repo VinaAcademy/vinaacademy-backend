@@ -95,7 +95,7 @@ public class CourseEventListener {
 	}
 
 	private void sendStatusChangeNotification(CourseStatusChangedEvent event) {
-		String title = "Khóa học của bạn ";
+		String title = event.getTitle()+" ";
 		String content = "";
 
 		String url = String.format("%s/instructor/courses/%s/content", AppConfig.INSTANCE.getFrontendUrl(),
