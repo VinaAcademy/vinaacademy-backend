@@ -202,7 +202,7 @@ public class GlobalExceptionHandlerAdvice extends ResponseEntityExceptionHandler
         logger.error("DuplicateVnpayTransactionException: " + e.getMessage(), e);
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(409, e.getMessage()));
+                .body(ApiResponse.error(409, "Conflict duplicate transaction"));
     }
 
     /**
@@ -257,7 +257,7 @@ public class GlobalExceptionHandlerAdvice extends ResponseEntityExceptionHandler
         logger.error("Generic Exception: " + e.getMessage(), e);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(500, e.getMessage()));
+                .body(ApiResponse.error(500, resolveMessage("operation.failed", null, null)));
     }
 
     /**

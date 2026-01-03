@@ -44,6 +44,8 @@ import com.vinaacademy.platform.feature.user.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -675,7 +677,7 @@ public class LessonServiceImpl implements LessonService {
                     course.getStatus(), request.getStatus() == LessonStatus.PUBLISHED
                             ? CourseStatus.PUBLISHED
                             : CourseStatus.REJECTED,
-                    request.getContent(), "Bài học '"+nameLesson+"' của bạn");
+                    request.getContent(), StringEscapeUtils.escapeHtml("Bài học '"+nameLesson+"' của bạn"));
         }
     }
 
