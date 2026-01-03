@@ -28,7 +28,7 @@ public interface CourseCommandService {
      * @param request The course update request
      * @return Updated course DTO
      */
-    CourseDto updateCourse(UUID id, CourseRequest request);
+    CourseDto updateCourse(UUID id, CourseRequest request, boolean statusSubmitForReview);
 
     /**
      * Delete a course
