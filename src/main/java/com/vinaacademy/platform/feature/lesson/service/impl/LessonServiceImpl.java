@@ -677,7 +677,7 @@ public class LessonServiceImpl implements LessonService {
                     course.getStatus(), request.getStatus() == LessonStatus.PUBLISHED
                             ? CourseStatus.PUBLISHED
                             : CourseStatus.REJECTED,
-                    request.getContent(), StringEscapeUtils.escapeHtml("Bài học '"+nameLesson+"' của bạn"));
+                    request.getContent(), "Bài học '"+nameLesson+"' của bạn");
         }
     }
 
