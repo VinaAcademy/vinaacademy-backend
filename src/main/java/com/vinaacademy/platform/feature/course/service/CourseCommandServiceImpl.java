@@ -297,6 +297,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
                     .actorId(currentUser.getId())
                     .timestamp(LocalDateTime.now())
                     .content(content)
+                    .title(course.getName())
                     .owner(owner)
                     .build();
 

@@ -44,6 +44,8 @@ import com.vinaacademy.platform.feature.user.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -99,7 +101,6 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    @Transactional
     @RequiresResourcePermission(
             resourceType = ResourceConstants.SECTION,
             permission = ResourceConstants.VIEW_OWN,
@@ -166,7 +167,6 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    @Transactional
     @RequiresResourcePermission(
             resourceType = ResourceConstants.SECTION,
             permission = ResourceConstants.VIEW_OWN,
@@ -662,11 +662,14 @@ public class LessonServiceImpl implements LessonService {
     public void moderateLesson(LessonReviewRequest request) {
         List<Lesson> lessons = lessonRepository.findAllById(request.getLessonIds());
         Set<Course> affectedCourses = new HashSet<>();
+        String nameLesson = "";
         for (Lesson lesson : lessons) {
             lesson.setLessonStatus(request.getStatus());
             lessonRepository.save(lesson);
             affectedCourses.add(lesson.getSection().getCourse());
+            nameLesson = lesson.getTitle();
         }
+        
         // Cập nhật trạng thái khóa học liên quan
         for (Course course : affectedCourses) {
             updateCourseStatusAfterModifyingLessons(course);
@@ -674,14 +677,14 @@ public class LessonServiceImpl implements LessonService {
                     course.getStatus(), request.getStatus() == LessonStatus.PUBLISHED
                             ? CourseStatus.PUBLISHED
                             : CourseStatus.REJECTED,
-                    "Lesson moderation changed to " + request.getStatus());
+                    request.getContent(), StringEscapeUtils.escapeHtml("Bài học '"+nameLesson+"' của bạn"));
         }
     }
 
     /**
      * Publish course status changed event
      */
-    private void publishCourseStatusChangedEvent(Course course, CourseStatus previousStatus, CourseStatus newStatus, String content) {
+    private void publishCourseStatusChangedEvent(Course course, CourseStatus previousStatus, CourseStatus newStatus, String content, String title) {
         try {
             User currentUser = securityHelper.getCurrentUser();
             UUID owner = course.getInstructors().stream()
@@ -699,6 +702,7 @@ public class LessonServiceImpl implements LessonService {
                     .actorId(currentUser.getId())
                     .timestamp(LocalDateTime.now())
                     .content(content)
+                    .title(title)
                     .owner(owner)
                     .build();
 

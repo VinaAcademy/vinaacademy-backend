@@ -5,7 +5,10 @@ import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 import com.vinaacademy.platform.feature.common.exception.ResourceNotFoundException;
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
 import com.vinaacademy.platform.feature.common.service.MessageService;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +19,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -83,25 +90,64 @@ public class GlobalExceptionHandlerAdvice extends ResponseEntityExceptionHandler
                 .body(ApiResponse.error(403, message));
     }
 
+    
+
     /**
-     * Handle validation errors with i18n support
+     * Handle constraint violation exceptions (for @Valid on path/query parameters)
+     */
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException e) {
+        logger.error("ConstraintViolationException: " + e.getMessage(), e);
+
+        String errors = e.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(400, errors));
+    }
+
+   
+
+    /**
+     * Handle missing request parameters
      */
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
-        logger.error("MethodArgumentNotValidException: " + e.getMessage(), e);
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException e,
+                                                                         HttpHeaders headers,
+                                                                         HttpStatusCode status,
+                                                                         WebRequest request) {
+        logger.error("MissingServletRequestParameterException: " + e.getMessage(), e);
 
-        List<String> errors = e.getBindingResult().getFieldErrors().stream()
-                .map(fieldError -> {
-                    String defaultMessage = fieldError.getDefaultMessage();
-                    // Try to resolve as message key first, fallback to default message
-                    return messageService.getMessage(defaultMessage, null, defaultMessage);
-                })
-                .toList();
+        String message = "Required parameter '" + e.getParameterName() + "' is missing";
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(400, message));
+    }
 
-        String message = String.join(", ", errors);
+    /**
+     * Handle HTTP message not readable (JSON parsing errors)
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException e,
+                                                                 HttpHeaders headers,
+                                                                 HttpStatusCode status,
+                                                                 WebRequest request) {
+        logger.error("HttpMessageNotReadableException: " + e.getMessage(), e);
+
+        String message = resolveMessage("request.body.invalid", null, "Invalid request body format");
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(400, message));
+    }
+
+    /**
+     * Handle method argument type mismatch (type conversion errors)
+     */
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+        logger.error("MethodArgumentTypeMismatchException: " + e.getMessage(), e);
+
+        String requiredType = e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "unknown";
+        String message = "Parameter '" + e.getName() + "' must be of type " + requiredType;
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error(400, message));
     }
@@ -118,25 +164,100 @@ public class GlobalExceptionHandlerAdvice extends ResponseEntityExceptionHandler
     public ResponseEntity<Object> handleUnauthorized(Exception e) {
         logger.error("AuthenticationException: " + e.getMessage(), e);
         
-        String messageKey = "unauthorized.access";
         String fallbackMessage = e.getCause() instanceof UsernameNotFoundException ?
                 e.getCause().getMessage() : e.getMessage();
         
-        String message = messageService.getMessage(messageKey, null, fallbackMessage);
+        String message = resolveMessage("unauthorized.access", null, fallbackMessage);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error(401, message));
     }
+    
+    /**
+     * Handle validation exceptions
+     */
+    @ExceptionHandler({ValidationException.class})
+    public ResponseEntity<Object> handleValidationException(ValidationException e) {
+        logger.error("ValidationException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(400, e.getMessage()));
+    }
 
     /**
-     * Handle generic exceptions
+     * Handle not found exceptions
+     */
+    @ExceptionHandler({NotFoundException.class})
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException e) {
+        logger.error("NotFoundException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(404, e.getMessage()));
+    }
+
+    /**
+     * Handle duplicate VNPAY transaction exceptions
+     */
+    @ExceptionHandler({DuplicateVnpayTransactionException.class})
+    public ResponseEntity<Object> handleDuplicateVnpayTransaction(DuplicateVnpayTransactionException e) {
+        logger.error("DuplicateVnpayTransactionException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(409, "Conflict duplicate transaction"));
+    }
+
+    /**
+     * Handle insufficient balance exceptions
+     */
+    @ExceptionHandler({InsufficientBalanceException.class})
+    public ResponseEntity<Object> handleInsufficientBalance(InsufficientBalanceException e) {
+        logger.error("InsufficientBalanceException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(400, e.getMessage()));
+    }
+
+    /**
+     * Handle invalid payout status exceptions
+     */
+    @ExceptionHandler({InvalidPayoutStatusException.class})
+    public ResponseEntity<Object> handleInvalidPayoutStatus(InvalidPayoutStatusException e) {
+        logger.error("InvalidPayoutStatusException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(400, e.getMessage()));
+    }
+
+    /**
+     * Handle payout request not found exceptions
+     */
+    @ExceptionHandler({PayoutRequestNotFoundException.class})
+    public ResponseEntity<Object> handlePayoutRequestNotFound(PayoutRequestNotFoundException e) {
+        logger.error("PayoutRequestNotFoundException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(404, e.getMessage()));
+    }
+
+    /**
+     * Handle retryable exceptions
+     */
+    @ExceptionHandler({RetryableException.class})
+    public ResponseEntity<Object> handleRetryableException(RetryableException e) {
+        logger.error("RetryableException: " + e.getMessage(), e);
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.error(503, e.getMessage()));
+    }
+
+    /**
+     * Handle generic exceptions (catch-all for any uncaught exceptions)
      */
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleGenericException(Exception e) {
         logger.error("Generic Exception: " + e.getMessage(), e);
 
-        String message = messageService.getMessage("operation.failed", null, e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(500, message));
+                .body(ApiResponse.error(500, resolveMessage("operation.failed", null, null)));
     }
 
     /**

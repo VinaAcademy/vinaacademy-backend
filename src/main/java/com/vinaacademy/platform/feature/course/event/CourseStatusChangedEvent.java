@@ -73,4 +73,6 @@ public class CourseStatusChangedEvent {
     private final UUID owner;
     
     private final String content;
+    
+    private final String title;
 }
