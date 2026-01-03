@@ -125,12 +125,14 @@ public class CourseCommandServiceImpl implements CourseCommandService {
                     lessonRepository.save(lesson);
                 }
             }
+            log.info("Course status has been change to pending for updated basic infomation");
+            publishCourseSubmittedForReviewEvent(course, currentUser);
+
         }
         Course savedCourse = courseRepository.save(course);
         
         
-        log.info("Course updated successfully and go to pending with ID: {} and slug: {}", savedCourse.getId(), savedCourse.getSlug());
-        publishCourseSubmittedForReviewEvent(course, currentUser);
+        log.info("Course updated successfully with ID: {} and slug: {}", savedCourse.getId(), savedCourse.getSlug());
         return courseMapper.toDTO(savedCourse);
     }
 
