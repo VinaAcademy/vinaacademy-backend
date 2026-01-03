@@ -394,9 +394,9 @@ public class CourseController {
                                             }
                                             """))))
   public ApiResponse<CourseDto> updateCourse(
-      @PathVariable UUID id, @RequestBody @Valid CourseRequest request) {
+      @PathVariable UUID id, @RequestBody @Valid CourseRequest request, @RequestParam boolean statusSubmitForReview) {
     log.debug("Updating course with id: {}", id);
-    return ApiResponse.success(courseCommandService.updateCourse(id, request));
+    return ApiResponse.success(courseCommandService.updateCourse(id, request, statusSubmitForReview));
   }
 
   @GetMapping("/by-slug/{slug}/learning")

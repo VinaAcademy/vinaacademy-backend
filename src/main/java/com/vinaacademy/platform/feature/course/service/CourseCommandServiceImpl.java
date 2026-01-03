@@ -88,7 +88,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
     @Override
     @Transactional
     @CacheEvict(value = {"coursesByCategory", "courseDetails", "courseExists", "courseById", "courseSlugById"}, allEntries = true)
-    public CourseDto updateCourse(UUID id, CourseRequest request) {
+    public CourseDto updateCourse(UUID id, CourseRequest request, boolean statusSubmitForReview) {
         log.debug("Updating course with id: {}", id);
 
         Course course = courseRepository.findById(id)
@@ -116,10 +116,20 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         course.setLanguage(request.getLanguage());
         course.setLevel(request.getLevel());
         course.setPrice(request.getPrice());
-        
+        if (statusSubmitForReview) {
+            course.setStatus(CourseStatus.PENDING);
+            List<Lesson> lessons = lessonRepository.findByCourseId(course.getId());
+            for (Lesson lesson : lessons) {
+                if (lesson.getLessonStatus() == LessonStatus.DRAFT) {
+                    lesson.setLessonStatus(LessonStatus.PENDING);
+                    lessonRepository.save(lesson);
+                }
+            }
+        }
         Course savedCourse = courseRepository.save(course);
-        log.info("Course updated successfully with ID: {} and slug: {}", savedCourse.getId(), savedCourse.getSlug());
         
+        
+        log.info("Course updated successfully and go to pending with ID: {} and slug: {}", savedCourse.getId(), savedCourse.getSlug());
         publishCourseSubmittedForReviewEvent(course, currentUser);
         return courseMapper.toDTO(savedCourse);
     }
