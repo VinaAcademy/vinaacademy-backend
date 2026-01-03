@@ -1,6 +1,5 @@
 package com.vinaacademy.platform.feature.video.utils;
 
-import com.vinaacademy.platform.feature.storage.service.S3Service;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -11,7 +10,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -109,7 +107,7 @@ public class FFmpegUtils {
             
             // Upload thumbnail to MinIO
             if (Files.exists(thumbnailFilePath)) {
-                String thumbnailKey = "videos/thumbnails/" + videoId.toString() + ".jpg";
+                String thumbnailKey = "videos/thumbnails/" + videoId + ".jpg";
                 s3Service.uploadFile(thumbnailKey, thumbnailFilePath, "image/jpeg");
             }
             
@@ -142,20 +140,38 @@ public class FFmpegUtils {
      * @throws InterruptedException if the current thread is interrupted while waiting for ffmpeg to finish
      */
     private static int convertToVariantHLS(Path inputFilePath, VideoVariant variant, Path variantDir) throws IOException, InterruptedException {
+        String[] wh = variant.resolution().split("x");
+        String w = wh[0];
+        String h = wh[1];
+
         String playlistPath = variantDir.resolve("playlist.m3u8").toString().replace("\\", "/");
         String segmentPattern = variantDir.resolve("segment_%03d.ts").toString().replace("\\", "/");
+        String vf = String.format(
+                "scale=w=%s:h=%s:force_original_aspect_ratio=decrease," +
+                        "pad=w=%s:h=%s:x=(ow-iw)/2:y=(oh-ih)/2:color=black",
+                w, h, w, h
+        );
+
 
         ProcessBuilder pb = new ProcessBuilder(
                 "ffmpeg",
                 "-i", inputFilePath.toString(),
-                "-vf", "scale=" + variant.resolution(),
+
+                "-vf", vf,
+
                 "-c:v", "libx264",
+                "-preset", "veryfast",
+                "-pix_fmt", "yuv420p",
                 "-b:v", variant.videoBitrate(),
+
                 "-c:a", "aac",
                 "-b:a", variant.audioBitrate(),
+
                 "-hls_time", "4",
                 "-hls_list_size", "0",
+                "-hls_flags", "independent_segments",
                 "-hls_segment_filename", segmentPattern,
+
                 "-f", "hls",
                 playlistPath
         );
