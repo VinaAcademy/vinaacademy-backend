@@ -8,6 +8,7 @@ import com.vinaacademy.platform.feature.common.utils.SlugUtils;
 import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import com.vinaacademy.platform.feature.instructor.repository.CourseInstructorRepository;
@@ -30,17 +31,18 @@ import com.vinaacademy.platform.feature.user.constant.AuthConstants;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.user.role.entity.Role;
 import com.vinaacademy.platform.feature.user.role.repository.RoleRepository;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -511,6 +513,7 @@ public class TestingDataService {
                         .free(false)
                         .orderIndex(0)
                         .author(instructor)
+                        .lessonStatus(LessonStatus.PUBLISHED)
                         .content(selectAppropriateContent(name, description, category.getName()))
                         .build();
 
@@ -527,6 +530,7 @@ public class TestingDataService {
                         .passingScore(50.0)
                         .totalPoints(75.0)
                         .duration(15)
+                        .lessonStatus(LessonStatus.PUBLISHED)
                         .randomizeQuestions(true)
                         .showCorrectAnswers(true)
                         .allowRetake(true)
