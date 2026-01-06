@@ -3,6 +3,16 @@ name: VinaAcademy Platform - CI/CD Pipeline
 on:
   push:
     branches: [ develop ]   # deploy when new code is pushed to main/master branch
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        description: 'Select the environment to deploy to'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - production
 
 jobs:
   test:
@@ -100,15 +110,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
-    environment: production
+    environment: ${{ github.event.inputs.deploy-environment || 'development' }}
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          host: ${{ github.event.inputs.deploy-environment == 'production' && secrets.VPS_PROD_HOST || secrets.VPS_DEV_HOST }}
+          username: ${{ github.event.inputs.deploy-environment == 'production' && secrets.VPS_PROD_USERNAME || secrets.VPS_DEV_USERNAME }}
+          password: ${{ github.event.inputs.deploy-environment == 'production' && secrets.VPS_PROD_PASSWORD || secrets.VPS_DEV_PASSWORD }}
+          port: ${{ github.event.inputs.deploy-environment == 'production' && secrets.VPS_PROD_PORT || secrets.VPS_DEV_PORT || 22 }}
           script: |
             # Navigate to deployment directory
             cd /root/ms-ci-cd
