@@ -8,13 +8,17 @@ import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
+import com.vinaacademy.platform.feature.discussion.entity.Discussion;
+import com.vinaacademy.platform.feature.discussion.repository.DiscussionRepository;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
 import com.vinaacademy.platform.feature.enrollment.enums.ProgressStatus;
 import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentRepository;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import com.vinaacademy.platform.feature.instructor.repository.CourseInstructorRepository;
+import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.migration.CategoryMigrationService;
 import com.vinaacademy.platform.feature.migration.data.CourseData;
+import com.vinaacademy.platform.feature.migration.data.DiscussionData;
 import com.vinaacademy.platform.feature.migration.data.ReviewData;
 import com.vinaacademy.platform.feature.migration.data.VideoData;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
@@ -59,6 +63,7 @@ public class CourseMockService {
     private final CourseReviewRepository courseReviewRepository;
     private final CourseInstructorRepository courseInstructorRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final DiscussionRepository discussionRepository;
     private final SectionRepository sectionRepository;
     private final ReadingRepository readingRepository;
     private final QuizRepository quizRepository;
@@ -229,7 +234,10 @@ public class CourseMockService {
                         .status(VideoStatus.READY)
                         .lessonStatus(LessonStatus.PUBLISHED)
                         .build();
+                welcomeVideo.setDuration(VideoData.VIDEO_DURATIONS.getOrDefault(welcomeVideo.getHlsPath(),
+                        300.0));
                 videoRepository.save(welcomeVideo);
+                createDiscussionsForLesson(welcomeVideo, students);
 
                 // Since we don't have actual videos, we just create the entity
 
@@ -255,6 +263,7 @@ public class CourseMockService {
                         .build();
 
                 readingRepository.save(reading);
+                createDiscussionsForLesson(reading, students);
 
                 // Add a quiz lesson to content section
                 Quiz quiz = Quiz.builder()
@@ -294,5 +303,39 @@ public class CourseMockService {
             }
         }
         log.info("Successfully created {} courses", count);
+    }
+
+    private void createDiscussionsForLesson(Lesson lesson, List<User> students) {
+        if (students.isEmpty()) return;
+
+        // Create 2-5 discussions per lesson
+        int numDiscussions = ThreadLocalRandom.current().nextInt(2, 6);
+
+        for (int i = 0; i < numDiscussions; i++) {
+            User author = students.get(ThreadLocalRandom.current().nextInt(students.size()));
+            
+            Discussion question = Discussion.builder()
+                    .lesson(lesson)
+                    .user(author)
+                    .comment(DiscussionData.getRandomQuestion())
+                    .build();
+            
+            discussionRepository.save(question);
+
+            // Add 0-3 replies
+            int numReplies = ThreadLocalRandom.current().nextInt(0, 4);
+            for (int j = 0; j < numReplies; j++) {
+                User replyAuthor = students.get(ThreadLocalRandom.current().nextInt(students.size()));
+                
+                Discussion reply = Discussion.builder()
+                        .lesson(lesson)
+                        .user(replyAuthor)
+                        .parentComment(question)
+                        .comment(DiscussionData.getRandomReply())
+                        .build();
+                
+                discussionRepository.save(reply);
+            }
+        }
     }
 }

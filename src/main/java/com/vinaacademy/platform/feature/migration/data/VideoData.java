@@ -2,11 +2,19 @@ package com.vinaacademy.platform.feature.migration.data;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.Map;
+
 @UtilityClass
 public class VideoData {
     public static final String JAVA_VIDEO_HLS_PATH = "videos/hls/d8862e3e-43e2-4534-a321-327f19a91f72";
     public static final String BOND_VIDEO_HLS_PATH = "videos/hls/3684e765-6c2f-4244-a080-642dfd9c71de";
     public static final String LINEAR_TRANSFORMATION_VIDEO_HLS_PATH = "videos/hls/e50e0649-cb20-407b-b5ae-1ce3a67d53bb";
+
+    public static final Map<String, Double> VIDEO_DURATIONS = Map.of(
+            JAVA_VIDEO_HLS_PATH, 141.200544,
+            BOND_VIDEO_HLS_PATH, 1071.82075,
+            LINEAR_TRANSFORMATION_VIDEO_HLS_PATH, 285.837642
+    );
 
     public static String selectAppropriateVideoTitle(String courseName, String categoryName) {
         if (isProgrammingCategory(categoryName)) {
