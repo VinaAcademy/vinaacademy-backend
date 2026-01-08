@@ -16,9 +16,11 @@ import com.vinaacademy.platform.feature.discussion.dto.DiscussionDto;
 import com.vinaacademy.platform.feature.discussion.dto.DiscussionSummaryDto;
 import com.vinaacademy.platform.feature.discussion.dto.request.DiscussionRequest;
 import com.vinaacademy.platform.feature.discussion.entity.Discussion;
+import com.vinaacademy.platform.feature.discussion.entity.DiscussionModerationFlag;
 import com.vinaacademy.platform.feature.discussion.mapper.DiscussionMapper;
 import com.vinaacademy.platform.feature.discussion.repository.DiscussionRepository;
 import com.vinaacademy.platform.feature.discussion.repository.FavoriteRepository;
+import com.vinaacademy.platform.feature.discussion.repository.DiscussionModerationFlagRepository;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
 import com.vinaacademy.platform.feature.lesson.repository.LessonRepository;
 import com.vinaacademy.platform.feature.user.auth.helpers.SecurityHelper;
@@ -41,6 +43,7 @@ public class DiscussionServiceImpl implements DiscussionService {
 	private final FavoriteRepository favoriteRepository;
 	private final NotificationProducer notificationProducer;
 	private final CourseRepository courseRepository;
+	private final DiscussionModerationService moderationService;
 
 	@Override
 	public DiscussionDto createDiscussion(DiscussionRequest request) {
@@ -48,49 +51,70 @@ public class DiscussionServiceImpl implements DiscussionService {
 		Lesson lesson = lessonRepository.findById(request.getLessonId())
 				.orElseThrow(() -> NotFoundException.message("Id của bài học này không tồn tại"));
 		Optional<Course> course = courseRepository.findById(request.getCourseId());
+		
 		Discussion parentComment = null;
 		if (request.getParentCommentId() != null) {
 			parentComment = discussionRepository.findById(request.getParentCommentId())
 					.orElseThrow(() -> NotFoundException.message("Id của thảo luận cha này không tìm thấy"));
-			if (course.isPresent()) {
-				Course coursereal = course.get();
-				UUID receiver = parentComment.getUser().getId();
-				if (!receiver.equals(user.getId())) {
-					NotificationCreateEvent notification = NotificationCreateEvent.builder()
-							.title(user.getFullName() + " đã phản hồi bình luận của bạn")
-							.content("Khóa học: " + coursereal.getName())
-							.targetUrl("/learning/" + coursereal.getSlug() + "/lecture/" + lesson.getId())
-							.userId(receiver).type(NotificationType.SYSTEM).build();
-					log.info("send noti reply to user: {}, slug: {}, lessonId: {}", receiver, coursereal.getSlug(),
-							lesson.getId());
-					notificationProducer.sendNotification(notification);
-				}
-
-			}
-
-		} else {
-			if (course.isPresent()) {
-				Course coursereal = course.get();
-				UUID insId = lesson.getAuthor().getId();
-				if (!insId.equals(user.getId())) {
-					NotificationCreateEvent notification = NotificationCreateEvent.builder()
-							.title(user.getFullName() + " đã bình luận vào khóa học của bạn")
-							.content("Khóa học: " + coursereal.getName()).targetUrl("/instructor/courses/"
-									+ coursereal.getId() + "/analytics?tab=feedback&lesson=" + lesson.getId())
-							.userId(insId).type(NotificationType.SYSTEM).build();
-					log.info("send noti feedback to instructor: {}, slug: {}, lessonId: {}", insId,
-							coursereal.getSlug(), lesson.getId());
-					notificationProducer.sendNotification(notification);
-				}
-			}
 		}
 
 		Discussion discussion = Discussion.builder().lesson(lesson).user(user).comment(request.getComment())
 				.parentComment(parentComment).build();
 		Discussion saveDiscussion = discussionRepository.save(discussion);
+		
+		// Check for moderation flags AFTER saving - returns result with flag info
+		DiscussionModerationService.ModerationResult moderationResult = 
+			moderationService.checkAndFlagDiscussion(saveDiscussion);
+		
+		// Only send notifications if discussion is NOT flagged with negative content
+		if (!moderationResult.isHasNegativeFlag()) {
+			if (parentComment != null) {
+				if (course.isPresent()) {
+					Course coursereal = course.get();
+					UUID receiver = parentComment.getUser().getId();
+					if (!receiver.equals(user.getId())) {
+						NotificationCreateEvent notification = NotificationCreateEvent.builder()
+								.title(user.getFullName() + " đã phản hồi bình luận của bạn")
+								.content("Khóa học: " + coursereal.getName())
+								.targetUrl("/learning/" + coursereal.getSlug() + "/lecture/" + lesson.getId())
+								.userId(receiver).type(NotificationType.SYSTEM).build();
+						log.info("send noti reply to user: {}, slug: {}, lessonId: {}", receiver, coursereal.getSlug(),
+								lesson.getId());
+						notificationProducer.sendNotification(notification);
+					}
+				}
+			} else {
+				if (course.isPresent()) {
+					Course coursereal = course.get();
+					UUID insId = lesson.getAuthor().getId();
+					if (!insId.equals(user.getId())) {
+						NotificationCreateEvent notification = NotificationCreateEvent.builder()
+								.title(user.getFullName() + " đã bình luận vào khóa học của bạn")
+								.content("Khóa học: " + coursereal.getName()).targetUrl("/instructor/courses/"
+										+ coursereal.getId() + "/analytics?tab=feedback&lesson=" + lesson.getId())
+								.userId(insId).type(NotificationType.SYSTEM).build();
+						log.info("send noti feedback to instructor: {}, slug: {}, lessonId: {}", insId,
+								coursereal.getSlug(), lesson.getId());
+						notificationProducer.sendNotification(notification);
+					}
+				}
+			}
+		} else {
+			log.warn("Discussion {} has negative flag, notifications suppressed", saveDiscussion.getId());
+		}
+
 		DiscussionDto discussionDto = DiscussionMapper.INSTANCE.toDto(saveDiscussion);
 		discussionDto.setAvatarUrl(user.getAvatarUrl());
 		discussionDto.setUserFullName(user.getFullName());
+		
+		// Set flag info from moderation result (no additional DB query needed!)
+		if (moderationResult.getFlag() != null) {
+			DiscussionModerationFlag flag = moderationResult.getFlag();
+			discussionDto.setFlagType(flag.getFlagType());
+			discussionDto.setModerationStatus(flag.getStatus());
+			discussionDto.setFlagSeverity(flag.getSeverity());
+		}
+		
 		return discussionDto;
 	}
 

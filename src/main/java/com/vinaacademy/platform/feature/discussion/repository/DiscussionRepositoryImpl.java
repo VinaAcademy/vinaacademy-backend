@@ -32,7 +32,13 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
             .append(" d.user.fullName, d.user.avatarUrl, d.createdDate, ")
             .append(" CASE WHEN ((SELECT COUNT(f3.id) FROM Favorite f3 WHERE f3.user.id = :currentUserId AND f3.comment.id = d.id) > 0) THEN true ELSE false END")
             .append(" ) FROM Discussion d ")
-            .append(" WHERE d.lesson.id = :lessonId AND d.parentComment IS NULL ");
+            .append(" WHERE d.lesson.id = :lessonId AND d.parentComment IS NULL ")
+            .append(" AND NOT EXISTS (")
+            .append("   SELECT 1 FROM DiscussionModerationFlag dmf ")
+            .append("   WHERE dmf.discussion.id = d.id ")
+            .append("   AND dmf.status = 'PENDING' ")
+            .append("   AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')")
+            .append(" )");
 
         String orderBy = buildOrderBy(currentUserId, pageable);
         String queryString = jpql.toString() + orderBy;
@@ -60,7 +66,13 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
             .append(" d.user.fullName, d.user.avatarUrl, d.createdDate, ")
             .append(" CASE WHEN ((SELECT COUNT(f3.id) FROM Favorite f3 WHERE f3.user.id = :currentUserId AND f3.comment.id = d.id) > 0) THEN true ELSE false END")
             .append(" ) FROM Discussion d ")
-            .append(" WHERE d.parentComment.id = :parentId ");
+            .append(" WHERE d.parentComment.id = :parentId ")
+            .append(" AND NOT EXISTS (")
+            .append("   SELECT 1 FROM DiscussionModerationFlag dmf ")
+            .append("   WHERE dmf.discussion.id = d.id ")
+            .append("   AND dmf.status = 'PENDING' ")
+            .append("   AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')")
+            .append(" )");
 
         String orderBy = buildOrderBy(currentUserId, pageable);
         String queryString = jpql.toString() + orderBy;
@@ -116,14 +128,28 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
     }
 
     private long countRootComments(UUID lessonId) {
-        String jpql = "SELECT COUNT(d.id) FROM Discussion d WHERE d.lesson.id = :lessonId AND d.parentComment IS NULL";
+        String jpql = "SELECT COUNT(d.id) FROM Discussion d " +
+                      "WHERE d.lesson.id = :lessonId AND d.parentComment IS NULL " +
+                      "AND NOT EXISTS (" +
+                      "  SELECT 1 FROM DiscussionModerationFlag dmf " +
+                      "  WHERE dmf.discussion.id = d.id " +
+                      "  AND dmf.status = 'PENDING' " +
+                  "  AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')" +
+                      ")";
         Query countQuery = entityManager.createQuery(jpql);
         countQuery.setParameter("lessonId", lessonId);
         return (Long) countQuery.getSingleResult();
     }
 
     private long countReplies(UUID parentId) {
-        String jpql = "SELECT COUNT(d.id) FROM Discussion d WHERE d.parentComment.id = :parentId";
+        String jpql = "SELECT COUNT(d.id) FROM Discussion d " +
+                      "WHERE d.parentComment.id = :parentId " +
+                      "AND NOT EXISTS (" +
+                      "  SELECT 1 FROM DiscussionModerationFlag dmf " +
+                      "  WHERE dmf.discussion.id = d.id " +
+                      "  AND dmf.status = 'PENDING' " +
+                  "  AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')" +
+                      ")";
         Query countQuery = entityManager.createQuery(jpql);
         countQuery.setParameter("parentId", parentId);
         return (Long) countQuery.getSingleResult();
