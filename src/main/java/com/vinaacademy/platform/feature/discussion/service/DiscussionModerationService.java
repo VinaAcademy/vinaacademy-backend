@@ -46,8 +46,8 @@ public class DiscussionModerationService {
     private final LangAiClient langAiClient;
     
     // Thresholds for toxicity detection (same as review feature)
-    private static final BigDecimal TOXIC_THRESHOLD = new BigDecimal("0.85");
-    private static final BigDecimal HIGH_NEGATIVE_THRESHOLD = new BigDecimal("0.90");
+    private static final BigDecimal TOXIC_THRESHOLD = new BigDecimal("0.45");
+    private static final BigDecimal HIGH_NEGATIVE_THRESHOLD = new BigDecimal("0.6");
     
     /**
      * Result wrapper for moderation check
@@ -167,7 +167,7 @@ public class DiscussionModerationService {
             DiscussionModerationFlag flag = DiscussionModerationFlag.builder()
                 .discussion(discussion)
                 .flagType(FlagType.EXTREME_NEGATIVE)
-                .severity(3) // Medium-high
+                .severity(7) // Medium-high
                 .confidence(negativeScore)
                 .reason("Bình luận có mức độ tiêu cực rất cao, cần xem xét")
                 .status(ModerationStatus.PENDING)
@@ -181,7 +181,7 @@ public class DiscussionModerationService {
                 .discussion(discussion)
                 .flagType(FlagType.SPAM)
                 .severity(2) // Low-medium
-                .confidence(new BigDecimal("0.75"))
+                .confidence(new BigDecimal("0.35"))
                 .reason("Phát hiện nội dung spam hoặc lặp lại quá nhiều")
                 .status(ModerationStatus.PENDING)
                 .build();
