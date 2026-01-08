@@ -8,10 +8,14 @@ import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
+import com.vinaacademy.platform.feature.enrollment.Enrollment;
+import com.vinaacademy.platform.feature.enrollment.enums.ProgressStatus;
+import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentRepository;
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import com.vinaacademy.platform.feature.instructor.repository.CourseInstructorRepository;
 import com.vinaacademy.platform.feature.migration.CategoryMigrationService;
 import com.vinaacademy.platform.feature.migration.data.CourseData;
+import com.vinaacademy.platform.feature.migration.data.ReviewData;
 import com.vinaacademy.platform.feature.migration.data.VideoData;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
 import com.vinaacademy.platform.feature.quiz.repository.AnswerRepository;
@@ -19,22 +23,28 @@ import com.vinaacademy.platform.feature.quiz.repository.QuestionRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuizRepository;
 import com.vinaacademy.platform.feature.reading.Reading;
 import com.vinaacademy.platform.feature.reading.repository.ReadingRepository;
+import com.vinaacademy.platform.feature.review.entity.CourseReview;
+import com.vinaacademy.platform.feature.review.repository.CourseReviewRepository;
 import com.vinaacademy.platform.feature.section.entity.Section;
 import com.vinaacademy.platform.feature.section.repository.SectionRepository;
 import com.vinaacademy.platform.feature.user.entity.User;
 import com.vinaacademy.platform.feature.video.entity.Video;
 import com.vinaacademy.platform.feature.video.enums.VideoStatus;
 import com.vinaacademy.platform.feature.video.repository.VideoRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.vinaacademy.platform.feature.migration.data.ReadingData.selectAppropriateContent;
 import static com.vinaacademy.platform.feature.migration.data.ReadingData.selectAppropriateReadingTitle;
@@ -42,11 +52,13 @@ import static com.vinaacademy.platform.feature.migration.data.ReadingData.select
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CourseMigrationService {
+public class CourseMockService {
 
     private final CategoryMigrationService categoryMigrationService;
     private final CourseRepository courseRepository;
+    private final CourseReviewRepository courseReviewRepository;
     private final CourseInstructorRepository courseInstructorRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final SectionRepository sectionRepository;
     private final ReadingRepository readingRepository;
     private final QuizRepository quizRepository;
@@ -54,7 +66,10 @@ public class CourseMigrationService {
     private final AnswerRepository answerRepository;
     private final VideoRepository videoRepository;
     private final QuizMockDataService quizMockDataService;
+    private final StudentMockService studentMockService;
+    private final EntityManager entityManager;
 
+    @Transactional
     public void createCoursesData(User instructor) throws IOException {
         // Read the JSON data from the file
         ObjectMapper objectMapper = new ObjectMapper();
@@ -118,7 +133,33 @@ public class CourseMigrationService {
                 // Get language - default to Tiếng Việt
                 String language = courseNode.has("language") ? courseNode.get("language").asText() : "Tiếng Việt";
 
-                // Create the course with zero students and ratings
+                List<User> students = studentMockService.createRandomStudents();
+
+                // Generate reviews
+                List<CourseReview> reviews = new ArrayList<>();
+                double totalRatingScore = 0;
+
+                for (User student : students) {
+                    // Random rating skewed towards positive (70% 4-5 stars)
+                    int rating = ThreadLocalRandom.current().nextInt(1, 101) <= 70 ?
+                            ThreadLocalRandom.current().nextInt(4, 6) :
+                            ThreadLocalRandom.current().nextInt(1, 4);
+
+                    String reviewContent = ReviewData.getRandomReview(rating);
+
+                    CourseReview review = CourseReview.builder()
+                            .rating(rating)
+                            .review(reviewContent)
+                            .user(student)
+                            .build();
+                    reviews.add(review);
+                    totalRatingScore += rating;
+                }
+
+                double averageRating = reviews.isEmpty() ? 0.0 : totalRatingScore / reviews.size();
+                averageRating = Math.round(averageRating * 10.0) / 10.0;
+
+                // Create the course with calculated ratings
                 Course course = Course.builder()
                         .name(name)
                         .description(description)
@@ -129,9 +170,9 @@ public class CourseMigrationService {
                         .status(CourseStatus.PUBLISHED)
                         .language(language)
                         .category(category)
-                        .rating(0.0)
-                        .totalRating(0)
-                        .totalStudent(0)
+                        .rating(averageRating)
+                        .totalRating(reviews.size())
+                        .totalStudent(students.size())
                         .totalSection(2)
                         .totalLesson(3)
                         .sections(new ArrayList<>())
@@ -139,6 +180,24 @@ public class CourseMigrationService {
                         .build();
 
                 courseRepository.save(course);
+
+                // Save reviews
+                for (CourseReview review : reviews) {
+                    review.setCourse(course);
+                    courseReviewRepository.save(review);
+                }
+
+                // Create enrollments for students
+                for (User student : students) {
+                    Enrollment enrollment = Enrollment.builder()
+                            .user(student)
+                            .course(course)
+                            .progressPercentage(0.0)
+                            .status(ProgressStatus.IN_PROGRESS)
+                            .completedLessons(0)
+                            .build();
+                    enrollmentRepository.save(enrollment);
+                }
 
                 // Assign instructor
                 CourseInstructor courseInstructor = CourseInstructor.builder()
@@ -168,6 +227,7 @@ public class CourseMigrationService {
                         .orderIndex(0)
                         .author(instructor)
                         .status(VideoStatus.READY)
+                        .lessonStatus(LessonStatus.PUBLISHED)
                         .build();
                 videoRepository.save(welcomeVideo);
 
@@ -228,6 +288,9 @@ public class CourseMigrationService {
 
             } catch (Exception e) {
                 log.error("Error creating course: {}", e.getMessage(), e);
+                // Clear the session to remove any failed entities from the persistence context
+                // This prevents "AssertionFailure: Entry ... has a null identifier" on subsequent flushes
+                entityManager.clear();
             }
         }
         log.info("Successfully created {} courses", count);

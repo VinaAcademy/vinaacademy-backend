@@ -4,7 +4,7 @@ import com.vinaacademy.platform.feature.category.repository.CategoryRepository;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
 import com.vinaacademy.platform.feature.instructor.repository.CourseInstructorRepository;
 import com.vinaacademy.platform.feature.migration.CouponMigrationService;
-import com.vinaacademy.platform.feature.migration.course.CourseMigrationService;
+import com.vinaacademy.platform.feature.migration.course.CourseMockService;
 import com.vinaacademy.platform.feature.quiz.repository.AnswerRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuestionRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuizRepository;
@@ -41,7 +41,7 @@ public class TestingDataService {
 
     private final PasswordEncoder passwordEncoder;
     private final CouponMigrationService couponMigrationService;
-    private final CourseMigrationService courseMigrationService;
+    private final CourseMockService courseMockService;
 
     @Transactional
     public void createTestingAuthData() {
@@ -130,7 +130,7 @@ public class TestingDataService {
                         return userRepository.save(newInstructor);
                     });
 
-            courseMigrationService.createCoursesData(instructor);
+            courseMockService.createCoursesData(instructor);
         } catch (IOException e) {
             log.error("Error reading categories-courses.json", e);
         } catch (Exception e) {
