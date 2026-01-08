@@ -1,4 +1,3 @@
-// DiscussionDto.java
 package com.vinaacademy.platform.feature.discussion.dto;
 
 import lombok.*;
@@ -8,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.vinaacademy.platform.feature.common.dto.BaseDto;
+import com.vinaacademy.platform.feature.review.enums.FlagType;
+import com.vinaacademy.platform.feature.review.enums.ModerationStatus;
 
 @Data
 @SuperBuilder
@@ -24,4 +25,9 @@ public class DiscussionDto extends BaseDto{
     private Long replyCount;
     private Long favoriteCount;         // tổng lượt like
     private boolean likedByCurrentUser;  // user hiện tại đã like?
+    
+    // Moderation fields
+    private FlagType flagType;
+    private ModerationStatus moderationStatus;
+    private Integer flagSeverity;
 }
