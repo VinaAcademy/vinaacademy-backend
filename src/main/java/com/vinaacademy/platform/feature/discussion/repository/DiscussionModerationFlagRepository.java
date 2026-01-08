@@ -87,7 +87,7 @@ public interface DiscussionModerationFlagRepository extends JpaRepository<Discus
      * Count critical pending flags (severity >= 4)
      */
     @Query("SELECT COUNT(dmf) FROM DiscussionModerationFlag dmf " +
-            "WHERE dmf.status = 'PENDING' AND dmf.severity >= 4")
+            "WHERE dmf.status = 'PENDING' AND dmf.severity > 7")
     long countCriticalPendingFlags();
 
     /**

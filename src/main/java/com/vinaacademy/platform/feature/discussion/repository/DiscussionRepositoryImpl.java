@@ -36,7 +36,7 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
             .append(" AND NOT EXISTS (")
             .append("   SELECT 1 FROM DiscussionModerationFlag dmf ")
             .append("   WHERE dmf.discussion.id = d.id ")
-            .append("   AND dmf.status IN ('PENDING', 'REJECTED') ")
+            .append("   AND dmf.status IN ('PENDING', 'APPROVED') ")
             .append("   AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')")
             .append(" )");
 
@@ -70,7 +70,7 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
             .append(" AND NOT EXISTS (")
             .append("   SELECT 1 FROM DiscussionModerationFlag dmf ")
             .append("   WHERE dmf.discussion.id = d.id ")
-            .append("   AND dmf.status IN ('PENDING', 'REJECTED') ")
+            .append("   AND dmf.status IN ('PENDING', 'APPROVED') ")
             .append("   AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')")
             .append(" )");
 
@@ -133,7 +133,7 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
                       "AND NOT EXISTS (" +
                       "  SELECT 1 FROM DiscussionModerationFlag dmf " +
                       "  WHERE dmf.discussion.id = d.id " +
-                      "  AND dmf.status IN ('PENDING', 'REJECTED') " +
+                      "  AND dmf.status IN ('PENDING', 'APPROVED') " +
                   "  AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')" +
                       ")";
         Query countQuery = entityManager.createQuery(jpql);
@@ -147,7 +147,7 @@ public class DiscussionRepositoryImpl implements DiscussionRepositoryCustom {
                       "AND NOT EXISTS (" +
                       "  SELECT 1 FROM DiscussionModerationFlag dmf " +
                       "  WHERE dmf.discussion.id = d.id " +
-                      "  AND dmf.status IN ('PENDING', 'REJECTED') " +
+                      "  AND dmf.status IN ('PENDING', 'APPROVED') " +
                   "  AND dmf.flagType IN ('TOXIC', 'EXTREME_NEGATIVE', 'SPAM')" +
                       ")";
         Query countQuery = entityManager.createQuery(jpql);
