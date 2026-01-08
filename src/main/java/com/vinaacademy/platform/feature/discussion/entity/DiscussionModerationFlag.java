@@ -42,9 +42,6 @@ public class DiscussionModerationFlag extends BaseEntity {
     @Column(name = "flag_type", length = 50, nullable = false)
     private FlagType flagType;
     
-    /**
-     * Severity level from 1 (low) to 5 (critical)
-     */
     @Column(name = "severity", nullable = false)
     private Integer severity;
     
@@ -77,7 +74,7 @@ public class DiscussionModerationFlag extends BaseEntity {
      * Helper method to check if this is a critical flag
      */
     public boolean isCritical() {
-        return severity >= 4;
+        return severity >= 7;
     }
     
     /**
