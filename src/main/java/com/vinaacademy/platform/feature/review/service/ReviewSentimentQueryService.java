@@ -71,8 +71,8 @@ public class ReviewSentimentQueryService {
                 .build())
             .collect(Collectors.toList());
         
-        // Get total reviews count
-        List<ReviewSentimentAnalysis> allSentiments = sentimentRepository.findByCourseId(courseId);
+        // Get total reviews count (exclude pending-flagged reviews)
+        List<ReviewSentimentAnalysis> allSentiments = sentimentRepository.findVisibleByCourseId(courseId);
         
         return ProsConsResponse.builder()
             .courseId(courseId)
@@ -95,15 +95,15 @@ public class ReviewSentimentQueryService {
         List<ReviewSentimentAnalysis> sentiments;
         
         if (sentiment != null) {
-            sentiments = sentimentRepository.findByCourseIdAndSentiment(courseId, sentiment);
+            sentiments = sentimentRepository.findVisibleByCourseIdAndSentiment(courseId, sentiment);
         } else {
-            sentiments = sentimentRepository.findByCourseId(courseId);
+            sentiments = sentimentRepository.findVisibleByCourseId(courseId);
         }
-        
-        // Convert to DTOs with pagination
+
+        // Convert to DTOs with pagination (data đã được lọc pending flag ở repository)
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), sentiments.size());
-        
+
         List<ReviewWithSentimentDto> dtos = sentiments.subList(start, end).stream()
             .map(this::convertToReviewWithSentiment)
             .collect(Collectors.toList());
