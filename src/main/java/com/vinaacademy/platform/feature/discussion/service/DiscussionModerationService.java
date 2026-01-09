@@ -97,19 +97,21 @@ public class DiscussionModerationService {
                 );
                 
                 if (!hasPendingFlag) {
-                    List<DiscussionModerationFlag> savedFlags = flagRepository.saveAll(flags);
-                    log.warn("Created {} moderation flags for discussion {}", flags.size(), discussion.getId());
-                    
-                    // Get the most severe flag
-                    DiscussionModerationFlag mostSevereFlag = savedFlags.stream()
+                    // Get the most severe flag only
+                    DiscussionModerationFlag mostSevereFlag = flags.stream()
                         .max(Comparator.comparing(DiscussionModerationFlag::getSeverity))
                         .orElse(null);
                     
-                    // Check if any flag is negative type
-                    boolean hasNegativeFlag = savedFlags.stream()
-                        .anyMatch(flag -> isNegativeFlag(flag.getFlagType()));
-                    
-                    return CompletableFuture.completedFuture(new ModerationResult(hasNegativeFlag, mostSevereFlag));
+                    if (mostSevereFlag != null) {
+                        DiscussionModerationFlag savedFlag = flagRepository.save(mostSevereFlag);
+                        log.warn("Created moderation flag {} (severity: {}) for discussion {}", 
+                            savedFlag.getFlagType(), savedFlag.getSeverity(), discussion.getId());
+                        
+                        // Check if flag is negative type
+                        boolean hasNegativeFlag = isNegativeFlag(savedFlag.getFlagType());
+                        
+                        return CompletableFuture.completedFuture(new ModerationResult(hasNegativeFlag, savedFlag));
+                    }
                 }
             }
             
@@ -278,7 +280,7 @@ public class DiscussionModerationService {
         
         // Send notification to discussion owner
         NotificationCreateEvent notification = NotificationCreateEvent.builder()
-            .title("Bình luận của bạn đã bị ẩn do vi phạm")
+            .title("Bình luận của bạn đã bị ẩn do vi phạm chuẩn mực ngôn từ")
             .content("Lý do: " + (notes != null ? notes : flag.getReason()))
             .targetUrl(null)
             .userId(discussionOwnerId)
@@ -292,7 +294,9 @@ public class DiscussionModerationService {
     }
     
     /**
-     * Reject flag - discussion is fine
+     * Reject flag - discussion is approved (no violation found)
+     * Sends notification to discussion owner confirming approval
+     * Also notifies parent comment owner or instructor (same as createDiscussion flow)
      */
     @Transactional
     public void rejectFlag(Long flagId, String notes) {
@@ -302,8 +306,67 @@ public class DiscussionModerationService {
         flag.reject(notes);
         flagRepository.save(flag);
         
-        log.info("Flag {} rejected. Discussion {} is fine", 
-            flagId, flag.getDiscussion().getId());
+        Discussion discussion = flag.getDiscussion();
+        UUID discussionOwnerId = discussion.getUser().getId();
+        Lesson lesson = discussion.getLesson();
+        Course course = lesson != null ? lesson.getSection().getCourse() : null;
+        
+        // Build URL to discussion
+        String targetUrl = course != null && lesson != null ? 
+            "/learning/" + course.getSlug() + "/lecture/" + lesson.getId() :
+            null;
+        
+        // 1. Send notification to discussion owner
+        NotificationCreateEvent ownerNotification = NotificationCreateEvent.builder()
+            .title("Bình luận của bạn đã được chấp thuận")
+            .content("Bình luận của bạn đã được phê duyệt và sẽ hiển thị trên khóa học " + 
+                    (course != null ? course.getName() : "") + ".")
+            .targetUrl(targetUrl)
+            .userId(discussionOwnerId)
+            .type(NotificationType.SYSTEM)
+            .build();
+        
+        notificationProducer.sendNotification(ownerNotification);
+        
+        // 2. Send notification to parent or instructor (same logic as createDiscussion)
+        Discussion parentComment = discussion.getParentComment();
+        if (parentComment != null) {
+            // This is a reply - notify parent comment owner
+            UUID parentOwnerId = parentComment.getUser().getId();
+            if (!parentOwnerId.equals(discussionOwnerId) && course != null) {
+                NotificationCreateEvent parentNotification = NotificationCreateEvent.builder()
+                    .title(discussion.getUser().getFullName() + " đã phản hồi bình luận của bạn")
+                    .content("Khóa học: " + course.getName())
+                    .targetUrl(targetUrl)
+                    .userId(parentOwnerId)
+                    .type(NotificationType.SYSTEM)
+                    .build();
+                
+                notificationProducer.sendNotification(parentNotification);
+                log.info("Notified parent comment owner {} about approved reply", parentOwnerId);
+            }
+        } else {
+            // This is a root comment - notify instructor
+            if (lesson != null && course != null) {
+                UUID instructorId = lesson.getAuthor().getId();
+                if (!instructorId.equals(discussionOwnerId)) {
+                    NotificationCreateEvent instructorNotification = NotificationCreateEvent.builder()
+                        .title(discussion.getUser().getFullName() + " đã bình luận vào khóa học của bạn")
+                        .content("Khóa học: " + course.getName())
+                        .targetUrl("/instructor/courses/" + course.getId() + 
+                                  "/analytics?tab=feedback&lesson=" + lesson.getId())
+                        .userId(instructorId)
+                        .type(NotificationType.SYSTEM)
+                        .build();
+                    
+                    notificationProducer.sendNotification(instructorNotification);
+                    log.info("Notified instructor {} about approved root comment", instructorId);
+                }
+            }
+        }
+        
+        log.info("Flag {} rejected (discussion approved). Discussion {} owner {} notified with URL: {}", 
+            flagId, discussion.getId(), discussionOwnerId, targetUrl);
     }
     
     /**
