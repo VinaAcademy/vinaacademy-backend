@@ -53,6 +53,16 @@ public class CourseReview extends BaseEntity {
     @Column(name = "hidden_by")
     private java.util.UUID hiddenBy;
 
+    // Hard delete field - for confirmed violations
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "deleted_at")
+    private java.time.LocalDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private java.util.UUID deletedBy;
+
     @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReviewKeyPhrase> keyPhrases = new ArrayList<>();

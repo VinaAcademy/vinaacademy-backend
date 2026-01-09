@@ -16,34 +16,48 @@ import java.util.UUID;
 @Repository
 public interface CourseReviewRepository extends JpaRepository<CourseReview, Long> {
     @Query("SELECT cr FROM CourseReview cr WHERE cr.course.id = :courseId " +
-           "AND (cr.isHidden = false OR cr.isHidden IS NULL)")
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
     Page<CourseReview> findByCourseId(@Param("courseId") UUID courseId, Pageable pageable);
 
     @Query("SELECT cr FROM CourseReview cr WHERE cr.user.id = :userId " +
-           "AND (cr.isHidden = false OR cr.isHidden IS NULL)")
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
     List<CourseReview> findByUserId(@Param("userId") UUID userId);
 
-    Optional<CourseReview> findByCourseIdAndUserId(UUID courseId, UUID userId);
+    @Query("SELECT cr FROM CourseReview cr WHERE cr.course.id = :courseId " +
+           "AND cr.user.id = :userId " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
+    Optional<CourseReview> findByCourseIdAndUserId(@Param("courseId") UUID courseId, @Param("userId") UUID userId);
 
-    boolean existsByCourseIdAndUserId(UUID courseId, UUID userId);
+    @Query("SELECT CASE WHEN COUNT(cr) > 0 THEN true ELSE false END FROM CourseReview cr " +
+           "WHERE cr.course.id = :courseId AND cr.user.id = :userId " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
+    boolean existsByCourseIdAndUserId(@Param("courseId") UUID courseId, @Param("userId") UUID userId);
 
     Optional<CourseReview> findByIdAndUserId(Long id, UUID userId);
 
     @Query("SELECT COUNT(cr) FROM CourseReview cr WHERE cr.course.id = :courseId " +
-           "AND (cr.isHidden = false OR cr.isHidden IS NULL)")
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
     Long countByCourseId(@Param("courseId") UUID courseId);
 
     @Query("SELECT AVG(cr.rating) FROM CourseReview cr WHERE cr.course.id = :courseId " +
-           "AND (cr.isHidden = false OR cr.isHidden IS NULL)")
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
     Double calculateAverageRatingByCourseId(@Param("courseId") UUID courseId);
 
     @Query("SELECT cr.rating as rating, COUNT(cr) as count FROM CourseReview cr " +
             "WHERE cr.course.id = :courseId " +
             "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+            "AND (cr.isDeleted = false OR cr.isDeleted IS NULL) " +
             "GROUP BY cr.rating ORDER BY cr.rating")
     List<Object[]> countRatingsByCourseId(@Param("courseId") UUID courseId);
 
-    boolean existsByIdAndUserId(Long id, UUID userId);
+    @Query("SELECT CASE WHEN COUNT(cr) > 0 THEN true ELSE false END FROM CourseReview cr " +
+           "WHERE cr.id = :id AND cr.user.id = :userId " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
+    boolean existsByIdAndUserId(@Param("id") Long id, @Param("userId") UUID userId);
 
     @Modifying
     @Query("UPDATE CourseReview cr SET cr.rating = :rating, cr.review = :review, " +
@@ -59,6 +73,7 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
     @Query("SELECT cr FROM CourseReview cr " +
            "WHERE cr.course.id IN :courseIds " +
            "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL) " +
            "ORDER BY cr.createdDate DESC")
     Page<CourseReview> findRecentReviewsByCourseIds(
             @Param("courseIds") List<UUID> courseIds,
@@ -98,7 +113,8 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
      * Dùng cho dashboard recent activities
      */
     @Query("SELECT cr FROM CourseReview cr " +
-           "WHERE cr.isHidden = false OR cr.isHidden IS NULL " +
+           "WHERE (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL) " +
            "ORDER BY cr.createdDate DESC")
     Page<CourseReview> findRecentReviews(Pageable pageable);
     
@@ -107,8 +123,19 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
      */
     @Query("SELECT COUNT(cr) FROM CourseReview cr " +
            "WHERE cr.createdDate >= :startDate " +
-           "AND (cr.isHidden = false OR cr.isHidden IS NULL)")
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
     Long countReviewsSince(@Param("startDate") LocalDateTime startDate);
+
+    /**
+     * Mark review as deleted (for confirmed violations)
+     */
+    @Modifying
+    @Query("UPDATE CourseReview cr SET cr.isDeleted = true, " +
+           "cr.deletedAt = :deletedAt, cr.deletedBy = :deletedBy WHERE cr.id = :id")
+    int markAsDeleted(@Param("id") Long id,
+                      @Param("deletedAt") LocalDateTime deletedAt,
+                      @Param("deletedBy") UUID deletedBy);
 
 }
 

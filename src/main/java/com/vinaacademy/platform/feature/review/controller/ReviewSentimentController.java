@@ -1,7 +1,6 @@
 package com.vinaacademy.platform.feature.review.controller;
 
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vinaacademy.platform.feature.common.response.ApiResponse;
+import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.course.service.CourseManagementService;
 import com.vinaacademy.platform.feature.review.dto.sentiment.FlaggedReviewDto;
 import com.vinaacademy.platform.feature.review.dto.sentiment.ModerationActionRequest;
@@ -191,15 +191,15 @@ public class ReviewSentimentController {
         Long reviewId = flag.getReview().getId();
         
         if ("approve".equalsIgnoreCase(request.getAction())) {
-            // APPROVE = Xác nhận vi phạm → ẨN review
+            // APPROVE = Xác nhận vi phạm → MARK AS DELETED (isHidden giữ nguyên)
             flag.approve(moderatorId, request.getNotes());
             
-            // Ẩn review thay vì xóa
-            courseReviewService.hideReview(reviewId, request.getNotes(), moderatorId);
+            // Mark review as deleted (isHidden đã là true từ auto-flag rồi)
+            courseReviewService.markReviewAsDeleted(reviewId, moderatorId);
             
             // Gửi thông báo cho người dùng
            NotificationCreateEvent notification = NotificationCreateEvent.builder()
-               .title("Đánh giá của bạn đã bị ẩn do vi phạm")
+               .title("Đánh giá của bạn đã bị xóa do vi phạm")
                .content("Lý do: " + request.getNotes())
                .targetUrl(null)
                .userId(reviewOwnerId)
@@ -207,13 +207,29 @@ public class ReviewSentimentController {
                .build();
 
            notificationProducer.sendNotification(notification);
-           log.info("Đã ẩn review {} và gửi thông báo cho user {}", reviewId, reviewOwnerId);
+           log.info("Đã đánh dấu xóa review {} và gửi thông báo cho user {}", reviewId, reviewOwnerId);
             
         } else if ("reject".equalsIgnoreCase(request.getAction())) {
             // REJECT = Từ chối cờ, review không vi phạm → GIỮ LẠI review
             flag.reject(moderatorId, request.getNotes());
-            log.info("Đã từ chối cờ {}, giữ lại review {}", flagId, reviewId);
-            
+            log.info("Đã đồng ý review {}, giữ lại review {}", flagId, reviewId);
+
+            // Nếu review đang bị ẩn do flag trước đó thì mở lại
+            if (Boolean.TRUE.equals(flag.getReview().getIsHidden())) {
+                courseReviewService.unhideReview(reviewId, moderatorId);
+                log.info("Đã khôi phục review {} sau khi reject flag {}", reviewId, flagId);
+            }
+
+            Course course = flag.getReview().getCourse();
+            NotificationCreateEvent notification = NotificationCreateEvent.builder()
+                .title("Đánh giá của bạn không vi phạm")
+                .content("Đánh giá của bạn đã được chấp thuận và sẽ hiển thị trên khóa học " + 
+                    (course != null ? course.getName() : "") + ".")
+                .targetUrl("/courses/"+course.getSlug())
+                .userId(reviewOwnerId)
+                .type(NotificationType.SYSTEM)
+                .build();
+            notificationProducer.sendNotification(notification);
         } else {
             return ResponseEntity.badRequest().body(new ApiResponse<>(
                 "error",
