@@ -31,6 +31,9 @@ public interface CourseReviewService {
     //Ẩn đánh giá (soft delete)
     void hideReview(Long reviewId, String reason, UUID moderatorId);
 
+    //Đánh dấu review là đã xóa (cho confirmed violations)
+    void markReviewAsDeleted(Long reviewId, UUID moderatorId);
+
     //Khôi phục đánh giá bị ẩn
     void unhideReview(Long reviewId, UUID moderatorId);
 

@@ -8,6 +8,7 @@ import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentReposito
 import com.vinaacademy.platform.feature.review.dto.CourseReviewDto;
 import com.vinaacademy.platform.feature.review.dto.CourseReviewRequestDto;
 import com.vinaacademy.platform.feature.review.entity.CourseReview;
+import com.vinaacademy.platform.feature.review.entity.ReviewSentimentAnalysis;
 import com.vinaacademy.platform.feature.review.mapper.CourseReviewMapper;
 import com.vinaacademy.platform.feature.review.repository.CourseReviewRepository;
 import com.vinaacademy.platform.feature.user.UserRepository;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     @Override
     @Transactional
     public CourseReviewDto createOrUpdateReview(UUID userId, CourseReviewRequestDto requestDto) {
-        // Validation (giữ nguyên)
+        // Validation
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + userId));
 
@@ -67,11 +69,11 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         Optional<CourseReview> existingReview = courseReviewRepository.findByCourseIdAndUserId(course.getId(), userId);
 
         if (existingReview.isEmpty()) {
-            // Tạo mới - dùng save()
+            // Tạo mới
             courseReview = CourseReviewMapper.INSTANCE.toEntity(requestDto, user, course);
             courseReview = courseReviewRepository.save(courseReview);
         } else {
-            // Update - dùng update query riêng
+            // Update
             courseReview = existingReview.get();
             int updatedRows = courseReviewRepository.updateReview(
                 courseReview.getId(),
@@ -88,23 +90,58 @@ public class CourseReviewServiceImpl implements CourseReviewService {
             entityManager.refresh(courseReview);
         }
 
-        // Cập nhật rating trung bình
-        updateCourseAverageRating(course.getId());
+        // Analyze sentiment và check flag đồng bộ - trả về flag info ngay
+        SentimentAnalysisService.ModerationResult moderationResult = 
+            sentimentAnalysisService.analyzeAndCheckFlag(courseReview);
         
-        // Trigger async sentiment analysis
-        sentimentAnalysisService.analyzeReviewAsync(courseReview);
+        // Only update rating and send notifications if review is NOT flagged with negative content
+        if (!moderationResult.isHasNegativeFlag()) {
+            // Cập nhật rating trung bình
+            updateCourseAverageRating(course.getId());
+            
+            // Send notification to instructor
+            UUID instructorId = course.getInstructors().get(0).getInstructor().getId();
+            NotificationCreateEvent notification = NotificationCreateEvent.builder()
+                .title(user.getFullName() + " đã đánh giá khóa học của bạn")
+                .content("Khóa học: " + course.getName())
+                .targetUrl("/courses/" + course.getSlug())
+                .userId(instructorId)
+                .type(NotificationType.SYSTEM)
+                .build();
+            log.info("send noti review to instructor: {}, slug: {}", instructorId, course.getSlug());
+            notificationProducer.sendNotification(notification);
+        } else {
+            log.warn("Review {} has negative flag, rating update and notifications suppressed", courseReview.getId());
+            
+            // Automatically hide the review
+            int updated = courseReviewRepository.updateHiddenStatus(
+                courseReview.getId(),
+                true,
+                LocalDateTime.now(),
+                moderationResult.getFlag().getReason(),
+                null
+            );
+            
+            if (updated > 0) {
+                entityManager.refresh(courseReview);
+                log.info("Automatically hidden review {} due to moderation flag", courseReview.getId());
+            }
+        }
         
-        //send noti to instructor
-        UUID instructorId = course.getInstructors().get(0).getInstructor().getId();
-        NotificationCreateEvent notification = NotificationCreateEvent.builder()
-				.title(user.getFullName() + " đã đánh giá khóa học của bạn").content("Khóa học: "+course.getName())
-				.targetUrl("/courses/"+course.getSlug())
-				.userId(instructorId)
-				.type(NotificationType.SYSTEM).build();
-		log.info("send noti review to instructor: {}, slug: {}", instructorId, course.getSlug());
-		notificationProducer.sendNotification(notification);
-
-        return CourseReviewMapper.INSTANCE.toDto(courseReview);
+        // Map to DTO and include flag info
+        CourseReviewDto dto = CourseReviewMapper.INSTANCE.toDto(courseReview);
+        
+        // Set flag info from moderation result
+        if (moderationResult.getFlag() != null) {
+            dto.setFlagType(moderationResult.getFlag().getFlagType());
+            dto.setModerationStatus(moderationResult.getFlag().getStatus());
+            dto.setFlagSeverity(moderationResult.getFlag().getSeverity());
+        }
+        
+        // Set hidden status
+        dto.setIsHidden(courseReview.getIsHidden());
+        
+        return dto;
     }
 
     @Override
@@ -157,7 +194,17 @@ public class CourseReviewServiceImpl implements CourseReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đánh giá với ID: " + reviewId));
 
         UUID courseId = review.getCourse().getId();
-        courseReviewRepository.delete(review);
+        
+        // Soft delete: mark as deleted instead of hard delete
+        int updated = courseReviewRepository.markAsDeleted(
+            reviewId,
+            LocalDateTime.now(),
+            userId
+        );
+        
+        if (updated == 0) {
+            throw new RuntimeException("Không thể xóa đánh giá");
+        }
 
         // Cập nhật đánh giá trung bình của khóa học
         updateCourseAverageRating(courseId);
@@ -189,8 +236,44 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
         // Cập nhật rating trung bình của khóa học (loại trừ review bị ẩn)
         updateCourseAverageRating(review.getCourse().getId());
+        
+        // Send notification to review owner
+        UUID reviewOwnerId = review.getUser().getId();
+        NotificationCreateEvent notification = NotificationCreateEvent.builder()
+            .title("Đánh giá của bạn đã bị ẩn do vi phạm chuẩn mực")
+            .content("Lý do: " + (reason != null ? reason : "Vi phạm tiêu chuẩn cộng đồng"))
+            .targetUrl(null)
+            .userId(reviewOwnerId)
+            .type(NotificationType.SYSTEM)
+            .build();
+        
+        notificationProducer.sendNotification(notification);
 
-        log.info("Đã ẩn đánh giá {} bởi moderator {}. Lý do: {}", reviewId, moderatorId, reason);
+        log.info("Đã ẩn đánh giá {} bởi moderator {}. Lý do: {}. Gửi notification cho user {}", 
+            reviewId, moderatorId, reason, reviewOwnerId);
+    }
+
+    @Override
+    @Transactional
+    public void markReviewAsDeleted(Long reviewId, UUID moderatorId) {
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đánh giá với ID: " + reviewId));
+
+        // Đánh dấu là đã xóa (isHidden giữ nguyên - đã là true từ auto-flag)
+        int updated = courseReviewRepository.markAsDeleted(
+            reviewId,
+            LocalDateTime.now(),
+            moderatorId
+        );
+
+        if (updated == 0) {
+            throw new RuntimeException("Không thể đánh dấu xóa đánh giá");
+        }
+
+        // Cập nhật rating trung bình của khóa học (loại trừ review bị xóa)
+        updateCourseAverageRating(review.getCourse().getId());
+
+        log.info("Đã đánh dấu xóa đánh giá {} bởi moderator {}", reviewId, moderatorId);
     }
 
     @Override

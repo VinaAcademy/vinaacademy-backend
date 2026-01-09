@@ -36,14 +36,61 @@ public class SentimentAnalysisService {
     private final CourseReviewRepository reviewRepository;
     
     // Thresholds for toxicity detection
-    private static final BigDecimal TOXIC_THRESHOLD = new BigDecimal("0.85");
-    private static final BigDecimal HIGH_NEGATIVE_THRESHOLD = new BigDecimal("0.90");
+    private static final BigDecimal TOXIC_THRESHOLD = new BigDecimal("0.6");
+    private static final BigDecimal HIGH_NEGATIVE_THRESHOLD = new BigDecimal("0.8");
     
     // Patterns for detecting toxic content (basic, can be extended)
     private static final List<Pattern> TOXIC_PATTERNS = Arrays.asList(
         Pattern.compile("\\b(ngu|đần|óc chó|đồ ngu|khốn nạn)\\b", Pattern.CASE_INSENSITIVE),
         Pattern.compile("\\b(fuck|shit|damn|bitch|asshole)\\b", Pattern.CASE_INSENSITIVE)
     );
+    
+    /**
+     * Phân tích cảm xúc đồng bộ - trả về sentiment và flag info ngay lập tức
+     * Dùng cho createOrUpdateReview để quyết định có update rating/noti hay không
+     */
+    @Transactional
+    public ModerationResult analyzeAndCheckFlag(CourseReview review) {
+        try {
+            if (review == null || review.getReview() == null || review.getReview().trim().isEmpty()) {
+                return new ModerationResult(false, null);
+            }
+            
+            // Check if LangAI service is available
+            if (!langAiClient.isServiceAvailable()) {
+                log.warn("LangAI Service not available, skipping analysis for review {}", review.getId());
+                return new ModerationResult(false, null);
+            }
+            
+            // 1. Analyze sentiment synchronously
+            LangAiSentimentResponse sentimentResponse = langAiClient.analyzeSentiment(
+                review.getReview(),
+                "vi"
+            );
+            
+            // 2. Save sentiment analysis
+            ReviewSentimentAnalysis sentiment = saveSentimentAnalysis(review, sentimentResponse);
+            
+            // 3. Extract and save key phrases
+            LangAiKeyPhrasesResponse phrasesResponse = langAiClient.extractKeyPhrases(
+                review.getReview(),
+                "vi"
+            );
+            saveKeyPhrases(review, phrasesResponse, sentiment.getSentiment());
+            
+            // 4. Check and flag review
+            ModerationResult result = checkAndFlagReview(review, sentiment);
+            
+            // 5. Update statistics
+            statisticsService.updateCourseStatistics(review.getCourse().getId());
+            
+            return result;
+            
+        } catch (Exception e) {
+            log.error("Error in synchronous analysis for review {}: {}", review.getId(), e.getMessage(), e);
+            return new ModerationResult(false, null);
+        }
+    }
     
     /**
      * Phân tích đánh giá bất đồng bộ
@@ -94,7 +141,10 @@ public class SentimentAnalysisService {
             saveKeyPhrases(review, phrasesResponse, sentiment.getSentiment());
             
             // 4. Tự động gắn cờ nếu cần
-            checkAndFlagReview(review, sentiment);
+            ModerationResult flagResult = checkAndFlagReview(review, sentiment);
+            if (flagResult.isHasNegativeFlag()) {
+                log.warn("Review {} được gắn cờ tiêu cực từ async analysis", review.getId());
+            }
             
             // 5. Cập nhật cache thống kê khóa học
             statisticsService.updateCourseStatistics(review.getCourse().getId());
@@ -279,10 +329,11 @@ public class SentimentAnalysisService {
      * Kiểm tra xem đánh giá có nên được gắn cờ để kiểm duyệt không
     /**
      * Tự động gắn cờ kiểm duyệt nếu phát hiện nội dung vi phạm
-     * Transaction được quản lý riêng
+     * Được gọi cả từ sync (createOrUpdateReview) và async (analyzeReviewAsync) context
+     * Trả về ModerationResult với flag info
      */
     @Transactional
-    private void checkAndFlagReview(CourseReview review, ReviewSentimentAnalysis sentiment) {
+    public ModerationResult checkAndFlagReview(CourseReview review, ReviewSentimentAnalysis sentiment) {
         List<ReviewModerationFlag> flags = new ArrayList<>();
         
         // Kiểm tra tính độc hại
@@ -320,10 +371,32 @@ public class SentimentAnalysisService {
             );
             
             if (!hasPendingFlag) {
-                flagRepository.saveAll(flags);
-                log.info("Đã tạo {} cờ kiểm duyệt cho đánh giá {}", flags.size(), review.getId());
+                // Get the most severe flag only
+                ReviewModerationFlag mostSevereFlag = flags.stream()
+                    .max(Comparator.comparing(ReviewModerationFlag::getSeverity))
+                    .orElse(null);
+                
+                if (mostSevereFlag != null) {
+                    flagRepository.save(mostSevereFlag);
+                    log.info("Đã tạo cờ kiểm duyệt {} cho đánh giá {}", mostSevereFlag.getFlagType(), review.getId());
+                    
+                    // Check if flag is negative type
+                    boolean hasNegativeFlag = isNegativeFlag(mostSevereFlag.getFlagType());
+                    return new ModerationResult(hasNegativeFlag, mostSevereFlag);
+                }
             }
         }
+        
+        return new ModerationResult(false, null);
+    }
+    
+    /**
+     * Check if flag type is negative (should suppress notifications and not update rating)
+     */
+    private boolean isNegativeFlag(FlagType flagType) {
+        return flagType == FlagType.TOXIC || 
+               flagType == FlagType.EXTREME_NEGATIVE ||
+               flagType == FlagType.ABUSIVE;
     }
     
     /**
@@ -369,5 +442,15 @@ public class SentimentAnalysisService {
     public void reanalyzeReview(Long reviewId) {
         // Triển khai cho phân tích lại thủ công nếu cần
         log.info("Đã yêu cầu phân tích lại thủ công cho đánh giá {}", reviewId);
+    }
+    
+    /**
+     * Result wrapper for moderation check
+     */
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    public static class ModerationResult {
+        private boolean hasNegativeFlag;
+        private ReviewModerationFlag flag; // null if no flag created
     }
 }

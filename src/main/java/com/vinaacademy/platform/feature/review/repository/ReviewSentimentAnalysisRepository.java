@@ -29,21 +29,31 @@ public interface ReviewSentimentAnalysisRepository extends JpaRepository<ReviewS
     @Query("SELECT rsa FROM ReviewSentimentAnalysis rsa " +
            "JOIN rsa.review r " +
            "WHERE r.course.id = :courseId " +
-           "AND rsa.deletedAt IS NULL")
-    List<ReviewSentimentAnalysis> findByCourseId(@Param("courseId") UUID courseId);
+           "AND rsa.deletedAt IS NULL " +
+           "AND (r.isDeleted = false OR r.isDeleted IS NULL) " +
+           "AND NOT EXISTS (" +
+           "   SELECT 1 FROM ReviewModerationFlag f " +
+           "   WHERE f.review.id = r.id AND f.status IN ('PENDING', 'APPROVED')" +
+           ")")
+    List<ReviewSentimentAnalysis> findVisibleByCourseId(@Param("courseId") UUID courseId);
     
     /**
      * Find sentiment analyses by course and sentiment type
      */
-    @Query("SELECT rsa FROM ReviewSentimentAnalysis rsa " +
-           "JOIN rsa.review r " +
-           "WHERE r.course.id = :courseId " +
-           "AND rsa.sentiment = :sentiment " +
-           "AND rsa.deletedAt IS NULL")
-    List<ReviewSentimentAnalysis> findByCourseIdAndSentiment(
-        @Param("courseId") UUID courseId,
-        @Param("sentiment") SentimentType sentiment
-    );
+       @Query("SELECT rsa FROM ReviewSentimentAnalysis rsa " +
+                 "JOIN rsa.review r " +
+                 "WHERE r.course.id = :courseId " +
+                 "AND rsa.sentiment = :sentiment " +
+                 "AND rsa.deletedAt IS NULL " +
+                 "AND (r.isDeleted = false OR r.isDeleted IS NULL) " +
+                 "AND NOT EXISTS (" +
+                 "   SELECT 1 FROM ReviewModerationFlag f " +
+                 "   WHERE f.review.id = r.id AND f.status IN ('PENDING', 'APPROVED')" +
+                 ")")
+       List<ReviewSentimentAnalysis> findVisibleByCourseIdAndSentiment(
+              @Param("courseId") UUID courseId,
+              @Param("sentiment") SentimentType sentiment
+       );
     
     /**
      * Find toxic reviews for a course
@@ -52,7 +62,8 @@ public interface ReviewSentimentAnalysisRepository extends JpaRepository<ReviewS
            "JOIN rsa.review r " +
            "WHERE r.course.id = :courseId " +
            "AND rsa.isToxic = true " +
-           "AND rsa.deletedAt IS NULL")
+           "AND rsa.deletedAt IS NULL " +
+           "AND (r.isDeleted = false OR r.isDeleted IS NULL)")
     List<ReviewSentimentAnalysis> findToxicReviewsByCourseId(@Param("courseId") UUID courseId);
     
     /**
@@ -62,6 +73,7 @@ public interface ReviewSentimentAnalysisRepository extends JpaRepository<ReviewS
            "JOIN rsa.review r " +
            "WHERE r.course.id = :courseId " +
            "AND rsa.deletedAt IS NULL " +
+           "AND (r.isDeleted = false OR r.isDeleted IS NULL) " +
            "GROUP BY rsa.sentiment")
     List<Object[]> countBySentimentForCourse(@Param("courseId") UUID courseId);
     
@@ -73,6 +85,7 @@ public interface ReviewSentimentAnalysisRepository extends JpaRepository<ReviewS
            "WHERE r.course.id = :courseId " +
            "AND rsa.analyzedAt BETWEEN :startDate AND :endDate " +
            "AND rsa.deletedAt IS NULL " +
+           "AND (r.isDeleted = false OR r.isDeleted IS NULL) " +
            "ORDER BY rsa.analyzedAt DESC")
     List<ReviewSentimentAnalysis> findByCourseIdAndDateRange(
         @Param("courseId") UUID courseId,
@@ -90,7 +103,8 @@ public interface ReviewSentimentAnalysisRepository extends JpaRepository<ReviewS
            "FROM ReviewSentimentAnalysis rsa " +
            "JOIN rsa.review r " +
            "WHERE r.course.id = :courseId " +
-           "AND rsa.deletedAt IS NULL")
+           "AND rsa.deletedAt IS NULL " +
+           "AND (r.isDeleted = false OR r.isDeleted IS NULL)")
     Object[] calculateAverageScores(@Param("courseId") UUID courseId);
     
     /**
