@@ -8,6 +8,7 @@ import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
 import com.vinaacademy.platform.feature.course.enums.LessonStatus;
 import com.vinaacademy.platform.feature.course.repository.CourseRepository;
+import com.vinaacademy.platform.feature.course.repository.UserProgressRepository;
 import com.vinaacademy.platform.feature.discussion.entity.Discussion;
 import com.vinaacademy.platform.feature.discussion.repository.DiscussionRepository;
 import com.vinaacademy.platform.feature.enrollment.Enrollment;
@@ -16,11 +17,19 @@ import com.vinaacademy.platform.feature.enrollment.repository.EnrollmentReposito
 import com.vinaacademy.platform.feature.instructor.CourseInstructor;
 import com.vinaacademy.platform.feature.instructor.repository.CourseInstructorRepository;
 import com.vinaacademy.platform.feature.lesson.entity.Lesson;
+import com.vinaacademy.platform.feature.lesson.entity.UserProgress;
 import com.vinaacademy.platform.feature.migration.CategoryMigrationService;
 import com.vinaacademy.platform.feature.migration.data.CourseData;
 import com.vinaacademy.platform.feature.migration.data.DiscussionData;
 import com.vinaacademy.platform.feature.migration.data.ReviewData;
 import com.vinaacademy.platform.feature.migration.data.VideoData;
+import com.vinaacademy.platform.feature.order_payment.entity.Order;
+import com.vinaacademy.platform.feature.order_payment.entity.OrderItem;
+import com.vinaacademy.platform.feature.order_payment.entity.Payment;
+import com.vinaacademy.platform.feature.order_payment.enums.OrderStatus;
+import com.vinaacademy.platform.feature.order_payment.enums.PaymentStatus;
+import com.vinaacademy.platform.feature.order_payment.repository.OrderRepository;
+import com.vinaacademy.platform.feature.order_payment.repository.PaymentRepository;
 import com.vinaacademy.platform.feature.quiz.entity.Quiz;
 import com.vinaacademy.platform.feature.quiz.repository.AnswerRepository;
 import com.vinaacademy.platform.feature.quiz.repository.QuestionRepository;
@@ -76,6 +85,9 @@ public class CourseMockService {
     private final AnswerRepository answerRepository;
     private final VideoRepository videoRepository;
     private final RevenueRecordRepository revenueRecordRepository;
+    private final UserProgressRepository userProgressRepository;
+    private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
     private final QuizMockDataService quizMockDataService;
     private final StudentMockService studentMockService;
     private final EntityManager entityManager;
@@ -211,9 +223,44 @@ public class CourseMockService {
                             .completedLessons(completedLessons)
                             .startAt(startTime)
                             .build();
-                    enrollmentRepository.save(enrollment);
+                    enrollment = enrollmentRepository.save(enrollment);
 
                     if (price.compareTo(BigDecimal.ZERO) > 0) {
+                        // Create Order
+                        Order order = Order.builder()
+                                .status(OrderStatus.PAID)
+                                .subTotal(price)
+                                .totalAmount(price)
+                                .discountAmount(BigDecimal.ZERO)
+                                .user(student)
+                                .orderItems(new ArrayList<>())
+                                .build();
+                        order.setCreatedDate(startTime);
+
+                        // Add Order Item
+                        OrderItem item = OrderItem.builder()
+                                .order(order)
+                                .course(course)
+                                .price(price)
+                                .build();
+                        order.addOrderItem(item);
+                        order = orderRepository.save(order);
+
+                        // Create Payment
+                        Payment payment = Payment.builder()
+                                .order(order)
+                                .amount(price)
+                                .createdAt(startTime)
+                                .paymentMethod("VNPAY")
+                                .paymentStatus(PaymentStatus.COMPLETED)
+                                .transactionId(UUID.randomUUID().toString())
+                                .build();
+                        payment.setCreatedDate(startTime);
+                        payment = paymentRepository.save(payment);
+                        
+                        order.setPayment(payment);
+                        orderRepository.save(order);
+
                         BigDecimal instructorPercent = BigDecimal.valueOf(0.7);
                         BigDecimal instructorEarning = price.multiply(instructorPercent);
                         BigDecimal platformFee = price.subtract(instructorEarning);
@@ -221,7 +268,7 @@ public class CourseMockService {
                         RevenueRecord revenueRecord = RevenueRecord.builder()
                                 .courseId(course.getId())
                                 .enrollmentId(enrollment.getId())
-                                .paymentId(UUID.randomUUID())
+                                .paymentId(payment.getId())
                                 .instructorId(instructor.getId())
                                 .studentId(student.getId())
                                 .totalAmount(price)
@@ -231,7 +278,7 @@ public class CourseMockService {
                                 .status(RevenueStatus.ACTIVE)
                                 .vnpayTxnRef(UUID.randomUUID().toString())
                                 .vnpayResponseCode("00")
-                                .vnpayTransactionNo(UUID.randomUUID().toString())
+                                .vnpayTransactionNo(payment.getTransactionId())
                                 .vnpayOrderInfo("Payment for course " + name)
                                 .vnpayAmount(price.multiply(BigDecimal.valueOf(100)))
                                 .build();
@@ -325,6 +372,24 @@ public class CourseMockService {
 
                 // Add questions and answers to the quiz
                 quizMockDataService.createQuizQuestions(quiz, name, category.getName());
+
+                // Create UserProgress for lessons (excluding Quiz)
+                List<Lesson> nonQuizLessons = new ArrayList<>();
+                nonQuizLessons.add(welcomeVideo);
+                nonQuizLessons.add(reading);
+
+                for (User student : students) {
+                    for (Lesson lesson : nonQuizLessons) {
+                        boolean completed = ThreadLocalRandom.current().nextBoolean();
+                        UserProgress progress = UserProgress.builder()
+                                .user(student)
+                                .lesson(lesson)
+                                .completed(completed)
+                                .lastWatchedTime(completed ? ThreadLocalRandom.current().nextLong(60, 600) : 0L)
+                                .build();
+                        userProgressRepository.save(progress);
+                    }
+                }
 
                 count++;
                 if (count % 10 == 0) {
