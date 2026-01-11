@@ -22,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +47,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     private static final String ROLE_INSTRUCTOR = "instructor";
     private static final String ROLE_STUDENT = "student";
-    private static final BigDecimal PLATFORM_FEE_RATE = new BigDecimal("0.20"); // 20%
+    private static final BigDecimal PLATFORM_FEE_RATE = new BigDecimal("0.30"); // 30%
 
     @Override
     public PlatformStatsDto getPlatformStats(String timeRange) {
@@ -434,7 +436,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
             return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
         }
 
-        return (parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
+        return (parts[0].charAt(0) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
     }
 
     /**
