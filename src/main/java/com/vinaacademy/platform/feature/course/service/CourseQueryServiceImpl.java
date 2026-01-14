@@ -271,7 +271,11 @@ public class CourseQueryServiceImpl implements CourseQueryService {
 
     Specification<Course> spec = CourseSpecBuilder.buildPublicSearch(searchRequest);
     Page<Course> coursePage = courseRepository.findAll(spec, pageable);
-    return coursePage.map(courseMapper::toDTO);
+    return coursePage.map(course -> {
+      CourseDto dto = courseMapper.toDTO(course);
+      dto.setNameInstructorOwner(courseMapper.extractOwnerInstructorName(course));
+      return dto;
+    });
   }
 
   @Override

@@ -23,6 +23,20 @@ public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecif
     Optional<Course> findBySlug(String slug);
 
     /**
+     * Find course by slug with instructors to avoid N+1 queries
+     */
+    @EntityGraph(attributePaths = {"instructors", "instructors.instructor"})
+    @Query("SELECT c FROM Course c WHERE c.slug = :slug")
+    Optional<Course> findBySlugWithInstructors(@Param("slug") String slug);
+
+    /**
+     * Find course by ID with instructors to avoid N+1 queries
+     */
+    @EntityGraph(attributePaths = {"instructors", "instructors.instructor"})
+    @Query("SELECT c FROM Course c WHERE c.id = :id")
+    Optional<Course> findByIdWithInstructors(@Param("id") UUID id);
+
+    /**
      * Check if a course exists with the given slug excluding a specific course ID
      * Used for slug uniqueness validation during updates
      */

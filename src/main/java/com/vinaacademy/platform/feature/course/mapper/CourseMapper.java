@@ -14,6 +14,7 @@ public interface CourseMapper {
     CourseMapper INSTANCE = Mappers.getMapper(CourseMapper.class);
 
     @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(target = "nameInstructorOwner", ignore = true)
     CourseDto toDTO(Course course);
     
     @Mapping(source = "category.name", target = "categoryName")
@@ -31,4 +32,19 @@ public interface CourseMapper {
     @Mapping(target = "sections", ignore = true)
     @Mapping(target = "id", ignore = true)
     Course toEntity(CourseRequest courseDto);
+
+    /**
+     * Helper method to extract owner instructor name from course
+     * Should be called after mapping to set nameInstructorOwner field
+     */
+    default String extractOwnerInstructorName(Course course) {
+        if (course == null || course.getInstructors() == null || course.getInstructors().isEmpty()) {
+            return null;
+        }
+        return course.getInstructors().stream()
+                .filter(ci -> ci != null && Boolean.TRUE.equals(ci.getIsOwner()))
+                .map(ci -> ci.getInstructor() != null ? ci.getInstructor().getFullName() : null)
+                .findFirst()
+                .orElse(null);
+    }
 }
