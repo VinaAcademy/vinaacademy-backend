@@ -20,6 +20,16 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
            "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
     Page<CourseReview> findByCourseId(@Param("courseId") UUID courseId, Pageable pageable);
 
+    @Query("SELECT cr FROM CourseReview cr WHERE cr.course.id = :courseId " +
+           "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
+           "AND (cr.isDeleted = false OR cr.isDeleted IS NULL) " +
+           "ORDER BY CASE WHEN cr.user.id = :currentUserId THEN 0 ELSE 1 END, " +
+           "cr.updatedDate DESC")
+    Page<CourseReview> findByCourseIdWithUserPriority(
+            @Param("courseId") UUID courseId,
+            @Param("currentUserId") UUID currentUserId,
+            Pageable pageable);
+
     @Query("SELECT cr FROM CourseReview cr WHERE cr.user.id = :userId " +
            "AND (cr.isHidden = false OR cr.isHidden IS NULL) " +
            "AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")

@@ -158,6 +158,24 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<CourseReviewDto> getCourseReviewsWithUserPriority(UUID courseId, UUID currentUserId, Pageable pageable) {
+        // Kiểm tra khóa học tồn tại
+        if (!courseRepository.existsById(courseId)) {
+            throw new ResourceNotFoundException("Không tìm thấy khóa học với ID: " + courseId);
+        }
+
+        if (currentUserId != null) {
+            Page<CourseReview> reviewPage = courseReviewRepository.findByCourseIdWithUserPriority(courseId, currentUserId, pageable);
+            return reviewPage.map(CourseReviewMapper.INSTANCE::toDto);
+        }
+        
+        // Nếu không có currentUserId, lấy tất cả reviews bình thường
+        Page<CourseReview> reviewPage = courseReviewRepository.findByCourseId(courseId, pageable);
+        return reviewPage.map(CourseReviewMapper.INSTANCE::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<CourseReviewDto> getUserReviews(UUID userId) {
         // Kiểm tra người dùng tồn tại
         if (!userRepository.existsById(userId)) {

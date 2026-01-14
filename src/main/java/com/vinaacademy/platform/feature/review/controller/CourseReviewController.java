@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,9 +70,13 @@ public class CourseReviewController {
     @GetMapping("/course/{courseId}")
     public ResponseEntity<ApiResponse<Page<CourseReviewDto>>> getCourseReviews(
             @PathVariable UUID courseId,
-            @PageableDefault(size = 10, sort = "createdDate") Pageable pageable) {
+            @PageableDefault(size = 10, sort = "updatedDate", direction = Direction.DESC) Pageable pageable) {
 
-        Page<CourseReviewDto> reviews = courseReviewService.getCourseReviews(courseId, pageable);
+        UUID currentUserId = SecurityContextHolder.getContext().getAuthentication() != null 
+                ? securityHelper.getCurrentUser().getId() 
+                : null;
+
+        Page<CourseReviewDto> reviews = courseReviewService.getCourseReviewsWithUserPriority(courseId, currentUserId, pageable);
 
         log.info("Lấy {} đánh giá cho khóa học {}", reviews.getTotalElements(), courseId);
 

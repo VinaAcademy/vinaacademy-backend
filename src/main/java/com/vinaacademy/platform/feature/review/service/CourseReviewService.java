@@ -16,6 +16,9 @@ public interface CourseReviewService {
     //Lấy tất cả đánh giá của một khóa học với phân trang
     Page<CourseReviewDto> getCourseReviews(UUID courseId, Pageable pageable);
 
+    //Lấy đánh giá của khóa học, ưu tiên đánh giá của currentUser, rồi sort theo updatedDate DESC
+    Page<CourseReviewDto> getCourseReviewsWithUserPriority(UUID courseId, UUID currentUserId, Pageable pageable);
+
     //Lấy tất cả đánh giá của một người dùng
     List<CourseReviewDto> getUserReviews(UUID userId);
 
