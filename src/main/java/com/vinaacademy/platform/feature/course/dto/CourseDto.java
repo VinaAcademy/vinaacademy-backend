@@ -55,5 +55,7 @@ public class CourseDto extends BaseDto {
     private EnrollmentProgressDto progress;
 
     private List<SectionDto> sections;
+    
+    private String nameInstructorOwner;
 
 }
