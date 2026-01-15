@@ -12,7 +12,6 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -87,6 +86,14 @@ public class Course extends BaseEntity {
   @Builder.Default
   private long totalLesson = 0;
 
+  @OneToOne(
+      mappedBy = "course",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @Builder.Default
+  private CourseEstimatedTime estimatedTimeInfo = null;
+
   @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderColumn(name = "order_index")
   @Builder.Default
@@ -128,5 +135,26 @@ public class Course extends BaseEntity {
   public int hashCode() {
     // Stable across proxies and before persisting (when id is null)
     return getClass().hashCode();
+  }
+
+  /**
+   * Convenience accessor to get estimated time with default fallback.
+   */
+  public Integer getEstimatedTime() {
+    return estimatedTimeInfo != null && estimatedTimeInfo.getEstimatedTime() != null
+        ? estimatedTimeInfo.getEstimatedTime()
+        : 1;
+  }
+
+  /**
+   * Upsert estimated time entry; keeps default 1 when null provided.
+   */
+  public void updateEstimatedTime(Integer estimatedTime) {
+    Integer value = estimatedTime != null ? estimatedTime : 1;
+    if (this.estimatedTimeInfo == null) {
+      this.estimatedTimeInfo = CourseEstimatedTime.builder().course(this).estimatedTime(value).build();
+    } else {
+      this.estimatedTimeInfo.setEstimatedTime(value);
+    }
   }
 }

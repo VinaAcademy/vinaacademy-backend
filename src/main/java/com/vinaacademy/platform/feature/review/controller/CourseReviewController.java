@@ -23,6 +23,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/course-reviews")
 @RequiredArgsConstructor
 @Slf4j
-@SecurityRequirement(name = "bearerAuth")
+//@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Course Review API", description = "API đánh giá khóa học")
 public class CourseReviewController {
     private final CourseReviewService courseReviewService;
@@ -71,8 +72,9 @@ public class CourseReviewController {
     public ResponseEntity<ApiResponse<Page<CourseReviewDto>>> getCourseReviews(
             @PathVariable UUID courseId,
             @PageableDefault(size = 10, sort = "updatedDate", direction = Direction.DESC) Pageable pageable) {
-
-        UUID currentUserId = SecurityContextHolder.getContext().getAuthentication() != null 
+    	var a = SecurityContextHolder.getContext().getAuthentication();
+    	String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID currentUserId = !SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ANONYMOUS")) 
                 ? securityHelper.getCurrentUser().getId() 
                 : null;
 
@@ -151,7 +153,6 @@ public class CourseReviewController {
     }
 
     @Operation(summary = "Kiểm tra người dùng đã đánh giá khóa học chưa")
-    @HasAnyRole({AuthConstants.STUDENT_ROLE})
     @GetMapping("/check/course/{courseId}")
     public ResponseEntity<ApiResponse<Boolean>> hasUserReviewedCourse(
             @PathVariable UUID courseId) {

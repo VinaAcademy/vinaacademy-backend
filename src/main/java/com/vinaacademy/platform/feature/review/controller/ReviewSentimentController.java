@@ -54,7 +54,7 @@ import vn.vinaacademy.kafka.event.NotificationCreateEvent.NotificationType;
 @RequestMapping("/api/v1/reviews/sentiment")
 @RequiredArgsConstructor
 @Slf4j
-@SecurityRequirement(name = "bearerAuth")
+//@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Review Sentiment API", description = "API phân tích cảm xúc đánh giá khóa học")
 public class ReviewSentimentController {
     

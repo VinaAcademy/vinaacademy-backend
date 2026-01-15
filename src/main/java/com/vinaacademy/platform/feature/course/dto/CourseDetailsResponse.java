@@ -39,6 +39,7 @@ public class CourseDetailsResponse extends BaseDto {
     private long totalStudent;
     private long totalSection;
     private long totalLesson;
+    private Integer estimatedTime = 1;
     
     // Additional fields for detailed view
     private List<UserDto> instructors = new ArrayList<>();

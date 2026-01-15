@@ -52,6 +52,8 @@ public class CourseDto extends BaseDto {
 
     private long totalLesson;
 
+    private Integer estimatedTime = 0;
+
     private EnrollmentProgressDto progress;
 
     private List<SectionDto> sections;

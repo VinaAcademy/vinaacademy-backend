@@ -3,6 +3,8 @@ package com.vinaacademy.platform.feature.course.dto;
 
 import com.vinaacademy.platform.feature.course.enums.CourseLevel;
 import com.vinaacademy.platform.feature.course.enums.CourseStatus;
+
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,6 +43,9 @@ public class CourseRequest {
 
     @NotBlank(message = "Danh mục khóa học không được để trống")
     private String categorySlug;
-
+    
+    @Min(value = 0, message = "Uớc lượng không được nhỏ hơn 0")
+    @Max(value = 10000, message = "Uớc lượng không được lớn hơn 10000")
+    private Integer estimatedTime;
 
 }
