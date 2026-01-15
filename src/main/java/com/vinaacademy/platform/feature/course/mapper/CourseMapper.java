@@ -15,6 +15,7 @@ public interface CourseMapper {
 
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(target = "nameInstructorOwner", ignore = true)
+    @Mapping(target = "estimatedTime", expression = "java(course.getEstimatedTime())")
     CourseDto toDTO(Course course);
     
     @Mapping(source = "category.name", target = "categoryName")
@@ -23,6 +24,7 @@ public interface CourseMapper {
     @Mapping(target = "ownerInstructor", ignore = true)
     @Mapping(target = "sections", ignore = true)
     @Mapping(target = "reviews", ignore = true)
+    @Mapping(target = "estimatedTime", expression = "java(course.getEstimatedTime())")
     CourseDetailsResponse toCourseDetailsResponse(Course course);
 
     @Mapping(target = "category", ignore = true)
@@ -30,6 +32,7 @@ public interface CourseMapper {
     @Mapping(target = "enrollments", ignore = true)
     @Mapping(target = "instructors", ignore = true)
     @Mapping(target = "sections", ignore = true)
+    @Mapping(target = "estimatedTimeInfo", ignore = true)
     @Mapping(target = "id", ignore = true)
     Course toEntity(CourseRequest courseDto);
 

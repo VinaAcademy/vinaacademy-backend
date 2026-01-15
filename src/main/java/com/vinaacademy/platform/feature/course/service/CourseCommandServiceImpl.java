@@ -76,8 +76,10 @@ public class CourseCommandServiceImpl implements CourseCommandService {
                 .price(request.getPrice())
                 .rating(0)
                 .slug(slug)
-                .status(CourseStatus.DRAFT)
-                .build();
+            .status(CourseStatus.DRAFT)
+            .build();
+
+        course.updateEstimatedTime(request.getEstimatedTime());
 
         Course savedCourse = courseRepository.save(course);
         log.info("Course created successfully with ID: {} and slug: {}", savedCourse.getId(), savedCourse.getSlug());
@@ -116,6 +118,7 @@ public class CourseCommandServiceImpl implements CourseCommandService {
         course.setLanguage(request.getLanguage());
         course.setLevel(request.getLevel());
         course.setPrice(request.getPrice());
+        course.updateEstimatedTime(request.getEstimatedTime());
         if (statusSubmitForReview) {
             course.setStatus(CourseStatus.PENDING);
             List<Lesson> lessons = lessonRepository.findByCourseId(course.getId());
