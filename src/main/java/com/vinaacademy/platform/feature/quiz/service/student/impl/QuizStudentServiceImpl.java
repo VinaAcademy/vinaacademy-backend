@@ -163,8 +163,6 @@ public class QuizStudentServiceImpl implements QuizStudentService {
 
         // Create a new session
         QuizSession session = QuizSession.createNewSession(quiz, currentUser);
-        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(quiz.getTimeLimit());
-        session.setExpiryTime(expiryTime);
 
         QuizSession savedSession = quizSessionRepository.save(session);
 
