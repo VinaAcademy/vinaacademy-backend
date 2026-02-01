@@ -4,9 +4,11 @@ import com.vinaacademy.platform.feature.course.entity.Course;
 import com.vinaacademy.platform.feature.enrollment.enums.ProgressStatus;
 import com.vinaacademy.platform.feature.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +42,6 @@ public class Enrollment {
     private ProgressStatus status = ProgressStatus.IN_PROGRESS;
 
     @Column(name = "start_at", nullable = false)
-    @CreationTimestamp
     private LocalDateTime startAt;
 
     @Column(name = "complete_at")
@@ -49,6 +50,13 @@ public class Enrollment {
     @Column(name = "completed_lessons", nullable = false)
     @ColumnDefault("0")
     private long completedLessons = 0;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.startAt == null) {
+            this.startAt = LocalDateTime.now();
+        }
+    }
 
     @Override
     public String toString() {

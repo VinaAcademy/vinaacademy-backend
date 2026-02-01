@@ -1,24 +1,15 @@
 package com.vinaacademy.platform.feature.revenue.entity;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import com.vinaacademy.platform.feature.common.entity.BaseEntity;
 import com.vinaacademy.platform.feature.revenue.enums.RevenueStatus;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.UniqueConstraint;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "revenue_records",
@@ -42,7 +33,7 @@ public class RevenueRecord extends BaseEntity {
     @Column(name = "enrollment_id", nullable = false)
     private Long enrollmentId;
     
-    @Column(name = "payment_id") 
+    @Column(name = "payment_id")
     private UUID paymentId;
     
     @Column(name = "instructor_id", nullable = false)

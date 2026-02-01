@@ -28,6 +28,8 @@ public class StudentData {
                     String email = firstName + "." + uniqueSuffix + "@vnacademy.io.vn";
 
                     return User.builder()
+                            .fullName(FAKER.name().fullName())
+                            .birthday(FAKER.timeAndDate().birthday())
                             .username(username)
                             .password("$2a$12$c8xwXNrvHAKNP/Yzirb8MOV/iKnTU3J/aUqC2uCH8E3FmUJ4MUIy.")
                             .email(email)
